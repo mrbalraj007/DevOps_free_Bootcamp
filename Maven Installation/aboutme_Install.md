@@ -1,3 +1,7 @@
+# Maven LifeCycle
+![alt text](image-9.png)
+
+
 #### Environment Setup
 ```bash
 Hostname: maven
@@ -7,7 +11,7 @@ IP Address: 192.168.1.250
 *Password Less Authentication*
 
 ```bash
-To set in sudoers file
+sudoers file
 path=/etc/sudoers 
 dev-ops ALL=(ALL) NOPASSWD: ALL
 
@@ -93,4 +97,105 @@ Maven home: /usr/share/maven
 Java version: 17.0.11, vendor: Ubuntu, runtime: /usr/lib/jvm/java-17-openjdk-amd64
 Default locale: en_US, platform encoding: UTF-8
 OS name: "linux", version: "6.8.0-31-generic", arch: "amd64", family: "unix"
+```
+
+#### Maven Project
+
+[Will clone the project](https://github.com/shackverse/spyapp)
+
+will goto ```spyapp``` folder and run the following command:
+
+```bash
+$ cd spyapp/
+
+$ mvn compile
+```
+![alt text](image.png)
+
+* - compile will let you know wheather any source code error (Syntex based) in code or not.
+* - make sure, you will the compile where there pom.xl file exists.
+
+*How to test* ```(will do the compile then do the test)```.
+
+```
+ ls
+mvnw  mvnw.cmd  pom.xml  README.md  src  target
+```
+```bash
+$ mvn test
+```
+Note:- *it will download the depency which is required for testing*
+
+![alt text](image-1.png)
+
+I am getting error message because there is in issue in code, we have ```two``` option here.
+- 1. we can inform ```developer/testing team``` about the code having issue
+- 2. or we can ignore the test.
+
+How to skip the testing by using these parameter(```-DskipTests=true```)
+```bash
+$ mvn package -DskipTests=true
+```
+![alt text](image-2.png)
+
+after running the package and skipping the testing, will see what have changes.
+
+* target folder created now and inside the target folder you will get ```.jar``` file.
+```bash
+$ cd target/
+
+$/target$ ls -l
+total 23704
+-rw-rw-r-- 1 dc-ops dc-ops 24230652 Jun 21 17:06 Assignment3_MihyeBang-0.0.1-SNAPSHOT.jar # this file is generated.
+-rw-rw-r-- 1 dc-ops dc-ops    10759 Jun 21 17:05 Assignment3_MihyeBang-0.0.1-SNAPSHOT.jar.original
+drwxrwxr-x 4 dc-ops dc-ops     4096 Jun 21 16:54 classes
+drwxrwxr-x 3 dc-ops dc-ops     4096 Jun 21 16:54 generated-sources
+drwxrwxr-x 3 dc-ops dc-ops     4096 Jun 21 17:00 generated-test-sources
+drwxrwxr-x 2 dc-ops dc-ops     4096 Jun 21 17:05 maven-archiver
+drwxrwxr-x 3 dc-ops dc-ops     4096 Jun 21 16:54 maven-status
+drwxrwxr-x 2 dc-ops dc-ops     4096 Jun 21 17:01 surefire-reports
+drwxrwxr-x 3 dc-ops dc-ops     4096 Jun 21 17:00 test-classes
+```
+we can run the jar file by using below- 
+
+we are still in ```target``` folder and will execute command from there.
+```bash
+$ java -jar Assignment3_MihyeBang-0.0.1-SNAPSHOT.jar
+```
+![alt text](image-3.png)
+
+now, we will try to access it ```http://192.168.1.250:8080/``` and it's accessible.
+
+![alt text](image-4.png)
+
+![alt text](image-6.png)
+
+* application is working fine.
+
+Note-- In package, all the artificates are store in target folder.
+
+
+- now, we will install
+ will out from target folder and current path is:
+```bash
+ /spyapp$ ls -l
+total 36
+-rw-rw-r-- 1 dc-ops dc-ops 10070 Jun 21 16:46 mvnw
+-rw-rw-r-- 1 dc-ops dc-ops  6608 Jun 21 16:46 mvnw.cmd
+-rw-rw-r-- 1 dc-ops dc-ops  1968 Jun 21 16:46 pom.xml
+-rw-rw-r-- 1 dc-ops dc-ops   656 Jun 21 16:46 README.md
+drwxrwxr-x 4 dc-ops dc-ops  4096 Jun 21 16:46 src
+drwxrwxr-x 9 dc-ops dc-ops  4096 Jun 21 17:06 target
+```
+```bash
+$ mvn install -DskipTests=true
+```
+![alt text](image-7.png)
+
+
+Now, we will see in deploy:
+
+If you want to clean the target folder then you need to run the below:
+```bash
+mvn clean package -DskipTests=true
 ```
