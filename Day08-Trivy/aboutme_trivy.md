@@ -1,4 +1,4 @@
-# What is Trivy tool and how to use it?
+# What is Trivy and how to use it?
 ---
 
 ## About Trivy:
