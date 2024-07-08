@@ -93,13 +93,92 @@ docker pull sonarqube:lts-community
 trivy image --format table -o trivy-image-report.html sonarqube:lts-community
 ```
 
+### Using Jenkins:
+
+- configure the ```maven``` first.
+
+Dashboard > Manage Jenkins> Tools:
+
+click on add under Maven installations.
+```bash
+name: maven3
+Version: 3.9.8
+```
+![alt text](image-2.png)
 
 
+will use Jenkins on the same server and create a declarative pipeline.
 
+- <span style="color: red;">Here we have scan the FS only </span>
+```bash
+pipeline {
+    agent any
+    tools {
+        maven 'maven3'
+          } 
+    stages {
+        stage('Git CheckOut') {
+            steps {
+                git branch: 'main', url: 'https://github.com/mrbalraj007/Boardgame.git'
+            }
+        }
+    stage('Compile and Test') {
+            steps {
+                sh 'mvn test'
+            }
+        } 
+    stage('Trivy FS Scan') {
+            steps {
+                sh 'trivy fs --format table -o trivy-fsreport.html .'
+            }
+        }
+    }
+}
+```
+- Pipeline executed succesfully.
+![alt text](image-3.png)
 
+- output generated in workspace.
+![alt text](image-4.png)
 
+- <span style="color: yellow;">Here we have scan the FS + Docker image </span>
+```sh
+pipeline {
+    agent any
+    tools {
+        maven 'maven3'
+          } 
+    stages {
+        stage('Git CheckOut') {
+            steps {
+                git branch: 'main', url: 'https://github.com/mrbalraj007/Boardgame.git'
+            }
+        }
+    stage('Compile and Test') {
+            steps {
+                sh 'mvn test'
+            }
+        } 
+    stage('Trivy FS Scan') {
+            steps {
+                sh 'trivy fs --format table -o trivy-fsreport.html .'
+            }
+        }
+    stage('Trivy image Scan') {
+            steps {
+                sh 'trivy image --format table -o trivy-image-report.html sonarqube:lts-community'
+            }
+        }
+    }
+}
+```
 
+Pipeline Status:
+![alt text](image-5.png)
 
+![alt text](image-6.png)
 
+Workspace:
+![alt text](image-7.png)
 
 
