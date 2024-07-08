@@ -1,4 +1,4 @@
-# What is Trivy and how to use it?
+# What is Trivy and how do you use it?
 ---
 
 ## About Trivy:
@@ -109,7 +109,7 @@ Version: 3.9.8
 
 will use Jenkins on the same server and create a declarative pipeline.
 
-- <span style="color: red;">Here we have scan the FS only </span>
+- <span style="color: red;">Here we have scanned the FS only </span>
 ```bash
 pipeline {
     agent any
