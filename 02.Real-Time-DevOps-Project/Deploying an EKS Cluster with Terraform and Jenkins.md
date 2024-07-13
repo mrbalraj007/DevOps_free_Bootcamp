@@ -170,3 +170,49 @@ Replace module_name, resource_type, and resource_name with your actual module na
 bash
 Copy code
 terraform destroy -target=module.ec2_instance.aws_instance.this[0]
+
+
+# Open a Jenkins and do the following
+
+- install the stage view plugin to veiw all of the stages.
+
+- First define the credential.
+    Dashboard >     Manage Jenkins >     Credentials >    System >    Global credentials (unrestricted)
+![alt text](image.png)
+
+Enter an item name : terraform-eks-cicd
+choose: Pipeline
+
+```sh
+pipeline {
+    agent any
+    environment {
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        region = "us-east-1"
+    }
+    stages {
+        stage('CheckOut SCM') {
+            steps {
+                script{
+                    checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/mrbalraj007/DevOps_free_Bootcamp.git']])
+                }
+            }
+        }
+        stage ('Initializing Terraform'){
+           steps{
+               script{
+                   dir('02.Real-Time-DevOps-Project/EC2_with_Terraform'){
+                     sh 'terraform init'
+                    }
+                }
+            }
+        }
+    }
+}    
+```
+
+now validate the pipeline.
+![alt text](image-1.png)
+
+
