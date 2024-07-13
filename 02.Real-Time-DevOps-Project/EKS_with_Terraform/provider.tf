@@ -6,6 +6,6 @@ terraform {
     }
   }
 }
-provider "aws" {
-  region = "us-east-1"  # Replace with your desired region
-}
+# provider "aws" {
+#   region = "us-east-1"  # Replace with your desired region
+# }
