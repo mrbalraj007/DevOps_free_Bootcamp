@@ -1,4 +1,5 @@
 # Deploying an EKS Cluster with Terraform and Jenkins
+ - *This pipeline demonstrates a secure and automated approach to creating and managing EKS clusters using Terraform within a CI/CD environment.*
 
 pre-requisit
 
