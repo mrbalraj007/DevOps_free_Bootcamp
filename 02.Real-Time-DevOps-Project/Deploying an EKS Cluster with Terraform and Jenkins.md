@@ -415,4 +415,6 @@ Will open the pipeline and do the following setting.
 ![alt text](image-5.png)
 
 * How it will looks.
+![alt text](image-6.png)
+
 
