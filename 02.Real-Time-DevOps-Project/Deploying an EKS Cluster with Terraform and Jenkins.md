@@ -189,7 +189,7 @@ pipeline {
     environment {
         AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-        region = "us-east-1"
+        AWS_DEFAULT_REGION = "us-east-1"
     }
     stages {
         stage('CheckOut SCM') {
@@ -202,7 +202,7 @@ pipeline {
         stage ('Initializing Terraform'){
            steps{
                script{
-                   dir('02.Real-Time-DevOps-Project/EC2_with_Terraform'){
+                   dir('02.Real-Time-DevOps-Project/EKS_with_Terraform'){
                      sh 'terraform init'
                     }
                 }
@@ -235,7 +235,7 @@ pipeline {
         stage ('Initializing Terraform'){
            steps{
                script{
-                   dir('02.Real-Time-DevOps-Project/EC2_with_Terraform'){
+                   dir('02.Real-Time-DevOps-Project/EKS_with_Terraform'){
                      sh 'terraform init'
                     }
                 }
@@ -244,7 +244,7 @@ pipeline {
         stage ('Formatting Terraform code'){
            steps{
                script{
-                   dir('02.Real-Time-DevOps-Project/EC2_with_Terraform'){
+                   dir('02.Real-Time-DevOps-Project/EKS_with_Terraform'){
                      sh 'terraform fmt'
                     }
                 }
@@ -253,7 +253,7 @@ pipeline {
         stage ('Validating Terraform'){
            steps{
                script{
-                   dir('02.Real-Time-DevOps-Project/EC2_with_Terraform'){
+                   dir('02.Real-Time-DevOps-Project/EKS_with_Terraform'){
                      sh 'terraform validate'
                     }
                 }
@@ -262,7 +262,7 @@ pipeline {
         stage ('Reviewing the Infra Using Terraform'){
            steps{
                script{
-                   dir('02.Real-Time-DevOps-Project/EC2_with_Terraform'){
+                   dir('02.Real-Time-DevOps-Project/EKS_with_Terraform'){
                      sh 'terraform plan'
                     }
                 }
@@ -293,7 +293,7 @@ pipeline {
         stage ('Initializing Terraform'){
            steps{
                script{
-                   dir('02.Real-Time-DevOps-Project/EC2_with_Terraform'){
+                   dir('02.Real-Time-DevOps-Project/EKS_with_Terraform'){
                      sh 'terraform init'
                     }
                 }
@@ -302,7 +302,7 @@ pipeline {
         stage ('Formatting Terraform code'){
            steps{
                script{
-                   dir('02.Real-Time-DevOps-Project/EC2_with_Terraform'){
+                   dir('02.Real-Time-DevOps-Project/EKS_with_Terraform'){
                      sh 'terraform fmt'
                     }
                 }
@@ -311,7 +311,7 @@ pipeline {
         stage ('Validating Terraform'){
            steps{
                script{
-                   dir('02.Real-Time-DevOps-Project/EC2_with_Terraform'){
+                   dir('02.Real-Time-DevOps-Project/EKS_with_Terraform'){
                      sh 'terraform validate'
                     }
                 }
@@ -320,7 +320,7 @@ pipeline {
         stage ('Reviewing the Infra Using Terraform'){
            steps{
                script{
-                   dir('02.Real-Time-DevOps-Project/EC2_with_Terraform'){
+                   dir('02.Real-Time-DevOps-Project/EKS_with_Terraform'){
                      sh 'terraform plan'
                     }
                 }
@@ -329,7 +329,7 @@ pipeline {
         stage ('Creating an EKS cluster Using Terraform'){
            steps{
                script{
-                   dir('02.Real-Time-DevOps-Project/EC2_with_Terraform'){
+                   dir('02.Real-Time-DevOps-Project/EKS_with_Terraform'){
                      sh 'terraform apply --auto-approve'
                     }
                 }
@@ -361,7 +361,7 @@ pipeline {
         stage ('Initializing Terraform'){
            steps{
                script{
-                   dir('02.Real-Time-DevOps-Project/EC2_with_Terraform'){
+                   dir('02.Real-Time-DevOps-Project/EKS_with_Terraform'){
                      sh 'terraform init'
                     }
                 }
@@ -370,7 +370,7 @@ pipeline {
         stage ('Formatting Terraform code'){
            steps{
                script{
-                   dir('02.Real-Time-DevOps-Project/EC2_with_Terraform'){
+                   dir('02.Real-Time-DevOps-Project/EKS_with_Terraform'){
                      sh 'terraform fmt'
                     }
                 }
@@ -379,7 +379,7 @@ pipeline {
         stage ('Validating Terraform'){
            steps{
                script{
-                   dir('02.Real-Time-DevOps-Project/EC2_with_Terraform'){
+                   dir('02.Real-Time-DevOps-Project/EKS_with_Terraform'){
                      sh 'terraform validate'
                     }
                 }
@@ -388,7 +388,7 @@ pipeline {
         stage ('Reviewing the Infra Using Terraform'){
            steps{
                script{
-                   dir('02.Real-Time-DevOps-Project/EC2_with_Terraform'){
+                   dir('02.Real-Time-DevOps-Project/EKS_with_Terraform'){
                      sh 'terraform plan'
                     }
                      input(message: "Are you sure to proceed?", ok: "Proceed")
@@ -398,7 +398,7 @@ pipeline {
         stage ('Creating an EKS cluster Using Terraform'){
            steps{
                script{
-                   dir('02.Real-Time-DevOps-Project/EC2_with_Terraform'){
+                   dir('02.Real-Time-DevOps-Project/EKS_with_Terraform'){
                      sh 'terraform apply --auto-approve'
                     }
                 }
@@ -417,4 +417,79 @@ Will open the pipeline and do the following setting.
 * How it will looks.
 ![alt text](image-6.png)
 
-
+```sh
+pipeline {
+    agent any
+    environment {
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        AWS_DEFAULT_REGION = "us-east-1"
+    }
+    stages {
+        stage('CheckOut SCM') {
+            steps {
+                script {
+                    checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/mrbalraj007/DevOps_free_Bootcamp.git']])
+                }
+            }
+        }
+        stage('Initializing Terraform') {
+            steps {
+                script {
+                    dir('02.Real-Time-DevOps-Project/EKS_with_Terraform') {
+                        sh 'terraform init'
+                    }
+                }
+            }
+        }
+        stage('Formatting Terraform code') {
+            steps {
+                script {
+                    dir('02.Real-Time-DevOps-Project/EKS_with_Terraform') {
+                        sh 'terraform fmt'
+                    }
+                }
+            }
+        }
+        stage('Validating Terraform') {
+            steps {
+                script {
+                    dir('02.Real-Time-DevOps-Project/EKS_with_Terraform') {
+                        sh 'terraform validate'
+                    }
+                }
+            }
+        }
+        stage('Reviewing the Infra Using Terraform') {
+            steps {
+                script {
+                    dir('02.Real-Time-DevOps-Project/EKS_with_Terraform') {
+                        sh 'terraform plan'
+                    }
+                    input(message: "Are you sure to proceed?", ok: "Proceed")
+                }
+            }
+        }
+        stage('Creating an EKS cluster Using Terraform') {
+            steps {
+                script {
+                    dir('02.Real-Time-DevOps-Project/EKS_with_Terraform') {
+                        sh 'terraform apply --auto-approve'
+                    }
+                }
+            }
+        }
+        stage('Deploying Nginx Application') {
+            steps {
+                script {
+                    dir('02.Real-Time-DevOps-Project/EKS_with_Terraform/ConfigurationFiles') {
+                        sh 'aws eks update-kubeconfig --name my-eks-cluster'
+                        sh 'kubectl apply -f deployment.yaml'
+                        sh 'kubectl apply -f service.yaml'
+                    }
+                }
+            }
+        }
+    }
+}
+```
