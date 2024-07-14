@@ -494,3 +494,10 @@ pipeline {
     }
 }
 ```
+If the above job failed
+
+![alt text](image-7.png)
+
+https://repost.aws/knowledge-center/eks-cluster-connection
+https://www.youtube.com/watch?v=o9MJP9U4Nk8&list=LL&index=1&t=221s
+https://www.youtube.com/watch?v=BuBDYFet0hI&ab_channel=Avinashkumar-TheLearningDestination
