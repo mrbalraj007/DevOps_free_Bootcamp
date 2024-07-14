@@ -135,13 +135,13 @@ pipeline {
     }
 }
 ```
-- Pipeline executed succesfully.
+- Pipeline has been executed succesfully.
 ![alt text](image-3.png)
 
 - output generated in workspace.
 ![alt text](image-4.png)
 
-- <span style="color: yellow;">Here we have scan the FS + Docker image </span>
+- <span style="color: yellow;">Here we have scanned the FS + Docker image </span>
 ```sh
 pipeline {
     agent any
