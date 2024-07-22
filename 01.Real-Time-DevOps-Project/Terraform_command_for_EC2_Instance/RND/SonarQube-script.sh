@@ -5,7 +5,7 @@ SONARQUBE_VERSION=9.9.0.65466
 
 # Update the package repository and install prerequisites
 sudo apt-get update -y
-sudo apt-get install -y openjdk-11-jdk wget unzip
+sudo apt-get install -y openjdk-17-jdk wget unzip
 
 # Download and unzip SonarQube
 wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-${SONARQUBE_VERSION}.zip

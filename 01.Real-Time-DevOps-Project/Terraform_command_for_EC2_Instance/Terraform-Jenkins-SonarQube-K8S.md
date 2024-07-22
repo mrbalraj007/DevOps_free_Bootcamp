@@ -6,6 +6,7 @@ Video Link -- https://youtu.be/dMVrwaYojYs
 terraform init
 terraform plan
 terraform apply -auto-approve
+```sh
 2--main.tf
 resource "aws_instance" "web" {
   ami                    = "ami-0287a05f0ef0e9d9a"      #change ami id for different region
@@ -52,8 +53,10 @@ resource "aws_security_group" "Jenkins-VM-SG" {
     Name = "Jenkins-VM-SG"
   }
 }
+```
 
 3--provider.tf
+```sh
 terraform {
   required_providers {
     aws = {
@@ -67,8 +70,9 @@ terraform {
 provider "aws" {
   region = "ap-south-1"     #change region as per you requirement
 }
-
+```
 4--install.sh
+```sh
 #!/bin/bash
 sudo apt update -y
 wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /etc/apt/keyrings/adoptium.asc
@@ -130,6 +134,7 @@ eksctl create cluster --name virtualtechbox-cluster \
 5-- Verify Cluster with below command
 $ kubectl get nodes
 $ kubectl get svc
+```
 =============================================================================================================================================================================================
 1--Jenkins Pipeline Script
 pipeline{

@@ -17,11 +17,11 @@ resource "aws_instance" "web" {
   key_name               = "MYLABKEY"
   vpc_security_group_ids = [aws_security_group.Jenkins-VM-SG.id]
   #user_data              = templatefile("${path.module}/SonarQube-script.sh", {})
-  user_data = file("${path.module}/SonarQube-script.sh")
-  # user_data              = templatefile("./SonarQube-script.sh", {})
-  
+  user_data = file("${path.module}/Jenkins-Master-script.sh")
+  #user_data              = templatefile("./SonarQube-script.sh", {})
+
   tags = {
-    Name = "Jenkins-SonarQube"
+    Name = "Jenkins-Master"
   }
 
   root_block_device {
