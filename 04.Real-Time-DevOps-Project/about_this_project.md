@@ -360,3 +360,6 @@ Now, we will do the fully automation for CI/CD.
 secret <paste the token here> // We will generate it from Jenkins userprofile>configure> API Token.
 
 Try to make any changes in files in Github and pipeline would be triggered automatically.
+
+![alt text](image-10.png)
+
