@@ -15,6 +15,6 @@ Now, we will configure the Jenkins.
 ```bash
 sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 ```
-![alt text](/Screenshot_for_project/image-1.png)
+![Reference Image](/Screenshot_for_project/image-1.png)
 
-![alt text](/Screenshot_for_project/image.png)
+![Reference Image](/Screenshot_for_project/image.png)
