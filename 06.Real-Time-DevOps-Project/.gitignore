@@ -12,4 +12,4 @@ terraform.tfstate.backup
 *.pem
 
 # Ignore Folder
-Screenshot_for_project/
+# Screenshot_for_project/
