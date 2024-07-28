@@ -1,4 +1,4 @@
-#### Deploying a YouTube Clone App with DevSecOps & DevOps tools like Jenkins Shared Library Using Docker and Kubernetes.
+#### Deploying a YouTube Clone App with DevSecOps & DevOps tools like Jenkins using Shared Library, Docker and Kubernetes.
 
 This blog will help you set up a secure DevSecOps pipeline for your project. Using tools like Kubernetes, Docker, SonarQube, Trivy, OWASP Dependency Check, Prometheus, Grafana, Jenkins (with a shared library), Splunk, Rapid API, and Slack notifications, we make it easy to create and manage your environment.
 
