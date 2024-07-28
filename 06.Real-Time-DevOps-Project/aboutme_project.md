@@ -7,8 +7,8 @@ Environment Setup:
 Step 1: Launch an Ubuntu instance for Jenkins, Trivy, Docker and SonarQube
 
 -I am using Terraform to create a infrastrucutre. I have prepared the Terraform code.
-+ clone the git [repo](https://github.com/mrbalraj007/DevOps_free_Bootcamp/tree/main/06.Real-Time-DevOps-Project/Terraform_Code) where Terraform code is created.
-+ Do the ```ls``` in terminal
++ clone the Terraform git [repo](https://github.com/mrbalraj007/DevOps_free_Bootcamp/tree/main/06.Real-Time-DevOps-Project/Terraform_Code) in your system.
++ Do the ```ls``` in a terminal, go to ```Terraform_code``` Folder, and initiate the following Terraform commands to run the infrastructure.
 ```bash
 $ cd Terraform_Code
 $ ls -l
