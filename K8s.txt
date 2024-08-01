@@ -1,0 +1,57 @@
+sudo apt-get update -y
+sudo apt-get install docker.io -y
+sudo usermod -aG docker $USER
+sudo systemctl enable docker
+
+# Add Kubernetes APT repository and install required packages
+sudo apt-get update
+sudo apt-get install -y apt-transport-https ca-certificates curl gpg
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+# This overwrites any existing configuration in /etc/apt/sources.list.d/kubernetes.list
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+sudo apt-get update -y
+sudo apt-get install kubeadm kubelet kubectl -y
+sudo apt-mark hold kubeadm kubelet kubectl
+
+sudo swapoff -a
+
+
+kubeadm version
+
+
+Master:
+sudo kubeadm config images pull
+sudo kubeadm init
+
+
+
+kubernetes-master-server:~$ mkdir -p $HOME/.kube
+kubernetes-master-server:~$ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+kubernetes-master-server:~$ sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+# Network Plugin = calico
+kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.0/manifests/calico.yaml
+
+sudo systemctl enable --now kubelet
+sudo systemctl start kubelet
+
+kubectl get nodes
+
+
+client
+
+sudo kubeadm reset pre-flight checks
+
+sudo your-token --v=5
+
+kubectl get nodes
+
+Obtaining machine-readable output
+	• kubectl get can output JSON, YAML, or be directly formatted
+	• Give us more info about the nodes:
+kubectl get nodes -o wide
+Let’s have some YAML:
+kubectl get no -o yaml
+
+

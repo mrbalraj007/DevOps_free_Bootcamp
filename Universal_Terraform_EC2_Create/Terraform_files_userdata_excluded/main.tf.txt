@@ -1,0 +1,48 @@
+provider "aws" {
+  region = "us-east-1" # Replace with your desired AWS region
+}
+
+# Variables
+variable "instance_count" {
+  default = 1 # Number of instances to create initially
+}
+
+variable "instance_type" {
+  default = "t2.micro" # Default instance type
+}
+
+# Data source for fetching latest Ubuntu 20.04 LTS AMI
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["099720109477"] # Canonical owner ID for Ubuntu AMIs
+}
+
+# EC2 Instance resource
+resource "aws_instance" "ec2_instance" {
+  count         = var.instance_count
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = var.instance_type
+  key_name      = "MYLABKEY" #change key name as per your setup
+  user_data     = file("${path.module}/Jenkins-Master-script.sh")
+  #user_data = file("${path.module}/Jenkins-Agent-script.sh")
+  #user_data = file("${path.module}/SonarQube-script.sh")
+  tags = {
+    Name = "EC2-Instance-${count.index + 1}"
+  }
+}
+
+# Output IP addresses of instances
+output "instance_ips" {
+  value = [for instance in aws_instance.ec2_instance : instance.public_ip]
+}

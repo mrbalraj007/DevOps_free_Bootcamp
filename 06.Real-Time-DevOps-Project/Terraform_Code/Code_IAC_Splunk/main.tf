@@ -16,7 +16,7 @@ data "aws_ami" "ubuntu" {
 
 resource "aws_instance" "splunk" {
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = "t2.medium"
+  instance_type          = "t2.large"
   key_name               = "MYLABKEY" # Change key name as per your setup
   vpc_security_group_ids = [aws_security_group.splunk-VM-SG.id]
   user_data              = templatefile("./Splunk_install.sh", {})
