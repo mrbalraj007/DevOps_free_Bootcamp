@@ -1,3 +1,4 @@
+Universal_Terraform_EC2_Create/.terraform/providers/registry.terraform.io/hashicorp/aws/5.58.0/windows_386/terraform-provider-aws_v5.58.0_x5.exe
 # Ignore everything in the .terraform directory
 .terraform/*
 
@@ -10,3 +11,7 @@ terraform.tfstate.backup
 
 # Ignore pem file
 *.pem
+Universal_Terraform_EC2_Create/.terraform/providers/registry.terraform.io/hashicorp/aws/5.58.0/windows_386/terraform-provider-aws_v5.58.0_x5.exe
+
+*.exe filter=lfs diff=lfs merge=lfs -text
+*.exe
