@@ -15,6 +15,6 @@ echo "[TASK 2] Set root password"
 echo -e "kubeadmin\nkubeadmin" | passwd root >/dev/null 2>&1
 
 sudo apt-get update 
-sudo apt-get install -y curl
+sudo apt-get install -y curl net-tools
 sudo apt-get install -y keepalived haproxy
 

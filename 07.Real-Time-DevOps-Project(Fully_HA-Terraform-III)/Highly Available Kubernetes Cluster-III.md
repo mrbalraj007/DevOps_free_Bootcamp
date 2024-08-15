@@ -1,5 +1,7 @@
 # <span style="color: Yellow;"> Setting up a Highly available Kubernetes cluster with redundant load balancers using Keepalived and HAProxy </span>
 
+![alt text](HA_Proxy.gif)
+
 In this blog, we'll walk you through the process of setting up a highly available Kubernetes cluster using Keepalived and HAProxy. The goal is to eliminate the single point of failure in your Kubernetes control plane by implementing redundancy in your load balancers and ensuring that your Kubernetes API server is always accessible.
 
 ## Introduction
@@ -13,7 +15,7 @@ To mitigate this risk, we set up a highly available Kubernetes cluster. In an HA
 ## Understanding Quorum in HA Clusters
 The concept of quorum is vital in HA clusters. Quorum refers to the minimum number of master nodes required to make decisions in the cluster. If the number of active master nodes falls below this threshold, the cluster can no longer function correctly.
 
-### Calculating Quorum
+#### Calculating Quorum
 To calculate the quorum, you can use the following formula:
 ```bash
 Quorum = floor(n/2) + 1
@@ -38,18 +40,18 @@ Before we begin, ensure you have the following:
 ## Overview of the Setup
 We will set up a Kubernetes cluster with the following components:
 
-__Three Master Nodes__: To ensure redundancy in the control plane.
+<span style="color: Yellow;"> __Three Master Nodes__</span>: To ensure redundancy in the control plane.
 
-__Two Load Balancers__: Implemented using HAProxy to distribute traffic to the master nodes.
+<span style="color: Yellow;"> __Two Load Balancers__</span>: Implemented using HAProxy to distribute traffic to the master nodes.
 
-__Keepalived__: To manage a virtual IP address that floats between the two load balancers, ensuring high availability.
+<span style="color: Yellow;"> __Keepalived__</span>: To manage a virtual IP address that floats between the two load balancers, ensuring high availability.
 
 ## __Hardware Requirements__
 For this demo, each virtual machine will be configured as follows:
 
-__Masters and Workers__: 2 CPUs, 2 GB RAM (```t2.medium```)
+__Masters and Workers__: 2 CPUs, 4 GB RAM (```t2.medium```)
 
-__Load Balancers__: 1 CPU, 512 MB RAM (```t2.micro```)
+__Load Balancers__: 1 CPU, 1 GB RAM (```t2.micro```)
 
 All virtual machines will run on Ubuntu 24.04 LTS with Kubernetes version 1.30.0.
 
@@ -96,52 +98,92 @@ terraform validate
 terraform plan
 terraform apply --auto-approve
 ```
+-------
+# Lab Setup:
 
-### Lab Setup:
-
-#### Configuring the Load Balancer
-- Install HAProxy on your load balancer VM:
-
-# Set up a Highly Available Kubernetes Cluster using kubeadm
+## Configuring the Load Balancer
+- <span style="color: Yellow;"> Install HAProxy on your load balancer VM </sapn>
+- <span style="color: Yellow;"> Set up a Highly Available Kubernetes Cluster using kubeadm<span>
 Follow this documentation to set up a highly available Kubernetes cluster using __Ubuntu 24.04 LTS LTS__ with keepalived and haproxy
 
 This documentation guides you in setting up a cluster with three master nodes, one worker node and two load balancer node using HAProxy and Keepalived.
 
-## Environment Setup (VMware Workstation )
-|Role|FQDN|IP|OS|RAM|CPU|
-|----|----|----|----|----|----|
-|HA-proxy01|HA-proxy01.singh.com|192.168.1.99|Ubuntu 24.04 LTS|1G|1|
-|HA-proxy02|HA-proxy02.singh.com|192.168.1.100|Ubuntu 24.04 LTS|1G|1|
-|Master01|master1.singh.com|192.168.1.101|Ubuntu 24.04 LTS|2G|2|
-|Master02|master2.singh.com|192.168.1.102|Ubuntu 24.04 LTS|2G|2|
-|Master03|master3.singh.com|192.168.1.103|Ubuntu 24.04 LTS|2G|2|
-|Worker01|worker1.singh.com|192.168.1.201|Ubuntu 24.04 LTS|2G|2|
-|Worker02|worker1.singh.com|192.168.1.201|Ubuntu 24.04 LTS|2G|2|
+### __Environment Setup__
+|HostName|
+|----|
+|HA-proxy01|
+|HA-proxy02|
+|K8-Master01|
+|K8-Master02|
+|K8-Master01|
+|K8-Worker01|
+|K8-Worker02|
 
 > * Password for the **root** account on all these virtual machines is **xxxxxxx**
 > * Perform all the commands as root user unless otherwise specified
 
-![alt text](image.png)
 
-
-
-### Virtual IP managed by Keepalived on the load balancer nodes
+### <span style="color: cyan;"> Virtual IP managed by Keepalived on the load balancer nodes
 |<span style="color: Yellow;"> Virtual IP</span>|
 |----|
-|<span style="color: Yellow;">172.31.1.50 <span>|
+|<span style="color: Yellow;">172.31.80.50 <span>|
 
-## Set up <span style="color: red;"> load balancer nodes (loadbalancer1 & loadbalancer2)</span>
+### <span style="color: Yellow;"> Set hostname on all EC2 instances</span>
+> Including (loadbalancer1-2 & master01-03 and Worker01-02)
 
-##### Install Keepalived & Haproxy
+- Change the hostname:
+```bash
+sudo hostnamectl set-hostname HA-proxy01
+sudo hostnamectl set-hostname HA-proxy02
+sudo hostnamectl set-hostname K8-Master01
+sudo hostnamectl set-hostname K8-Master02
+sudo hostnamectl set-hostname K8-Master03
+sudo hostnamectl set-hostname K8-Worker01
+sudo hostnamectl set-hostname K8-Worker02
+```
+- Update the /etc/hosts file:
+  - Open the file with a text editor, for example:
+```bash
+sudo vi /etc/hosts
+```
+Replace the old hostname with the new one where it appears in the file.
 
+Apply the new hostname without rebooting:
+```bash
+sudo systemctl restart systemd-logind.service
+```
+Verify the change:
+```bash
+hostnamectl
+```
+
+Update the package
+```bash
+sudo -i
+apt update 
+```
+
+## <span style="color: red;"> Set up load balancer nodes (loadbalancer1 & loadbalancer2)</span>
+
+<!-- #### Install Keepalived & Haproxy
 ```bash
 sudo -i
 apt-get install -y curl
 apt-get update && apt-get install -y keepalived haproxy
-```
-##### configure keepalived (Create the health check script)
-On both Proxy nodes create the health check script ```/etc/keepalived/check_apiserver.sh```
+``` -->
+### Verify the ```Keepalived and Haproxy``` service status
 ```bash
+systemctl status keepalived
+systemctl status haproxy
+```
+
+### Configure keepalived (Create the health check script)
+First, check the IP address range of the EC2 instance and identify the subnet from which they are getting their IP addresses. You need to choose an IP address from this range to use as the virtual IP for the HAProxy server in the health check script.
+
+- On both Proxy nodes create the health check script ```/etc/keepalived/check_apiserver.sh```
+```bash
+sudo -i
+
 sudo tee /etc/keepalived/check_apiserver.sh > /dev/null <<EOF
 #!/bin/sh
 
@@ -151,8 +193,8 @@ errorExit() {
 }
 
 curl --silent --max-time 2 --insecure https://localhost:6443/ -o /dev/null || errorExit "Error GET https://localhost:6443/"
-if ip addr | grep -q 172.31.1.50; then
-  curl --silent --max-time 2 --insecure https://172.31.1.50:6443/ -o /dev/null || errorExit "Error GET https://172.31.1.50:6443/"
+if ip addr | grep -q 172.31.80.50; then
+  curl --silent --max-time 2 --insecure https://172.31.80.50:6443/ -o /dev/null || errorExit "Error GET https://172.31.80.50:6443/"
 fi
 EOF
 sudo chmod +x /etc/keepalived/check_apiserver.sh
@@ -167,7 +209,7 @@ ip link show
 
 ip a s
 ```
-### in my Lab it is as below
+##### In my Lab it is as below:
 ```powershell
 ubuntu@ip-172-31-90-55:~$ ip link show
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
@@ -189,7 +231,7 @@ ubuntu@ip-172-31-90-55:~$ ip a s
        valid_lft forever preferred_lft forever
 ```
 
-Adjust the connect name ```interface eth1``
+* Adjust the connect name ```interface eth1```
 
 Create keepalived config /etc/keepalived/keepalived.conf
 ```bash
@@ -214,7 +256,7 @@ vrrp_instance VI_1 {
         auth_pass mysecret
     }
     virtual_ipaddress {
-        192.168.1.50
+        172.31.80.50
     }
     track_script {
         check_apiserver
@@ -222,27 +264,52 @@ vrrp_instance VI_1 {
 }
 EOF
 ```
-##### Enable & start keepalived service
+### Enable & start keepalived service
 ```bash
+sudo systemctl restart keepalived
 sudo systemctl enable --now keepalived
+sudo systemctl restart haproxy
+sudo systemctl enable haproxy
 ```
 
-##### Verify the ```Keepalived and Haproxy``` service status
+
+
+
+### To verify which one is master HA Proxy
+
+- Check HAProxy:
+Ensure HAProxy is listening on port 6443:
 ```bash
-systemctl status keepalived
-systemctl status haproxy
+sudo netstat -tuln | grep 6443
 ```
-![alt text](image-1.png)
 
-##### To verify which one is master HA Proxy
-
+- Check Keepalived:
+The virtual IP should be assigned to the MASTER node:
 ```bash
 journalctl -flu keepalived
+                or
+sudo systemctl status keepalived
+                or 
+ip a | grep <virtual_ip>
+                or
+sudo grep Keepalived /var/log/syslog
+                or
+sudo ip addr show | grep 172.31.80.50  # Replace with your virtual IP
+                or
+ip a | grep 172.31.80.50
 ```
+
+- Failover Test:
+Stop the Keepalived service on the MASTER node and check if the virtual IP is moved to the BACKUP node:
+```bash
+sudo systemctl stop keepalived
+ip a | grep 172.31.80.50  # On Backup (Load Balancer02) Node
+```
+
 > In my case my ```HA-proxy02``` become master.
 
 
-##### Configure haproxy
+### Configure haproxy
 On both load balancer nodes, configure HAProxy to forward traffic to the master nodes:
 Edit the HAProxy configuration file ```/etc/haproxy/haproxy.cfg```
 ```
@@ -260,9 +327,9 @@ backend kubernetes-backend
   mode tcp
   option ssl-hello-chk
   balance roundrobin
-    server master1 52.200.125.138:6443 check fall 3 rise 2
-    server master2 34.229.179.153:6443 check fall 3 rise 2
-    server master3 54.226.15.226:6443 check fall 3 rise 2
+    server master1 3.84.181.226:6443 check fall 3 rise 2
+    server master2 34.228.82.252:6443 check fall 3 rise 2
+    server master3 3.90.205.74:6443 check fall 3 rise 2
 EOF
 ```
 ##### Restart HAProxy to apply the configuration: (Enable & restart haproxy service)
@@ -272,18 +339,17 @@ systemctl enable haproxy && systemctl restart haproxy
 
 ## <span style="color: red;"> Pre-requisites </span> on all kubernetes nodes (masters & workers)
 
-##### Disable swap (after reboot it would ramain disable state)
+<!-- ##### Disable swap (after reboot it would ramain disable state)
 ```bash
 sudo -i
 swapoff -a; sed -i '/swap/d' /etc/fstab
-```
-##### we will disable Firewall if it is enabled.
+``` -->
+##### We will disable Firewall if it is enabled.
 ```bash
 systemctl disable --now ufw
 ```
-##### Enable and Load Kernel modules
+<!-- ##### Enable and Load Kernel modules
 ```bash
-{
 cat >> /etc/modules-load.d/containerd.conf <<EOF
 overlay
 br_netfilter
@@ -291,13 +357,11 @@ EOF
 
 modprobe overlay
 modprobe br_netfilter
-}
-```
+``` -->
 
 
-##### Add Kernel settings (If server rebooted then file would be auto added after reboot)
+<!-- ##### Add Kernel settings (If server rebooted then file would be auto added after reboot)
 ```bash
-{
 cat >>/etc/sysctl.d/kubernetes.conf<<EOF
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables  = 1
@@ -305,9 +369,8 @@ net.ipv4.ip_forward                 = 1
 EOF
 
 sysctl --system
-}
-```
-##### Install containerd runtime
+``` -->
+<!-- ##### Install containerd runtime
 ```bash
 {
   apt update
@@ -323,14 +386,18 @@ sysctl --system
 systemctl status containerd
 containerd --version
 journalctl -u containerd
-```
+``` -->
 
-##### Add apt repo for kubernetes & Install Kubernetes components
+<!-- ##### Add apt repo for kubernetes & Install Kubernetes components
 
 create a ```install_kube.sh``` file and paste the following content
 ```bash
 cat >> install_kube.sh <<EOF
-#!/bin/sh
+sudo swapoff -a
+sudo sed -i '/ swap / s/^/#/' /etc/fstab
+sudo apt-get update
+sudo apt install docker.io -y
+sudo chmod 666 /var/run/docker.sock
 sudo apt-get install -y apt-transport-https ca-certificates curl gnupg
 sudo mkdir -p -m 755 /etc/apt/keyrings
 curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
@@ -343,7 +410,7 @@ chmod +x install_kube.sh
 run it 
 ```bash
 ./install_kube.sh
-```
+``` -->
 
 ## <span style="color: red;"> Setup Bootstrap the cluster</span>
 
@@ -364,8 +431,22 @@ sudo -i
 kubeadm init --control-plane-endpoint="172.31.1.50:6443" --upload-certs --apiserver-advertise-address=172.31.19.179 --pod-network-cidr=10.244.0.0/16
 # as we are selecting master01 node then we will use IP address 172.31.19.179
 ```
+To Inspect Control Plane Containers
+```bash
+ sudo crictl --runtime-endpoint unix:///var/run/containerd/containerd.sock ps -a | grep kube | grep -v pause
+ ```
+To inspect the logs of a failing container, replace CONTAINERID with the actual container ID:
 
 Follow the output instructions to join the other master and worker nodes to the cluster.
+```bash
+sudo crictl --runtime-endpoint unix:///var/run/containerd/containerd.sock logs CONTAINERID
+```
+If you get an error then run the following command
+Try Re-running Kubeadm
+```bash
+sudo kubeadm reset -f
+sudo kubeadm init --control-plane-endpoint="172.31.80.50:6443" --upload-certs --apiserver-advertise-address=172.31.29.29 --pod-network-cidr=10.244.0.0/16
+```
 
 ```css
 [kubelet-finalize] Updating "/etc/kubernetes/kubelet.conf" to point to a rotatable kubelet client certificate and key
@@ -414,14 +495,16 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```bash
 sudo -i
 # kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f https://docs.projectcalico.org/v3.18/manifests/calico.yaml
-wget https://raw.githubusercontent.com/projectcalico/calico/v3.28.1/manifests/calico.yaml
-kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f calico.yaml
+# wget https://raw.githubusercontent.com/projectcalico/calico/v3.28.1/manifests/calico.yaml
+# kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f calico.yaml
+
+kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
 
 # Official Page - https://docs.tigera.io/calico/3.27/about/
 ```
- <span style="color: Yellow;">__Note__--> I was getting an error message while using ```v3.18```manifests for calico.yaml file and noticed that "The error message indicates that the ```PodDisruptionBudget``` resource in the calico.yaml manifest is using an outdated API version ```(policy/v1beta1)```. Kubernetes 1.21 and later versions have deprecated this version in favor of ```policy/v1```."
+ <span style="color: cyan;">__Note__--> I was getting an error message while using ```v3.18```manifests for ```calico.yaml``` file and noticed that "The error message indicates that the ```PodDisruptionBudget``` resource in the calico.yaml manifest is using an outdated API version ```(policy/v1beta1)```. Kubernetes 1.21 and later versions have deprecated this version in favor of ```policy/v1```."
 
-## Join other ```Master 02 & Master03``` nodes to the cluster
+## <span style="color: Yellow;"> Join other ```Master 02 & Master03``` nodes to the cluster
 > Use the respective kubeadm join commands you copied from the output of kubeadm init command on the first master.
 
 ```bash
@@ -436,10 +519,9 @@ kubectl get pods -n kube-system
 kubectl get nodes -o wide
 ```
 
-
 > IMPORTANT: Don't forget the --apiserver-advertise-address option to the join command when you join the other master nodes, if you are using additional NIC then it need to use.
 
-## Join worker nodes to the cluster
+## <span style="color: Yellow;"> Join worker nodes to the cluster</span>.
 > Use the kubeadm join command you copied from the output of kubeadm init command on the first master
 ```bash
 kubeadm join 192.168.1.50:6443 --token gmzu3t.vsmajpb4cr16y6nx \
@@ -452,7 +534,7 @@ kubectl get pods -n kube-system
 kubectl get nodes -o wide
 ```
 
-## Verifying the cluster
+## <span style="color: Yellow;">Verifying the cluster</span>
 ```
 kubectl cluster-info
 kubectl get nodes
@@ -465,6 +547,252 @@ CoreDNS is running at https://192.168.1.50:6443/api/v1/namespaces/kube-system/se
 To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
 root@master01:~#
 ```
+**Check the status of all pods:**
+  ```bash
+  kubectl get pods --all-namespaces
+  ```
+
+By following these instructions, you will have created a highly available Kubernetes cluster with two master nodes, three worker nodes, and a load balancer that distributes traffic across the master nodes. This setting assures that if one master node dies, the other will still process API calls.
+
+## <span style="color: Yellow;">Verification (following command should be run on all master nodes ```M1, M2 & M3```)
+
+### Install etcdctl to verify the health check
+**Install etcdctl using apt:**
+  ```bash
+   sudo apt-get update
+   sudo apt-get install -y etcd-client
+  ```
+
+### Verify Etcd Cluster Health, It needs to run on all master nodes. 
+**Check the health of the etcd cluster:**
+```bash
+sudo ETCDCTL_API=3 etcdctl --endpoints=https://127.0.0.1:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/peer.crt --key=/etc/kubernetes/pki/etcd/peer.key endpoint health
+```
+
+
+**Check the cluster membership:**
+```bash
+sudo ETCDCTL_API=3 etcdctl --endpoints=https://127.0.0.1:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/peer.crt --key=/etc/kubernetes/pki/etcd/peer.key member list
+```
+### <span style="color: Yellow;">Verify ```HAProxy``` Configuration and Functionality
+
+**Configure HAProxy Stats:**
+   - Add the stats configuration to `/etc/haproxy/haproxy.cfg`:
+     ```haproxy
+     listen stats
+         bind *:8404
+         mode http
+         stats enable
+         stats uri /
+         stats refresh 10s
+         stats admin if LOCALHOST
+     ```
+
+
+**Restart HAProxy:**
+```bash
+sudo systemctl restart haproxy
+```
+**Check HAProxy Stats:**
+- Access the stats page at `http://<LOAD_BALANCER_IP>:8404`.
+```sh
+http://3.91.39.241:8404/
+```
+
+
+### Will do the deployment to check the functionality.
+
+[Will use this yml file](https://github.com/mrbalraj007/Boardgame/blob/main/deployment-service.yaml)
+
+will go to master 3
+ will create a deploy.yml and paste the following conent
+```powershell
+apiVersion: apps/v1
+kind: Deployment # Kubernetes resource kind we are creating
+metadata:
+  name: boardgame-deployment
+spec:
+  selector:
+    matchLabels:
+      app: boardgame
+  replicas: 2 # Number of replicas that will be created for this deployment
+  template:
+    metadata:
+      labels:
+        app: boardgame
+    spec:
+      containers:
+        - name: boardgame
+          image: adijaiswal/boardgame:latest # Image that will be used to containers in the cluster
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080 # The port that the container is running on in the cluster
+---
+apiVersion: v1 # Kubernetes API version
+kind: Service # Kubernetes resource kind we are creating
+metadata: # Metadata of the resource kind we are creating
+  name: boardgame-ssvc
+spec:
+  selector:
+    app: boardgame
+  ports:
+    - protocol: "TCP"
+      port: 8080 # The port that the service is running on in the cluster
+      targetPort: 8080 # The port exposed by the service
+  type: LoadBalancer # type of the service.
+
+```
+- will deploy the file from master 3.
+```sh
+kubectl apply -f deploy.yml
+```
+- View from Master 1
+```sh
+ kubectl get all
+NAME                                        READY   STATUS    RESTARTS   AGE
+pod/boardgame-deployment-6bfc85f56d-82n2z   1/1     Running   0          3m20s
+pod/boardgame-deployment-6bfc85f56d-stswz   1/1     Running   0          3m5s
+
+NAME                     TYPE           CLUSTER-IP    EXTERNAL-IP   PORT(S)          AGE
+service/boardgame-ssvc   LoadBalancer   10.98.2.227   <pending>     8080:32499/TCP   5m38s
+service/kubernetes       ClusterIP      10.96.0.1     <none>        443/TCP          36m
+
+NAME                                   READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/boardgame-deployment   2/2     2            2           5m38s
+
+NAME                                              DESIRED   CURRENT   READY   AGE
+replicaset.apps/boardgame-deployment-6bfc85f56d   2         2         2       3m20s
+replicaset.apps/boardgame-deployment-7d7f76876f   0         0         0       5m38s
+
+# describe the pod if needed.
+ubuntu@ip-172-31-29-116:~$ kubectl describe pod boardgame-deployment-6bfc85f56d-82n2z
+Name:             boardgame-deployment-6bfc85f56d-82n2z
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             ip-172-31-18-179/172.31.18.179
+Start Time:       Fri, 09 Aug 2024 07:39:55 +0000
+Labels:           app=boardgame
+                  pod-template-hash=6bfc85f56d
+Annotations:      cni.projectcalico.org/containerID: 4980888e7b1752260904286e0611e7a9f01f79d59d03ef76e57380032f9d626d
+                  cni.projectcalico.org/podIP: 10.244.224.2/32
+                  cni.projectcalico.org/podIPs: 10.244.224.2/32
+Status:           Running
+IP:               10.244.224.2
+IPs:
+  IP:           10.244.224.2
+Controlled By:  ReplicaSet/boardgame-deployment-6bfc85f56d
+Containers:
+  boardgame:
+    Container ID:   containerd://adb82acb13786599710397ad328e021c7c447d656f91ad30334d58b3eb98a8dc
+    Image:          adijaiswal/boardgame:latest
+    Image ID:       docker.io/adijaiswal/boardgame@sha256:1fc859b0529657a73f8078a4590a21a2087310372d7e518e0adff67d55120f3d
+    Port:           8080/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Fri, 09 Aug 2024 07:40:09 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-9hp5f (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True
+  Initialized                 True
+  Ready                       True
+  ContainersReady             True
+  PodScheduled                True
+Volumes:
+  kube-api-access-9hp5f:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age    From               Message
+  ----    ------     ----   ----               -------
+  Normal  Scheduled  5m24s  default-scheduler  Successfully assigned default/boardgame-deployment-6bfc85f56d-82n2z to ip-172-31-18-179
+  Normal  Pulling    5m24s  kubelet            Pulling image "adijaiswal/boardgame:latest"
+  Normal  Pulled     5m11s  kubelet            Successfully pulled image "adijaiswal/boardgame:latest" in 12.748s (12.748s including waiting). Image size: 282836720 bytes.
+  Normal  Created    5m10s  kubelet            Created container boardgame
+  Normal  Started    5m10s  kubelet            Started container boardgame
+ubuntu@ip-172-31-29-116:~$
+```
+since 172.31.18.179 is a worker 2 and will note it down the public IP address and will try to open it on broswer.
+```sh
+http://3.80.108.177:32499/
+```
+### Test High Availability
+**Simulate Master Node Failure:**
+We will run the command on master 02 to double verify.
+
+   - Stop the kubelet service and Docker containers on one of the master nodes to simulate a failure:
+     ```bash
+     sudo systemctl stop kubelet
+     sudo docker stop $(sudo docker ps -q)
+     ```
+![alt text](image-13.png)
+
+**Verify Cluster Functionality:**
+   - Check the status of the cluster from a worker node or the remaining master node:
+     ```bash
+     kubectl get nodes
+     kubectl get pods --all-namespaces
+     ```
+   - The cluster should still show the remaining nodes as Ready, and the Kubernetes API should be accessible.
+
+![alt text](image-12.png)
+
+**HAProxy Routing:**
+   - Ensure that HAProxy is routing traffic to the remaining master node. Check the stats page or use curl to test:
+     ```bash
+     curl -k https://<LOAD_BALANCER_IP>:6443/version
+     ```
+```sh
+ubuntu@ip-172-31-27-21:~$ curl -k https://3.91.39.241:6443/version
+{
+  "major": "1",
+  "minor": "30",
+  "gitVersion": "v1.30.3",
+  "gitCommit": "6fc0a69044f1ac4c13841ec4391224a2df241460",
+  "gitTreeState": "clean",
+  "buildDate": "2024-07-16T23:48:12Z",
+  "goVersion": "go1.22.5",
+  "compiler": "gc",
+  "platform": "linux/amd64"
+}ubuntu@ip-172-31-27-21:~$
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Downloading kube config to your local machine
 On your host machine
 ```
@@ -489,7 +817,7 @@ After HAProxy02 is power-off now, HAproxy01 has taken all the loads and no impac
 PowerState of ```HAPRoxy02```
 
 
-## Verifying the cluster
+## <span style="color: Yellow;">Verifying the cluster</span>
 ```
 kubectl cluster-info
 kubectl get nodes
@@ -505,7 +833,7 @@ If we stop the HAproxy services from HAProxy nodes, then we will lose the K8s co
 ```
 For testing purposes, we will power on ```HAProxy02```, and stop the services "haproxy" from ```HAproxy01``` on it, and see.
 
-## To destroy the setup using Terraform.
+## <span style="color: Yellow;">To destroy the setup using Terraform.</span>
 
 First go to ```"Master_Worker_Setup"``` directory then run the command
 ```bash
@@ -516,7 +844,27 @@ Once it's done then go to "HA_proxy_LB" directory
 terraform destroy --auto-approve
 ```
 
-#### Conclusion
+
+## Conclusion
 By following this guide, you've successfully set up a highly available Kubernetes cluster with redundant load balancers using Keepalived and HAProxy. This setup ensures that your Kubernetes API server remains accessible even if one of your load balancers goes down, providing greater resilience and reliability for your applications.
 
 This approach can be further extended by adding more master nodes, worker nodes, and load balancers to meet your specific requirements.
+
+
+### <span style="color: Red;"> Troubleshooting:
+
+If you want to delete and recreate specific section then use below command
+
+- Destroy the current k8s_master EC2 instances:
+
+Run the following command to destroy the existing k8s_master instances:
+```bash
+terraform destroy -target="aws_instance.k8s_master" --auto-approve
+```
+
+- Recreate the k8s_master EC2 instances:
+
+After destroying the k8s_master instances, you can recreate them by running:
+```bash
+terraform apply -target="aws_instance.k8s_master" --auto-approve
+```
