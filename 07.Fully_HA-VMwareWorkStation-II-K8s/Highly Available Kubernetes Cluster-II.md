@@ -289,8 +289,8 @@ Now, SSH into one of the master nodes and initialize the Kubernetes cluster: On 
 
 ```bash
 sudo -i
-# kubeadm init --control-plane-endpoint="192.168.1.50:6443" --upload-certs --pod-network-cidr=10.244.0.0/16
-kubeadm init --control-plane-endpoint="192.168.1.50:6443" --upload-certs --apiserver-advertise-address=192.168.1.101 --pod-network-cidr=10.244.0.0/16
+kubeadm init --control-plane-endpoint="192.168.1.50:6443" --upload-certs --pod-network-cidr=10.244.0.0/16
+# kubeadm init --control-plane-endpoint="192.168.1.50:6443" --upload-certs --apiserver-advertise-address=192.168.1.101 --pod-network-cidr=10.244.0.0/16
 # as we are selecting master node then we will use IP address 192.168.1.101
 ```
 
