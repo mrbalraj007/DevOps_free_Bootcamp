@@ -4,7 +4,7 @@ data "aws_ami" "ubuntu" {
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"] # For Ubuntu Instance.
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server*"] # For Ubuntu Instance.
     #values = ["amzn2-ami-hvm-*-x86_64*"] # For Amazon Instance.
   }
 
@@ -41,8 +41,8 @@ resource "aws_instance" "k8s_master" {
 resource "aws_instance" "k8s_worker" {
   count = 2
   # ami           = "ami-04a81a99f5ec58529" # Replace with the latest Ubuntu AMI ID for your region
-  instance_type          = "t2.medium"  # t2.medium
-  key_name               = "MYLABKEY" # Reference your existing key
+  instance_type          = "t2.medium" # t2.medium
+  key_name               = "MYLABKEY"  # Reference your existing key
   ami                    = data.aws_ami.ubuntu.id
   vpc_security_group_ids = [aws_security_group.k8s_sg.id]
   user_data              = templatefile("./install.sh", {})
@@ -75,7 +75,8 @@ resource "aws_security_group" "k8s_sg" {
     from_port   = 6443
     to_port     = 6443
     protocol    = "tcp"
-    cidr_blocks = ["172.31.0.0/16"]
+    cidr_blocks = ["0.0.0.0/0"]
+    # cidr_blocks = ["172.31.0.0/16"]
   }
 
   ingress {
@@ -83,7 +84,7 @@ resource "aws_security_group" "k8s_sg" {
     from_port   = 2380
     to_port     = 2380
     protocol    = "tcp"
-    cidr_blocks = ["172.31.0.0/16"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
@@ -131,7 +132,7 @@ resource "aws_security_group" "k8s_sg" {
     from_port   = 2379
     to_port     = 2379
     protocol    = "tcp"
-    cidr_blocks = ["172.31.0.0/16"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {

@@ -428,7 +428,8 @@ sudo systemctl status kubelet
 
 ```bash
 sudo -i
-kubeadm init --control-plane-endpoint="172.31.1.50:6443" --upload-certs --apiserver-advertise-address=172.31.19.179 --pod-network-cidr=10.244.0.0/16
+# kubeadm init --control-plane-endpoint="172.31.1.50:6443" --upload-certs --apiserver-advertise-address=172.31.19.179 --pod-network-cidr=10.244.0.0/16
+kubeadm init --control-plane-endpoint="172.31.1.50:6443" --upload-certs --pod-network-cidr=10.244.0.0/16
 # as we are selecting master01 node then we will use IP address 172.31.19.179
 ```
 To Inspect Control Plane Containers

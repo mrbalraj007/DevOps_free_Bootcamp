@@ -4,8 +4,8 @@ data "aws_ami" "ubuntu" {
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"] # For Ubuntu Instance.
-    #values = ["amzn2-ami-hvm-*-x86_64*"] # For Amazon Instance.
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server*"] # For Ubuntu Instance.
+    #values = ["amzn2-ami-hvm-*-x86_64*"] # For Amazon Instance.    
   }
 
   filter {
@@ -19,10 +19,10 @@ data "aws_ami" "ubuntu" {
 
 # Create two EC2 instances
 resource "aws_instance" "k8s_proxy" {
-  count = 2
+  count = 1
   # ami           = "ami-04a81a99f5ec58529" # Replace with the latest Ubuntu AMI ID for your region
 
-  instance_type          = "t2.micro"
+  instance_type          = "t2.micro" # t2.micro
   key_name               = "MYLABKEY" # Reference your existing key
   ami                    = data.aws_ami.ubuntu.id
   vpc_security_group_ids = [aws_security_group.k8s_sg.id]
@@ -58,7 +58,8 @@ resource "aws_security_group" "k8s_sg" {
     from_port   = 6443
     to_port     = 6443
     protocol    = "tcp"
-    cidr_blocks = ["172.31.0.0/16"]
+    # cidr_blocks = ["172.31.0.0/16"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
@@ -66,7 +67,7 @@ resource "aws_security_group" "k8s_sg" {
     from_port   = 2380
     to_port     = 2380
     protocol    = "tcp"
-    cidr_blocks = ["172.31.0.0/16"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
@@ -114,7 +115,7 @@ resource "aws_security_group" "k8s_sg" {
     from_port   = 2379
     to_port     = 2379
     protocol    = "tcp"
-    cidr_blocks = ["172.31.0.0/16"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
