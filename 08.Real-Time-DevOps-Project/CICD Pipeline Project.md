@@ -1,24 +1,35 @@
-# <span style="color: Yellow;"> Deploying a Kubernetes Application with Jenkins: A Comprehensive Guide </span>
+# <span style="color: Yellow;"> Deploying a Kubernetes Application with Jenkins: A Comprehensive Guide- Production Level CICD Pipeline Project</span>
 
+![alt text](image-32.png)
 
 In this blog, we’ll walk through the process of deploying a Kubernetes application using Jenkins, along with integrating various tools like ```GitHub, Trivy, SonarQube, Nexus, Grafana, Docker, and Prometheus```. We will cover the setup, deployment, and monitoring stages to ensure a seamless and efficient pipeline.
 
-## <span style="color: Yellow;">Key Technologies Used </span>
-+ ```Jenkins```: An open-source automation server for building, deploying, and automating tasks.
+Implementing a complete CI/CD pipeline involves integrating various tools and technologies to automate the software development processes from code integration to deployment. 
 
-+ ```GitHub```: A platform for version control and collaboration.
+Here's a high-level overview of how each tool fits into the pipeline:
+1. **Jenkins**:: An open-source automation server for building, deploying, and automating tasks.
+2. **GitHub**: Serves as the version control system to manage code changes and history.
+3. **Maven**: A build automation tool used for Java projects, Maven compiles the source code and packages it into a deployable format.
+4. **Trivy**: An open-source vulnerability scanner for container images, ensuring the security of the application.
+5. **SonarQube**: Analyzes source code quality and provides reports on code smells, bugs, and vulnerabilities.
+6. **Docker**: Packages the application and its dependencies into a container, making it easy to deploy anywhere.
+7. **Terraform**: Infrastructure as Code (IaC) tool that allows you to define and provision infrastructure using a high-level configuration language.
+8. **Kubernetes**: An orchestration platform for managing containerized applications, handling scaling and failover.
+9. **Prometheus**: A monitoring system that collects metrics from configured targets at given intervals, evaluates rule expressions, and displays results.
+10. **Grafana**: A visualization tool that allows you to create dashboards for your metrics, giving insights into the application's performance and health.
 
-+ ```Trivy```: A vulnerability scanner for container images.
-+ ```SonarQube```: A tool for continuous inspection of code quality.
-+ ```Nexus```: A repository manager for managing dependencies and build artifacts.
-+ ```Docker```: A platform for developing, shipping, and running applications in containers.
-+ ```Docker Hub```: A cloud-based registry for Docker images.
-+ ```Grafana```: A tool for monitoring and visualizing metrics.
-+ ```Prometheus```: A monitoring system and time-series database.
+By chaining these tools together, developers can automate the testing, building, scanning, and deployment of applications, leading to more efficient and reliable software delivery. The pipeline begins with a developer pushing code to GitHub, triggering Maven to build the application. Post-build, Trivy scans the Docker container for vulnerabilities, while SonarQube checks for code quality issues. If all checks pass, Terraform provisions the required infrastructure, and Kubernetes rolls out the application. Prometheus monitors the system, and Grafana provides a dashboard for real-time analytics. This pipeline exemplifies a robust DevOps practice, ensuring continuous integration and delivery with an emphasis on code quality and security.
+
+### <span style="color: Yellow;">Prerequisites </span>
+1. [Clone repository for terraform code](https://github.com/mrbalraj007/DevOps_free_Bootcamp.git) 
+2. [App Repo](https://github.com/mrbalraj007/FullStack-Blogging-App)
+3. Domain name ( optional )
+
 
 ### <span style="color: Yellow;">Setting Up the Environment </span>
+I have created a terraform file to create a whole Environment setup
 
-1. Setting Up the Virtual Machines (EC2)
++ Setting Up the Virtual Machines (EC2)
 
 First, we'll create the necessary virtual machines using ```terraform```. 
 
@@ -905,10 +916,9 @@ http://44.201.170.60:3000/login
 default login password for grafana is ```admin/admin```
 ![alt text](image-28.png)
 
-
-
+<!-- 
 # to download Prometheus
-https://github.com/prometheus/prometheus/releases/download/v2.54.0/prometheus-2.54.0.linux-amd64.tar.gz
+wget https://github.com/prometheus/prometheus/releases/download/v2.54.0/prometheus-2.54.0.linux-amd64.tar.gz
 
 
 tar -xvf prometheus-2.54.0.linux-amd64.tar.gz
@@ -922,7 +932,7 @@ wget https://github.com/prometheus/blackbox_exporter/releases/download/v0.25.0/b
 
 tar -xvf blackbox_exporter-0.25.0.linux-amd64.tar.gz
 mv blackbox_exporter-0.25.0.linux-amd64/ blackbox
-
+ -->
 
 Now, run the following command for prometheus
 ```bash
@@ -1003,13 +1013,11 @@ In this blog, we’ve covered the essential steps for deploying and monitoring a
 
 __Key Takeaways__:
 
-Set up and configure an EKS cluster and kubectl.
-Define and execute Jenkins pipelines for deployment.
-Configure email notifications for deployment status.
-Set up and test custom domain mapping.
-Install and configure monitoring tools like Prometheus, Blackbox Exporter, and Grafana.
-
-
+- Set up and configure an EKS cluster and kubectl.
+- Define and execute Jenkins pipelines for deployment.
+- Configure email notifications for deployment status.
+- Set up and test custom domain mapping.
+- Install and configure monitoring tools like Prometheus, Blackbox Exporter, and Grafana.
 
 
 __Ref Link__: 
@@ -1022,3 +1030,4 @@ __Ref Link__:
 
 [4. Download Prometheus](https://prometheus.io/download/)
 
+[5.YouTube Link - Production Level CICD Pipeline Project](https://www.youtube.com/watch?v=kWON8yc6efU)
