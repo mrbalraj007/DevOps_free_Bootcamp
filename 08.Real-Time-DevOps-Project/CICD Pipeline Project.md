@@ -446,14 +446,13 @@ command
 kubectl apply -f service.yml
 ```
 
-#### To test the yml file to see whether it's a valid configuration or not, we can use either ```dry-run``` or ```kubeval```
+#### <span style="color: orange;"> To test the yml file to see whether it's a valid configuration or not, we can use either ```dry-run``` or ```kubeval```
 
 <details><summary>dry-run</b></summary></br> 
 To dry run
 kubectl apply --dry-run=client -f role.yaml
 </details>
-                             or 
-                             
+                                                         
 <details><summary>Kubebal</b></summary></br> 
 
 [Kubeval](https://github.com/instrumenta/kubeval?tab=readme-ov-file) is a tool specifically designed for validating Kubernetes YAML files against the Kubernetes OpenAPI schemas.
@@ -542,7 +541,7 @@ type: kubernetes.io/service-account-token
 metadata:
   name: mysecretname
   annotations:
-   kubernetes.io/service-account.name: jenkins
+   kubernetes.io/service-account.name: jenkins    # your service account name
 ```
 
 To apply to token you need to run with namespace as below
@@ -550,7 +549,7 @@ To apply to token you need to run with namespace as below
 kubectl apply -f jen-secret.yml -n webapps
 ```
 
-Now, you need to create a docker secret as we are using private repo in docker hub.
+Now, we need to create a ```docker secret``` as we are using ```private repo``` in docker hub.
 ```bash
 kubectl create secret docker-registry regcred \
 --docker-server=https://index.docker.io/v1/ \
@@ -887,10 +886,10 @@ pipeline {
   }
 }
 ```
-email notification
+E-mail notification
 ![alt text](image-22.png)
 
-pipeline view:
+Pipeline view:
 ![alt text](image-23.png)
 
 We will try access LB and see deployment is succesfull or not.
@@ -905,11 +904,11 @@ will create a temp user and password and login with that user credentail
 clink on ```add post```
 ![alt text](image-27.png)
 
-# Custom Domain
+# Custom Domain (Optional)
 
 
 
-# configuring monitoring(Grafana).
+# Configuring monitoring(Grafana).
 ```bash
 http://44.201.170.60:3000/login
 ```
@@ -951,17 +950,19 @@ Now, run the following command for blackbox
 ```bash
 ubuntu@ip-172-31-80-196:~$ ls
 blackbox  prometheus
+
 ubuntu@ip-172-31-80-196:~$ pwd
 /home/ubuntu
-ubuntu@ip-172-31-80-196:~$
-ubuntu@ip-172-31-80-196:~$ pwd
-/home/ubuntu
+
 ubuntu@ip-172-31-80-196:~$ cd blackbox/
+
 ubuntu@ip-172-31-80-196:~/blackbox$ ls
 LICENSE  NOTICE  blackbox.yml  blackbox_exporter
+
 ubuntu@ip-172-31-80-196:~/blackbox$ ./blackbox_exporter &
 ```
-Tyr to open 
+Tyr to open in browser and you will see below.
+
 http://44.201.170.60:9115/
 
 ![alt text](image-30.png)
