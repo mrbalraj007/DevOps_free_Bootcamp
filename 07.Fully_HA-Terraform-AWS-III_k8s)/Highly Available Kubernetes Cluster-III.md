@@ -126,7 +126,7 @@ This documentation guides you in setting up a cluster with three master nodes, o
 ### <span style="color: cyan;"> Virtual IP managed by Keepalived on the load balancer nodes
 |<span style="color: Yellow;"> Virtual IP</span>|
 |----|
-|<span style="color: Yellow;">172.31.80.50 <span>|
+|<span style="color: Yellow;">54.161.211.164 <span>|
 
 ### <span style="color: Yellow;"> Set hostname on all EC2 instances</span>
 > Including (loadbalancer1-2 & master01-03 and Worker01-02)
@@ -177,6 +177,8 @@ systemctl status keepalived
 systemctl status haproxy
 ```
 
+If you found Keepalive is not running, then you need to add the following script to make it work.
+
 ### Configure keepalived (Create the health check script)
 First, check the IP address range of the EC2 instance and identify the subnet from which they are getting their IP addresses. You need to choose an IP address from this range to use as the virtual IP for the HAProxy server in the health check script.
 
@@ -193,8 +195,8 @@ errorExit() {
 }
 
 curl --silent --max-time 2 --insecure https://localhost:6443/ -o /dev/null || errorExit "Error GET https://localhost:6443/"
-if ip addr | grep -q 172.31.80.50; then
-  curl --silent --max-time 2 --insecure https://172.31.80.50:6443/ -o /dev/null || errorExit "Error GET https://172.31.80.50:6443/"
+if ip addr | grep -q 54.161.211.164; then
+  curl --silent --max-time 2 --insecure https://54.161.211.164:6443/ -o /dev/null || errorExit "Error GET https://54.161.211.164:6443/"
 fi
 EOF
 sudo chmod +x /etc/keepalived/check_apiserver.sh
@@ -211,27 +213,17 @@ ip a s
 ```
 ##### In my Lab it is as below:
 ```powershell
-ubuntu@ip-172-31-90-55:~$ ip link show
+root@ip-172-31-47-206:~# ip link show
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 9001 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
-    link/ether 12:98:fb:45:9c:ef brd ff:ff:ff:ff:ff:ff
-ubuntu@ip-172-31-90-55:~$ ip a s
-1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-    inet 127.0.0.1/8 scope host lo
-       valid_lft forever preferred_lft forever
-    inet6 ::1/128 scope host
-       valid_lft forever preferred_lft forever
-2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 9001 qdisc fq_codel state UP group default qlen 1000
-    link/ether 12:98:fb:45:9c:ef brd ff:ff:ff:ff:ff:ff
-    inet 172.31.90.55/20 brd 172.31.95.255 scope global dynamic eth0
-       valid_lft 3429sec preferred_lft 3429sec
-    inet6 fe80::1098:fbff:fe45:9cef/64 scope link
-       valid_lft forever preferred_lft forever
+2: enX0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 9001 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
+    link/ether 0e:aa:42:cf:89:a3 brd ff:ff:ff:ff:ff:ff
+root@ip-172-31-47-206:~# ^C
+root@ip-172-31-47-206:~# ^C
+root@ip-172-31-47-206:~#
 ```
 
-* Adjust the connect name ```interface eth1```
+* Adjust the connect name ```interface enX0```
 
 Create keepalived config /etc/keepalived/keepalived.conf
 ```bash
@@ -247,7 +239,7 @@ vrrp_script check_apiserver {
 
 vrrp_instance VI_1 {
     state BACKUP
-    interface eth0
+    interface enX0
     virtual_router_id 1
     priority 100
     advert_int 5
@@ -256,7 +248,7 @@ vrrp_instance VI_1 {
         auth_pass mysecret
     }
     virtual_ipaddress {
-        172.31.80.50
+        54.161.211.164
     }
     track_script {
         check_apiserver
@@ -264,6 +256,13 @@ vrrp_instance VI_1 {
 }
 EOF
 ```
+### Validate the configuration file:
+
+Ensure that the keepalived configuration file does not have syntax errors. You can test the configuration by running:
+```bash
+sudo keepalived -f /etc/keepalived/keepalived.conf -t
+```
+
 ### Enable & start keepalived service
 ```bash
 sudo systemctl restart keepalived
@@ -271,9 +270,6 @@ sudo systemctl enable --now keepalived
 sudo systemctl restart haproxy
 sudo systemctl enable haproxy
 ```
-
-
-
 
 ### To verify which one is master HA Proxy
 
@@ -294,16 +290,16 @@ ip a | grep <virtual_ip>
                 or
 sudo grep Keepalived /var/log/syslog
                 or
-sudo ip addr show | grep 172.31.80.50  # Replace with your virtual IP
+sudo ip addr show | grep 54.161.211.164  # Replace with your virtual IP
                 or
-ip a | grep 172.31.80.50
+ip a | grep 54.161.211.164
 ```
 
 - Failover Test:
 Stop the Keepalived service on the MASTER node and check if the virtual IP is moved to the BACKUP node:
 ```bash
 sudo systemctl stop keepalived
-ip a | grep 172.31.80.50  # On Backup (Load Balancer02) Node
+ip a | grep 54.161.211.164  # On Backup (Load Balancer02) Node
 ```
 
 > In my case my ```HA-proxy02``` become master.
@@ -327,9 +323,8 @@ backend kubernetes-backend
   mode tcp
   option ssl-hello-chk
   balance roundrobin
-    server master1 3.84.181.226:6443 check fall 3 rise 2
-    server master2 34.228.82.252:6443 check fall 3 rise 2
-    server master3 3.90.205.74:6443 check fall 3 rise 2
+    server master1 54.221.141.238:6443 check fall 3 rise 2
+    server master2 54.226.139.190:6443 check fall 3 rise 2    
 EOF
 ```
 ##### Restart HAProxy to apply the configuration: (Enable & restart haproxy service)
@@ -429,7 +424,7 @@ sudo systemctl status kubelet
 ```bash
 sudo -i
 # kubeadm init --control-plane-endpoint="172.31.1.50:6443" --upload-certs --apiserver-advertise-address=172.31.19.179 --pod-network-cidr=10.244.0.0/16
-kubeadm init --control-plane-endpoint="172.31.1.50:6443" --upload-certs --pod-network-cidr=10.244.0.0/16
+kubeadm init --control-plane-endpoint="54.161.211.164:6443" --upload-certs --pod-network-cidr=10.244.0.0/16
 # as we are selecting master01 node then we will use IP address 172.31.19.179
 ```
 To Inspect Control Plane Containers
@@ -446,7 +441,8 @@ If you get an error then run the following command
 Try Re-running Kubeadm
 ```bash
 sudo kubeadm reset -f
-sudo kubeadm init --control-plane-endpoint="172.31.80.50:6443" --upload-certs --apiserver-advertise-address=172.31.29.29 --pod-network-cidr=10.244.0.0/16
+sudo kubeadm init --control-plane-endpoint="54.161.211.164:6443" --upload-certs --pod-network-cidr=10.244.0.0/16
+# sudo kubeadm init --control-plane-endpoint="54.161.211.164:6443" --upload-certs --apiserver-advertise-address=172.31.29.29 --pod-network-cidr=10.244.0.0/16
 ```
 
 ```css

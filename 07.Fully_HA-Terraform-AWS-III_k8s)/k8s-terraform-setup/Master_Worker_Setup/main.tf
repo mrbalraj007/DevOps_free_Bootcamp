@@ -19,7 +19,7 @@ data "aws_ami" "ubuntu" {
 
 # Create two EC2 instances
 resource "aws_instance" "k8s_master" {
-  count = 3
+  count = 2
   # ami           = "ami-04a81a99f5ec58529" # Replace with the latest Ubuntu AMI ID for your region
   instance_type          = "t2.medium"
   key_name               = "MYLABKEY" # Reference your existing key

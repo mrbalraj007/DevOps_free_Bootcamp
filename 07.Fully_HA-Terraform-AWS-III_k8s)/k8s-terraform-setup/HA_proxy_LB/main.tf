@@ -1,11 +1,10 @@
-# Data source for fetching latest Ubuntu 20.04 LTS AMI
+# Fetch the latest Ubuntu 24.04 LTS AMI
 data "aws_ami" "ubuntu" {
   most_recent = true
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server*"] # For Ubuntu Instance.
-    #values = ["amzn2-ami-hvm-*-x86_64*"] # For Amazon Instance.    
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server*"]
   }
 
   filter {
@@ -14,18 +13,52 @@ data "aws_ami" "ubuntu" {
   }
 
   owners = ["099720109477"] # Canonical owner ID for Ubuntu AMIs
-  # owners = ["137112412989"] # Amazon owner ID for Amazon Linux AMIs
+}
+
+# Create IAM Role
+resource "aws_iam_role" "ha_lb_role" {
+  name = "HA-LB"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+# Attach Full EC2 Permissions to IAM Role
+resource "aws_iam_role_policy_attachment" "ec2_full_access" {
+  role       = aws_iam_role.ha_lb_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
+}
+
+# Attach Full IAM Permissions to IAM Role
+resource "aws_iam_role_policy_attachment" "iam_full_access" {
+  role       = aws_iam_role.ha_lb_role.name
+  policy_arn = "arn:aws:iam::aws:policy/IAMFullAccess"
+}
+
+# Create IAM Instance Profile for EC2
+resource "aws_iam_instance_profile" "ha_lb_instance_profile" {
+  name = "HA-LB-Instance-Profile"
+  role = aws_iam_role.ha_lb_role.name
 }
 
 # Create two EC2 instances
 resource "aws_instance" "k8s_proxy" {
-  count = 1
-  # ami           = "ami-04a81a99f5ec58529" # Replace with the latest Ubuntu AMI ID for your region
-
-  instance_type          = "t2.micro" # t2.micro
-  key_name               = "MYLABKEY" # Reference your existing key
+  count                  = 2
+  instance_type          = "t2.micro"
+  key_name               = "MYLABKEY"
   ami                    = data.aws_ami.ubuntu.id
   vpc_security_group_ids = [aws_security_group.k8s_sg.id]
+  iam_instance_profile   = aws_iam_instance_profile.ha_lb_instance_profile.name
   user_data              = templatefile("./HA_Proxy_install.sh", {})
 
   root_block_device {
@@ -35,10 +68,12 @@ resource "aws_instance" "k8s_proxy" {
   tags = {
     Name = "HA-Proxy-${count.index + 1}"
   }
-
 }
 
-
+# Create an Elastic IP for the first EC2 instance
+resource "aws_eip" "ha_proxy_eip" {
+  instance = aws_instance.k8s_proxy[0].id
+}
 
 # Create a security group
 resource "aws_security_group" "k8s_sg" {
@@ -58,7 +93,6 @@ resource "aws_security_group" "k8s_sg" {
     from_port   = 6443
     to_port     = 6443
     protocol    = "tcp"
-    # cidr_blocks = ["172.31.0.0/16"]
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -146,12 +180,15 @@ resource "aws_security_group" "k8s_sg" {
   }
 }
 
-
-
 output "instance_public_ips" {
   value = aws_instance.k8s_proxy[*].public_ip
 }
 
 output "instance_private_ips" {
   value = aws_instance.k8s_proxy[*].private_ip
+}
+
+# Output the Elastic IP
+output "ha_proxy_eip" {
+  value = aws_eip.ha_proxy_eip.public_ip
 }
