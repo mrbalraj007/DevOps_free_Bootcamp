@@ -127,7 +127,7 @@ resource "aws_eks_node_group" "balraj_node_group" {
     source_security_group_ids = [aws_security_group.balraj_node_sg.id]
   }
 
-  instance_types = ["t2.micro"]   # You can change here for any instance "t3.medium"
+  instance_types = ["t3.medium"]   # You can change here for any instance "t2.micro"
 
   depends_on = [
     aws_iam_role_policy_attachment.balraj_node_group_policy_attachment,
