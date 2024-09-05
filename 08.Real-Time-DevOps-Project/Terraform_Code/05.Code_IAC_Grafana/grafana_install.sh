@@ -4,8 +4,8 @@ sudo apt-get update -y
 
 # Enable ssh password authentication
 echo "[TASK 1] Enable ssh password authentication"
-sed -i 's/^#PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config
-echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
+sudo sed -i 's/^#PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+sudo echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
 sudo systemctl reload ssh
 
 # Set Root password

@@ -1,4 +1,4 @@
-# <span style="color: Yellow;"> Deploying a Kubernetes Application with Jenkins: A Comprehensive Guide- Production Level CICD Pipeline Project</span>
+# <span style="color: Yellow;"> Building a Robust CICD Pipeline: Deploying Kubernetes Apps with Jenkins</span>
 
 ![alt text](image-32.png)
 
@@ -18,22 +18,21 @@ Here's a high-level overview of how each tool fits into the pipeline:
 9. **Prometheus**: A monitoring system that collects metrics from configured targets at given intervals, evaluates rule expressions, and displays results.
 10. **Grafana**: A visualization tool that allows you to create dashboards for your metrics, giving insights into the application's performance and health.
 
-By chaining these tools together, developers can automate the testing, building, scanning, and deployment of applications, leading to more efficient and reliable software delivery. The pipeline begins with a developer pushing code to GitHub, triggering Maven to build the application. Post-build, Trivy scans the Docker container for vulnerabilities, while SonarQube checks for code quality issues. If all checks pass, Terraform provisions the required infrastructure, and Kubernetes rolls out the application. Prometheus monitors the system, and Grafana provides a dashboard for real-time analytics. This pipeline exemplifies a robust DevOps practice, ensuring continuous integration and delivery with an emphasis on code quality and security.
+*By chaining these tools together, developers can automate the testing, building, scanning, and deployment of applications, leading to more efficient and reliable software delivery. The pipeline begins with a developer pushing code to GitHub, triggering Maven to build the application. Post-build, Trivy scans the Docker container for vulnerabilities, while SonarQube checks for code quality issues. If all checks pass, Terraform provisions the required infrastructure, and Kubernetes rolls out the application. Prometheus monitors the system, and Grafana provides a dashboard for real-time analytics. This pipeline exemplifies a robust DevOps practice, ensuring continuous integration and delivery with an emphasis on code quality and security.*
 
 ### <span style="color: Yellow;">Prerequisites </span>
 1. [Clone repository for terraform code](https://github.com/mrbalraj007/DevOps_free_Bootcamp.git) 
 2. [App Repo](https://github.com/mrbalraj007/FullStack-Blogging-App)
 3. Domain name ( optional )
 
-
 ### <span style="color: Yellow;">Setting Up the Environment </span>
-I have created a terraform file to create a whole Environment setup
+I have created a Terraform file to set up the entire environment, including the installation of required applications and tools.
 
-+ Setting Up the Virtual Machines (EC2)
+- [x] Setting Up the Virtual Machines (EC2)
 
 First, we'll create the necessary virtual machines using ```terraform```. 
 
-Below is a sample terraform configuration:
+Below is a terraform configuration:
 
 Once you [clone repo](https://github.com/mrbalraj007/DevOps_free_Bootcamp.git) then go to folder *<span style="color: cyan;">"08.Real-Time-DevOps-Project/Terraform_Code"</span>* and run the terraform command.
 ```bash
@@ -53,7 +52,7 @@ da---l          25/08/24   8:38 PM                05.Code_IAC_Grafana
 
 You need to run ```main.tf``` file using following terraform command.
 
-__<span style="color: Red;">Note__</span> &rArr; make sure you will run ```main.tf``` not from inside the folders.
+__<span style="color: Red;">Note__</span> &rArr; Make sure to run ```main.tf``` from outside the folders; do not go inside the folders.
 
 ```bash
 cd 08.Real-Time-DevOps-Project/Terraform_Code
@@ -75,18 +74,19 @@ terraform apply --auto-approve
 ```
 -------
 ### __Environment Setup__
-|HostName|
-|----|
-|Jenkins|
-|SonarQube|
-|Nexus|
-|Terraform|
-|Grafana|
+|HostName|OS|
+|:----:|:----:|
+|Jenkins| Ubuntu 24 LTS|
+|SonarQube| Ubuntu 24 LTS|
+|Nexus| Ubuntu 24 LTS|
+|Terraform| Ubuntu 24 LTS|
+|Grafana| Ubuntu 24 LTS|
 
 > * Password for the **root** account on all these virtual machines is **xxxxxxx**
 > * Perform all the commands as root user unless otherwise specified
 
-- Change the hostname:
+<details><summary><b><span style="color: Orange;">Change the hostname: (optional)</b></summary><br>
+
 ```bash
 sudo hostnamectl set-hostname Jenkins
 sudo hostnamectl set-hostname SonarQube
@@ -115,6 +115,8 @@ Update the package
 sudo -i
 apt update 
 ```
+</details>
+
 ## <span style="color: red;"> Setup for SonarQube</span>
 ```bash
 http://publicIPofSonarQube:9000
@@ -168,6 +170,7 @@ bash-4.4$ cat admin.password
 bash-4.4$
 ```
 Type the new password
+
 ![alt text](image-3.png)
 
 Select the ```enable anonymous access```
@@ -428,12 +431,12 @@ current path
 /home/ubuntu   # Current path
 ```
 ### To create a namespace 
-```bash
+```sh
 kubectl create ns webapps
 ```
 ### To create a service account
 
-```bash
+```sh
 ubuntu@ip-172-31-28-76:~$ cat service.yml
 apiVersion: v1
 kind: ServiceAccount
@@ -441,7 +444,7 @@ metadata:
  name: jenkins
  namespace: webapps
 ```
-command
+- [x] command for apply 
 ```sh
 kubectl apply -f service.yml
 ```
@@ -749,6 +752,7 @@ Configure email notification in Jenkins.
     Manage Jenkins
     System
 ![alt text](image-20.png)
+
 click on ```test configuration```
 now, configure ```Extended E-mail Notification ```
 ![alt text](image-21.png)
@@ -999,26 +1003,26 @@ kubectl get nodes
 
 
 ## <span style="color: Yellow;">To destroy the setup using Terraform.</span>
-First go to your ```Terrform``` EC2 VM and delete the EKS cluster
+- [x] First go to your ```Terrform``` EC2 VM and delete the EKS cluster
 ```bash
 terraform destroy --auto-approve
 ```
-then go to your directory on main folder ```"Terraform_Code"``` directory then run the command 
+- [x] then go to your directory on main folder ```"Terraform_Code"``` directory then run the command 
 ```bash
 terraform destroy --auto-approve
 ```
 
 
 ## <span style="color: Yellow;">Conclusion </span>
-In this blog, we’ve covered the essential steps for deploying and monitoring a Kubernetes application using Jenkins and various supporting tools. By following this guide, you can set up a robust pipeline, ensure your application is deployed smoothly, and monitor its performance effectively.
+**In this blog, we’ve covered the essential steps for deploying and monitoring a Kubernetes application using Jenkins and various supporting tools. By following this guide, you can set up a robust pipeline, ensure your application is deployed smoothly, and monitor its performance effectively.**
 
 __Key Takeaways__:
 
-- Set up and configure an EKS cluster and kubectl.
+*- Set up and configure an EKS cluster and kubectl.
 - Define and execute Jenkins pipelines for deployment.
 - Configure email notifications for deployment status.
 - Set up and test custom domain mapping.
-- Install and configure monitoring tools like Prometheus, Blackbox Exporter, and Grafana.
+- Install and configure monitoring tools like Prometheus, Blackbox Exporter, and Grafana*.
 
 
 __Ref Link__: 
@@ -1032,3 +1036,4 @@ __Ref Link__:
 [4. Download Prometheus](https://prometheus.io/download/)
 
 [5.YouTube Link - Production Level CICD Pipeline Project](https://www.youtube.com/watch?v=kWON8yc6efU)
+
