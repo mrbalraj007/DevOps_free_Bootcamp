@@ -15,30 +15,48 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical owner ID for Ubuntu AMIs
 }
 
-# Custom IAM Policy for EKS
+# # Custom IAM Policy for EKS
+# resource "aws_iam_policy" "eks_custom_policy" {
+#   name        = "eks_custom_policy"
+#   description = "Custom policy for EKS operations"
+#   policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [
+#       {
+#         Effect = "Allow"
+#         Action = [
+#           "eks:CreateNodegroup",
+#           "eks:DescribeNodegroup",
+#           "eks:DeleteNodegroup",
+#           "eks:ListNodegroups",
+#           "eks:CreateCluster",
+#           "eks:DescribeCluster",
+#           "eks:DeleteCluster",
+#           "eks:ListClusters"
+#         ]
+#         Resource = "*"
+#       }
+#     ]
+#   })
+# }
+
+# Custom IAM Policy for EKS with full permissions
 resource "aws_iam_policy" "eks_custom_policy" {
   name        = "eks_custom_policy"
-  description = "Custom policy for EKS operations"
+  description = "Custom policy for EKS operations with full permissions"
   policy = jsonencode({
-    Version = "2012-10-17"
+    Version = "2012-10-17",
     Statement = [
       {
-        Effect = "Allow"
-        Action = [
-          "eks:CreateNodegroup",
-          "eks:DescribeNodegroup",
-          "eks:DeleteNodegroup",
-          "eks:ListNodegroups",
-          "eks:CreateCluster",
-          "eks:DescribeCluster",
-          "eks:DeleteCluster",
-          "eks:ListClusters"
-        ]
+        Sid      = "VisualEditor0",
+        Effect   = "Allow",
+        Action   = "eks:*",
         Resource = "*"
       }
     ]
   })
 }
+
 
 # Attach Custom EKS Policy to IAM Role
 resource "aws_iam_role_policy_attachment" "eks_custom_policy_attachment" {
@@ -146,7 +164,7 @@ resource "aws_iam_instance_profile" "k8s_cluster_instance_profile" {
 
 resource "aws_instance" "terrabox" {
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = "t2.large"
+  instance_type          = "t3.medium"
   key_name               = "MYLABKEY" # Change key name as per your setup
   vpc_security_group_ids = [aws_security_group.TerraBox.id]
   iam_instance_profile   = aws_iam_instance_profile.k8s_cluster_instance_profile.name

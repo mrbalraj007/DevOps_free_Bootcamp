@@ -107,4 +107,6 @@ echo "Continuing with the rest of the script..."
 cd /home/ubuntu/k8s_setup_file
 terraform init
 sleep 60  # Pause for 1 minutes
-terraform apply -auto-approve
+#terraform apply -auto-approve
+echo "Applying the Terraform plan with auto-approve..."
+terraform apply -auto-approve | tee apply.log
