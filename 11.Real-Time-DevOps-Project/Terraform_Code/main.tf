@@ -50,7 +50,7 @@ resource "aws_iam_instance_profile" "starbucks_policy_instance_profile" {
 
 resource "aws_instance" "terrabox" {
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = "t3.medium"
+  instance_type          = "t2.xlarge"
   key_name               = "MYLABKEY" # Change key name as per your setup
   vpc_security_group_ids = [aws_security_group.TerraBox.id]
   iam_instance_profile   = aws_iam_instance_profile.starbucks_policy_instance_profile.name
@@ -84,7 +84,8 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
 }
 
 resource "aws_sns_topic" "alerts" {
-  name = "High CPU alerts"
+  #name = "High CPU alerts"
+  name = "alerts"
 }
 
 resource "aws_sns_topic_subscription" "email_subscription" {
