@@ -138,6 +138,10 @@ resource "aws_instance" "kind_instance" {
   tags = {
     Name = "Terraform-Kind-Cluster"
   }
+
+  root_block_device {
+    volume_size = 30
+  }
 }
 
 output "instance_public_ip" {
