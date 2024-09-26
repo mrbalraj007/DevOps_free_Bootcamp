@@ -22,3 +22,4 @@ Universal_Terraform_EC2_Create/.terraform/providers/registry.terraform.io/hashic
 *.bak
 *.sh
 *.txt
+CICD Pipeline Project.md

@@ -54,12 +54,12 @@ resource "aws_security_group" "instance_sg" {
   name        = "allow_ssh_all"
   description = "Allow SSH and all other traffic"
 
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Replace with your IP for better security
-  }
+  #   ingress {
+  #     from_port   = 22
+  #     to_port     = 22
+  #     protocol    = "tcp"
+  #     cidr_blocks = ["0.0.0.0/0"] # Replace with your IP for better security
+  #   }
 
   ingress {
     from_port   = 0
@@ -76,7 +76,7 @@ resource "aws_security_group" "instance_sg" {
   }
 }
 
-# Launch EC2 instance and install Kind with a 3-node cluster
+# Launch EC2 instance and install Kind, ArgoCD, Helm, Prometheus, and Grafana
 resource "aws_instance" "kind_instance" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = "t2.medium"
@@ -84,7 +84,7 @@ resource "aws_instance" "kind_instance" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
   vpc_security_group_ids = [aws_security_group.instance_sg.id]
 
-  # Install Docker, Kind, and create the Kind cluster
+  # Install Docker, Kind, create the Kind cluster, ArgoCD, Helm, Prometheus, and Grafana
   user_data = <<-EOF
     #!/bin/bash
     sudo apt update -y
@@ -132,6 +132,36 @@ resource "aws_instance" "kind_instance" {
 
     # Make sure kubeconfig is accessible
     chown ubuntu:ubuntu /home/ubuntu/.kube/config
+
+    # Install ArgoCD
+    kubectl create namespace argocd
+    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+    
+    # Install Kubernetes dashboard
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+
+    # Install Helm
+    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    chmod 700 get_helm.sh
+    ./get_helm.sh
+
+    # Add Helm repositories
+    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+    helm repo add stable https://charts.helm.sh/stable
+    helm repo update
+
+    # Install Prometheus and Grafana using Helm
+    kubectl create namespace monitoring
+    helm install kind-prometheus prometheus-community/kube-prometheus-stack \
+      --namespace monitoring \
+      --set prometheus.service.nodePort=30000 \
+      --set prometheus.service.type=NodePort \
+      --set grafana.service.nodePort=31000 \
+      --set grafana.service.type=NodePort \
+      --set alertmanager.service.nodePort=32000 \
+      --set alertmanager.service.type=NodePort \
+      --set prometheus-node-exporter.service.nodePort=32001 \
+      --set prometheus-node-exporter.service.type=NodePort
 
   EOF
 

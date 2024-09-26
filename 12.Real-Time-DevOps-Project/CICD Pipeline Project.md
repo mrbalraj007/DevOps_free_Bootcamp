@@ -1,5 +1,7 @@
 # <span style="color: Yellow;"> End-to-End Kubernetes Observability with ArgoCD, Prometheus, and Grafana on KinD</span>
 
+![alt text](Project10.gif)
+
 This guide will help you set up Prometheus and Grafana on Kubernetes with ArgoCD, ideal for both beginners and experienced DevOps professionals. The project focuses on monitoring Kubernetes clusters using Prometheus (for metrics collection) and Grafana (for visualizing those metrics). We'll also briefly cover ArgoCD for continuous delivery and how to integrate these tools to create a robust observability platform.
 
 ## <span style="color: Yellow;"> What is KinD?
@@ -62,7 +64,7 @@ I have created a Terraform file to set up the entire environment, including the 
 
 <!-- <span style="color: cyan;"> __Note__&rArr;</span> I was using <span style="color: red;">```t3.medium```</span> and having performance issues; I was unable to run the pipeline, and it got stuck in between. So, I am now using ```t2.xlarge``` now. Also, you have to update ```your email address``` in the ```main.tf``` file so that topic for alerting can be created while creation the VM. -->
 
-#### <span style="color: Yellow;">Setting Up the Virtual Machines (EC2)
+###### <span style="color: Yellow;">Setting Up the Virtual Machines (EC2)
 
 First, we'll create the necessary virtual machines using ```terraform```. 
 
@@ -90,7 +92,7 @@ Mode                 LastWriteTime         Length Name
 ```
 You need to run ```main.tf``` file using following terraform command.
 
-#### Now, run the following command.
+Now, run the following command.
 ```bash
 terraform init
 terraform fmt
@@ -102,7 +104,7 @@ terraform apply
 -------
 Once you run the terraform command, then we will verify the following things to make sure everything is setup via a terraform.
 
-#### <span style="color: cyan;"> Verify the Docker version
+###### <span style="color: cyan;"> Verify the Docker version
 ```bash
 ubuntu@ip-172-31-95-197:~$ docker --version
 Docker version 24.0.7, build 24.0.7-0ubuntu4.1
@@ -117,7 +119,8 @@ CONTAINER ID   IMAGE                  COMMAND                  CREATED         S
 ```
 
 
-#### <span style="color: Cyan;"> Inspect the ```Cloud-Init``` logs</span>: Once connected to EC2 instance then you can check the status of the ```user_data``` script by inspecting the log files.
+###### <span style="color: Cyan;"> Inspect the ```Cloud-Init``` logs</span>: 
+    Once connected to EC2 instance then you can check the status of the ```user_data``` script by inspecting the log files.
 
 ```bash
 # Primary log file for cloud-init
@@ -131,7 +134,7 @@ sudo tail -f /var/log/cloud-init-output.log
 Kubeconfig Setup: The kind get kubeconfig command exports the Kubernetes cluster configuration to the correct location (/home/ubuntu/.kube/config) and sets the KUBECONFIG environment variable so that kubectl can interact with the Kind cluster.
 Permissions for Kubeconfig: The ownership of the kubeconfig file is set to the ubuntu user to ensure it can be accessed and modified properly. -->
 
-#### <span style="color: cyan;">Verify the KIND cluster and command to Test it:
+###### <span style="color: cyan;">Verify the KIND cluster and command to Test it:
 After Terraform deploys the instance and the cluster is set up, you can SSH into the instance and run:
 
 ```bash
@@ -143,35 +146,36 @@ kubectl cluster-info --context kind-kind
 
 ## <span style="color: yellow;">Managing Docker and Kubernetes Pods
 
-- #### <span style="color: Cyan;">Check Docker containers running:</span>
+##### <span style="color: Cyan;">Check Docker containers running:</span>
 ```sh
 docker ps
 ```
-- #### <span style="color: Cyan;">List all Kubernetes pods in all namespaces:</span>
+##### <span style="color: Cyan;">List all Kubernetes pods in all namespaces:</span>
 ```sh
 kubectl get pods -A
 ```
-
-### <span style="color: Yellow;">Installing/Setup Argo CD</span>
-
 - To get the existing namespace 
 ```sh
 kubectl get namespace
 ```
-- #### <span style="color: Cyan;">Create a namespace for Argo CD:
+
+### <span style="color: Yellow;">Setup Argo CD</span>
+
+<!-- 
+- ###### <span style="color: Cyan;">Create a namespace for Argo CD:
 ```sh
 kubectl create namespace argocd
 ```
-- #### <span style="color: Cyan;"> Apply the Argo CD manifest:
+- ###### <span style="color: Cyan;"> Apply the Argo CD manifest:
 ```sh
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 ```
 This will deploy a bunch of Kubernetes resources inside argocd namespace. Create this namespace if it’s not created.
 This will deploy the ArgoCD server, along with other components such as the ArgoCD repo server, ArgoCD application controller, and the Redis cache.
 
-![alt text](image.png)
+![alt text](image.png) -->
 
-- #### <span style="color: Cyan;"> Verify all nodes in namespace argocd
+##### <span style="color: Cyan;"> Verify all nodes in namespace argocd
 ```bash  
 kubectl get pods -n argocd 
 ```  
@@ -219,7 +223,7 @@ After researching the issue, it was discovered that there was insufficient disk 
 
 </details>
 
-- #### <span style="color: Cyan;"> Check services in Argo CD namespace:
+##### <span style="color: Cyan;"> Check services in Argo CD namespace:
 ```sh
 kubectl get svc -n argocd
 ```
@@ -232,7 +236,7 @@ kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
 ```
 ![alt text](image-2.png)
 
-- #### <span style="color: Cyan;">Forward ports to access Argo CD server:
+##### <span style="color: Cyan;">Forward ports to access Argo CD server:
 ```sh
 kubectl port-forward -n argocd service/argocd-server 8443:443 --address=0.0.0.0 &
 # kubectl port-forward -n argocd service/argocd-server 8443:443 &
@@ -244,13 +248,13 @@ https://18.212.179.217:8443
 ![alt text](image-3.png)
 
 - Argo CD Initial Admin Password
-- #### <span style="color: Cyan;">Grab the password to login to the dashboard/Retrieve Argo CD admin password:
+##### <span style="color: Cyan;">Grab the password to login to the dashboard/Retrieve Argo CD admin password:
 ```sh
 kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
 ```
 ![alt text](image-4.png)
 
-- #### <span style="color: Cyan;">Configure the application in argocd
+##### <span style="color: Cyan;">Configure the application in argocd
 click on > applications>new apps><br>
 Application Name: voting-app><br>
 Project Name: default<br>
@@ -268,7 +272,7 @@ Namespace: default <br>
 ![alt text](image-11.png)
 ![alt text](image-13.png)
 
-- #### <span style="color: Cyan;">Validate the pods
+##### <span style="color: Cyan;">Validate the pods
 ```sh
 kubectl get pods
 ```
@@ -278,13 +282,13 @@ kubectl get pods
 
 ![alt text](image-49.png)
 
-- #### <span style="color: Cyan;">Verify the deployment
+##### <span style="color: Cyan;">Verify the deployment
 ```sh
 kubectl get deployments
 ```
 ![alt text](image-15.png)
 
-#### <span style="color: Cyan;">Verify the service 
+##### <span style="color: Cyan;">Verify the service 
 ```sh
 kubectl get svc
 ```
@@ -306,7 +310,7 @@ kubectl port-forward svc/vote 5000:5000 --address=0.0.0.0 &
 kubectl port-forward svc/result 5001:5001 --address=0.0.0.0 &
 ```
 
-#### <span style="color: Cyan;">Verify the ```vote``` & ```results``` in browser.
+##### <span style="color: Cyan;">Verify the ```vote``` & ```results``` in browser.
 Now, we will open in browser to access services.
 
 ```http://<public IP Address of EC2>: 5000``` (vote) <br>
@@ -324,7 +328,7 @@ I clicked on dog, and the results are presented below.
 
 ![alt text](image-19.png)
 
-### <span style="color: orange;">**We have successfully set up Argo CD on a Kubernetes cluster & deployed the applications automatically.**
+<span style="color: orange;">**We have successfully set up Argo CD on a Kubernetes cluster & deployed the applications automatically.**
 
 ### <span style="color: Cyan;">Deploy Kubernetes dashboard:
 ```sh
@@ -332,7 +336,7 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/a
 ```
 ![alt text](image-20.png)
 
-#### <span style="color: Cyan;">Create a admin user for Kubernetes dashboard: dashboard-adminuser.yml
+##### <span style="color: Cyan;">Create a admin user for Kubernetes dashboard: dashboard-adminuser.yml
 ```sh
 apiVersion: v1
 kind: ServiceAccount
@@ -360,7 +364,7 @@ kubectl apply -f dashboard-adminuser.yml
 ![alt text](image-21.png)
 
 
-- #### <span style="color: Cyan;">Create a token for dashboard access:
+##### <span style="color: Cyan;">Create a token for dashboard access:
 ```sh
 kubectl -n kubernetes-dashboard create token admin-user
 ```
@@ -379,7 +383,7 @@ kubectl get svc -n kubernetes-dashboard
 kubectl port-forward svc/kubernetes-dashboard -n kubernetes-dashboard 8080:443 --address=0.0.0.0 &
 ```
 
-#### <span style="color: Cyan;">Verify the ```dashboard``` in browser.
+##### <span style="color: Cyan;">Verify the ```dashboard``` in browser.
 Now, we will open in browser to access services.
 
 ```https://<public IP Address of EC2>: 8080``` 
@@ -422,7 +426,7 @@ helm install kind-prometheus prometheus-community/kube-prometheus-stack --namesp
 kubectl get svc -n monitoring
 kubectl get namespace
 ```
-#### <span style="color: cyan;"> To view all pods in monitoring namespace.
+##### <span style="color: cyan;"> To view all pods in monitoring namespace.
 ```sh
 kubectl get pods -n monitoring
 ```
@@ -454,7 +458,7 @@ For prometheus
 ```sh
 kubectl port-forward svc/kind-prometheus-kube-prome-prometheus -n monitoring 9090:9090 --address=0.0.0.0 & 
 ```
-#### <span style="color: Cyan;">Verify the ```prometheus``` in browser.
+##### <span style="color: Cyan;">Verify the ```prometheus``` in browser.
 Now, we will open in browser to access services.
 ```http://<public IP Address of EC2>:9090``` 
 ```http://<public IP Address of EC2>:9090/metrics``` # it is sending to prometheus
@@ -463,7 +467,7 @@ http://18.206.155.5:9090/metrics
 ![alt text](image-30.png)
 ![alt text](image-31.png)
 
-#### <span style="color: Cyan;">Prometheus Queries
+##### <span style="color: Cyan;">Prometheus Queries
 paste the below query in expression on prometheus and click on execute
 ![alt text](image-33.png)
 
@@ -517,7 +521,7 @@ For grafanan (expose port)
 ```bash
 kubectl port-forward svc/kind-prometheus-grafana -n monitoring 3000:80 --address=0.0.0.0 &
 ```
-#### <span style="color: Cyan;">Verify the ```Grafana``` in browser.
+##### <span style="color: Cyan;">Verify the ```Grafana``` in browser.
 Now, we will open in browser to access services.<br>
 ```http://<public IP Address of EC2>:3000``` <br>
 http://18.206.155.5:3000 <br>
@@ -528,7 +532,7 @@ Password: prom-operator
 
 ![alt text](image-36.png)
 
-#### <span style="color: Cyan;">Creating a user in Grafana
+##### <span style="color: Cyan;">Creating a user in Grafana
 - Now , we will create a test user and will give permission accordingly.<br>
   Home> Administration> Users and access> Users> create user
 
@@ -537,7 +541,7 @@ Password: prom-operator
 You can change the role as well, as per blow screenshot.
 ![alt text](image-38.png)
 
-#### <span style="color: Cyan;">Creating a dashboard in Grafana<br>
+##### <span style="color: Cyan;">Creating a dashboard in Grafana<br>
 Home> Connections> Data sources >Build a dashboard>add visualization> select the Prometheus
 
 select the metrix, label filter.. Hit on run query>click save.
@@ -569,12 +573,12 @@ AWS Resources:
 
 
 ## <span style="color: Yellow;"> Environment Cleanup:
-#### <span style="color: cyan;">Delete ArgoCD
+##### <span style="color: cyan;">Delete ArgoCD
 To remove ArgoCD resources, it is recommended to delete the corresponding argocd namespace within the Kubernetes environment. This can be achieved by executing the following command:
 ```bash
 kubectl delete namespace argocd
 ```
-#### <span style="color: cyan;">Delete KinD Cluster
+##### <span style="color: cyan;">Delete KinD Cluster
 Once you have completed your testing, you may delete the KinD cluster by executing the following command, which will remove the associated Docker containers and volumes.
 ```bash
 kind delete cluster --name argocd
@@ -585,7 +589,7 @@ kind delete cluster --name argocd
 ```bash
 terraform destroy --auto-approve
 ```
-#### <span style="color: cyan;">Time to delete the Virtual machine.
+##### <span style="color: cyan;">Time to delete the Virtual machine.
 
 Go to folder *<span style="color: cyan;">"12.Real-Time-DevOps-Project/Terraform_Code"</span>* and run the terraform command.
 ```bash
