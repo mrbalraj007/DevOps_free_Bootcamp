@@ -1,10 +1,10 @@
 # <span style="color: Yellow;"> Simple Notes App for Community: End-to-End Implementation using CI/CD" </span>
-This project involves creating a Simple Notes App for a community, using CI/CD (Continuous Integration and Continuous Deployment) pipelines. Below is a detailed breakdown of the prerequisites, key takeaways, what to avoid, and the key benefits of using this approach."
+This project involves creating a Simple Notes App for a community, using CI/CD (Continuous Integration and Continuous Deployment) pipelines. 
 
 ## <span style="color: Yellow;"> Prerequisites </span>
 Before diving into this project, here are some skills and tools you should be familiar with:
 
-- [x] [Clone repository for terraform code](https://github.com/mrbalraj007/DevOps_free_Bootcamp/tree/main/13.Real-Time-DevOps-Project/Terraform_Code/Code_IAC_Terraform_box)<br>
+- [x] [Clone repository for terraform code](https://github.com/mrbalraj007/DevOps_free_Bootcamp/tree/main/14.Real-Time-DevOps-Project/Terraform_Code/Code_IAC_Terraform_box)<br>
   __Note__: Replace resource names and variables as per your requirement in terraform code
     - from Virtual machine main.tf (i.e keyname- ```MYLABKEY```*)
 
@@ -28,7 +28,7 @@ First, we'll create the necessary virtual machines using ```terraform```.
 
 Below is a terraform configuration:
 
-Once you [clone repo](https://github.com/mrbalraj007/DevOps_free_Bootcamp.git) then go to folder *<span style="color: cyan;">"13.Real-Time-DevOps-Project/Terraform_Code/Code_IAC_Terraform_box"</span>* and run the terraform command.
+Once you [clone repo](https://github.com/mrbalraj007/DevOps_free_Bootcamp.git) then go to folder *<span style="color: cyan;">"14.Real-Time-DevOps-Project/Terraform_Code/Code_IAC_Terraform_box"</span>* and run the terraform command.
 ```bash
 cd Terraform_Code/Code_IAC_Terraform_box
 
@@ -79,8 +79,8 @@ sudo tail -f /var/log/cloud-init-output.log
 - If there’s an error, this log will provide clues about what failed.
 
 Outcome of "```cloud-init-output.log```"
-![alt text](image.png)
-![alt text](image-1.png)
+![image](https://github.com/user-attachments/assets/bb628a4f-36be-4af9-998f-2165fb837046)
+![image-1](https://github.com/user-attachments/assets/cd0b6335-681c-4773-b233-325efbaa7ac1)
 
 
 ### <span style="color: cyan;"> Verify the Installation 
@@ -94,33 +94,11 @@ Docker version 24.0.7, build 24.0.7-0ubuntu4.1
 docker ps -a
 ubuntu@ip-172-31-94-25:~$ docker ps
 ```
-
-- [x] <span style="color: brown;"> trivy version
-```bash
-ubuntu@ip-172-31-89-97:~$ trivy version
-Version: 0.55.2
-```
-- [x] <span style="color: brown;"> Helm version
-```bash
-ubuntu@ip-172-31-89-97:~$ helm version
-version.BuildInfo{Version:"v3.16.1", GitCommit:"5a5449dc42be07001fd5771d56429132984ab3ab", GitTreeState:"clean", GoVersion:"go1.22.7"}
-```
 - [x] <span style="color: brown;"> Terraform version
 ```bash
 ubuntu@ip-172-31-89-97:~$ terraform version
 Terraform v1.9.6
 on linux_amd64
-```
-- [x] <span style="color: brown;"> eksctl version
-```bash
-ubuntu@ip-172-31-89-97:~$ eksctl version
-0.191.0
-```
-- [x] <span style="color: brown;"> kubectl version
-```bash
-ubuntu@ip-172-31-89-97:~$ kubectl version
-Client Version: v1.31.1
-Kustomize Version: v5.4.2
 ```
 - [x] <span style="color: brown;"> aws cli version
 ```bash
@@ -131,41 +109,6 @@ To see help text, you can run:
   aws <command> help
   aws <command> <subcommand> help
 ```
-
-- [x] <span style="color: brown;"> Verify the EKS cluster
-
-After Terraform deploys the instance and the cluster is set up, you can SSH into the instance and run:
-
-```bash
-aws eks update-kubeconfig --name <cluster-name> --region 
-<region>
-```
-
-On the virtual machine, Go to directory ```k8s_setup_file``` and open the file ```cat apply.log``` to verify the cluster is created or not.
-```sh
-ubuntu@ip-172-31-90-126:~/k8s_setup_file$ pwd
-/home/ubuntu/k8s_setup_file
-ubuntu@ip-172-31-90-126:~/k8s_setup_file$
-```
-Once EKS cluster is setup then need to run the following command to make it intract with EKS.
-
-```sh
-aws eks update-kubeconfig --name balraj-cluster --region us-east-1
-```
-The ```aws eks update-kubeconfig``` command is used to configure your local kubectl tool to interact with an Amazon EKS (Elastic Kubernetes Service) cluster. It updates or creates a kubeconfig file that contains the necessary authentication information to allow kubectl to communicate with your specified EKS cluster.
-
-<span style="color: Orange;"> What happens when you run this command:</span><br>
-The AWS CLI retrieves the required connection information for the EKS cluster (such as the API server endpoint and certificate) and updates the kubeconfig file located at ~/.kube/config (by default).
-It configures the authentication details needed to connect kubectl to your EKS cluster using IAM roles.
-After running this command, you will be able to interact with your EKS cluster using kubectl commands, such as ```kubectl get nodes``` or ```kubectl get pods```.
-
-```sh
-kubectl get nodes
-kubectl cluster-info
-kubectl config get-contexts
-```
-![alt text](image-2.png)
-
 <details><summary><b><span style="color: Orange;">Change the hostname: (optional)</b></summary><br>
 
 sudo terraform show
@@ -203,8 +146,8 @@ Access Jenkins via http://<your-server-ip>:8080. Retrieve the initial admin pass
 ```bash
 sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 ```
-![alt text](image-5.png)
-![alt text](image-6.png)
+![image-5](https://github.com/user-attachments/assets/4f51816f-190a-4a43-a7a1-e6a93a1bedb0)
+![image-6](https://github.com/user-attachments/assets/d2c70de6-debc-4bec-9208-b36f0b308a32)
 
 
 ### <span style="color: yellow;"> Setup the Jenkins agent</span>
@@ -212,7 +155,7 @@ sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 ```sh
 sudo passwd ubuntu
 ```  
-  ![alt text](image-3.png)
+![image-3](https://github.com/user-attachments/assets/57fae1e1-7dbc-4b0f-877e-0266c83af6bc)  
 
 - Need to do the password-less authentication between both servers.
 ```bash
@@ -242,13 +185,13 @@ ubuntu@ip-172-31-89-97:~$ cat ~/.ssh/id_ed25519.pub
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG4BFDIh47LkE6huSzi6ryMKcw+Rj1+6ErnplFbOK5Nz ubuntu@ip-172-31-89-97
 ```
 From Agent.
-![alt text](image-4.png)
+![image-4](https://github.com/user-attachments/assets/5ac10b8d-2ef1-426e-9e0c-6971cfb4f03a)
 
 Now, try to do the ssh to agent, and it should be connected without any credentials.
 ```bash
 ssh ubuntu@<private IP address of agent VM>
 ```
-![alt text](image-7.png)
+![image-7](https://github.com/user-attachments/assets/475ddd3a-fb0c-40ce-857d-af6cfbef0a08)
 
 Open Jenkins UI and configure the agent.
 Dashboard> Manage Jenkins> Nodes
@@ -259,16 +202,18 @@ Launch method: Launch agents via ssh
 - Credential of the agent. (will create the credential)
     - Kind: SSH Username with private key
     - private key from Jenkins Master server.
-  ![alt text](image-10.png)
+  ![image-10](https://github.com/user-attachments/assets/35a4974d-9447-4b7a-b074-4151e4691708)
+
 - Host Key Verification Strategy: Non Verifying Verification Strategy
 
-![alt text](image-8.png)
+![image-8](https://github.com/user-attachments/assets/ece7e0e6-d398-42ae-8d90-45d8bd9445e9)
 
-![alt text](image-9.png)
-![alt text](image-11.png)
+![image-9](https://github.com/user-attachments/assets/6b865751-770d-45e4-a991-9d82feb0a44d)
+
+![image-11](https://github.com/user-attachments/assets/b276a604-bc28-432b-a8cd-51ce6062e024)
 
 Congratulations; Agent is successfully configured and alive.
-![alt text](image-12.png)
+![image-12](https://github.com/user-attachments/assets/4bf6a9fc-5579-4ce5-bfe4-2eedef303579)
 
 ### <span style="color: cyan;"> Install the plugin in Jenkins </span>
 
@@ -294,7 +239,7 @@ pipeline {
     }
 }
 ```
-![alt text](image-13.png)
+![image-13](https://github.com/user-attachments/assets/6671ba4f-690e-47f6-be6a-217a7fe2ede8)
 
 - Build an Docker image.
 add the following state in main pipeline
@@ -307,7 +252,7 @@ add the following state in main pipeline
             }
         }
 ```
-![alt text](image-14.png)
+![image-14](https://github.com/user-attachments/assets/64d2b951-5a58-4ab0-b471-e6cd6b5559fd)
 
 - Add the below the deploy the image.
 ```sh
@@ -323,7 +268,7 @@ add the following state in main pipeline
             }
         }
 ```
-![alt text](image-15.png)
+![image-15](https://github.com/user-attachments/assets/f7f25d1c-187c-4271-a37a-211c9a95c895)
 
 ```bash
 pipeline {
@@ -360,11 +305,11 @@ pipeline {
 ```
 Now, try to access it via 8000 port
 <agent Public Ipaddress:8000>
-![alt text](image-16.png)
+![image-16](https://github.com/user-attachments/assets/a4aa43ba-163a-4c63-97ed-326d3dd19373)
 
 If you rerun the build, then you will get an error because port 8000 has already been used. So we will use here Docker Compose.
 
-![alt text](image-17.png)
+![image-17](https://github.com/user-attachments/assets/b76a7f1e-ec81-44ad-8c7a-6dd8f869969f)
 
 here is the updated pipeline
 ```bash
@@ -405,12 +350,13 @@ Kill the existing image/deployment before build/executing it.
 docker container ls
 docker stop aa48f961a5de && docker rm aa48f961a5de
 ```
-![alt text](image-18.png)
-![alt text](image-19.png)
+![image-18](https://github.com/user-attachments/assets/2f44ca33-9edc-4c2c-8ae8-456b2c9b725e)
+![image-19](https://github.com/user-attachments/assets/cb3c2969-9844-45ca-9cd7-2d121e614b49)
+
 
 - Push image to Docker hub.
    - create crdential in Jenkins for Dockerhub
-![alt text](image-20.png)
+![image-20](https://github.com/user-attachments/assets/e7ec7dd7-45d8-45fc-beef-7cabef19a6e5)
 
 - bind credential in pipeline
 ```bash
@@ -456,56 +402,31 @@ pipeline {
     }
 }
 ```
-![alt text](image-21.png)
+![image-21](https://github.com/user-attachments/assets/8e5ecc07-77b3-410d-b3c2-e10f2686d901)
 
 - Creating a [webhook](https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks) for Jenkins in Github
 - Go to repo setting and click on webhooks
   PayloadURL: http://54.144.163.163:8080/github-webhook/   (Jenkins URL with port)
 - Content type: Application/Json
-![alt text](image-22.png)
 
-I was getting a 302 error message, and when I followed the below procedure, it fixed itself.
-I clicked on webhooks and clicked on the recent deliveries and clicked on redeliver and issue fixed.
-![alt text](image-23.png)
-![alt text](image-24.png)
+![image-22](https://github.com/user-attachments/assets/688e5d89-da8a-4a6d-8877-6e3f675625aa)
+
+> [!Note]
+> I was getting a 302 error message, and when I followed the below procedure, it fixed itself.
+
+- I clicked on webhooks and clicked on the recent deliveries and clicked on redeliver and issue fixed.
+![image-23](https://github.com/user-attachments/assets/2191c55c-6693-4663-88d4-ce5110329c22)
+![image-24](https://github.com/user-attachments/assets/a12e92f4-9650-4d62-8a3e-6c9f525899b7)
 
 Now, we have to tick this option in Jenkins: "GitHub hook trigger for GITScm polling."
-![alt text](image-25.png)
+![image-25](https://github.com/user-attachments/assets/ca734da6-ef5a-454b-a516-9b0c9dcff4d2)
 
 Try to modify anything in Github repo and build should be auto trigger.
 
-![alt text](image-26.png)
+![image-26](https://github.com/user-attachments/assets/514af65a-448f-462b-8a57-b9afd0a875de)
 
 it works :-)
 
-
-![image](https://github.com/user-attachments/assets/bb628a4f-36be-4af9-998f-2165fb837046)
-![image-1](https://github.com/user-attachments/assets/cd0b6335-681c-4773-b233-325efbaa7ac1)
-![image-2](https://github.com/user-attachments/assets/d029f649-81e9-4750-a6c4-8e636c104e16)
-![image-3](https://github.com/user-attachments/assets/57fae1e1-7dbc-4b0f-877e-0266c83af6bc)
-![image-4](https://github.com/user-attachments/assets/5ac10b8d-2ef1-426e-9e0c-6971cfb4f03a)
-![image-5](https://github.com/user-attachments/assets/4f51816f-190a-4a43-a7a1-e6a93a1bedb0)
-![image-6](https://github.com/user-attachments/assets/d2c70de6-debc-4bec-9208-b36f0b308a32)
-![image-7](https://github.com/user-attachments/assets/475ddd3a-fb0c-40ce-857d-af6cfbef0a08)
-![image-8](https://github.com/user-attachments/assets/ece7e0e6-d398-42ae-8d90-45d8bd9445e9)
-![image-9](https://github.com/user-attachments/assets/6b865751-770d-45e4-a991-9d82feb0a44d)
-![image-10](https://github.com/user-attachments/assets/35a4974d-9447-4b7a-b074-4151e4691708)
-![image-11](https://github.com/user-attachments/assets/b276a604-bc28-432b-a8cd-51ce6062e024)
-![image-12](https://github.com/user-attachments/assets/4bf6a9fc-5579-4ce5-bfe4-2eedef303579)
-![image-13](https://github.com/user-attachments/assets/6671ba4f-690e-47f6-be6a-217a7fe2ede8)
-![image-14](https://github.com/user-attachments/assets/64d2b951-5a58-4ab0-b471-e6cd6b5559fd)
-![image-15](https://github.com/user-attachments/assets/f7f25d1c-187c-4271-a37a-211c9a95c895)
-![image-16](https://github.com/user-attachments/assets/a4aa43ba-163a-4c63-97ed-326d3dd19373)
-![image-17](https://github.com/user-attachments/assets/b76a7f1e-ec81-44ad-8c7a-6dd8f869969f)
-![image-18](https://github.com/user-attachments/assets/2f44ca33-9edc-4c2c-8ae8-456b2c9b725e)
-![image-19](https://github.com/user-attachments/assets/cb3c2969-9844-45ca-9cd7-2d121e614b49)
-![image-20](https://github.com/user-attachments/assets/e7ec7dd7-45d8-45fc-beef-7cabef19a6e5)
-![image-21](https://github.com/user-attachments/assets/8e5ecc07-77b3-410d-b3c2-e10f2686d901)
-![image-22](https://github.com/user-attachments/assets/688e5d89-da8a-4a6d-8877-6e3f675625aa)
-![image-23](https://github.com/user-attachments/assets/2191c55c-6693-4663-88d4-ce5110329c22)
-![image-24](https://github.com/user-attachments/assets/a12e92f4-9650-4d62-8a3e-6c9f525899b7)
-![image-25](https://github.com/user-attachments/assets/ca734da6-ef5a-454b-a516-9b0c9dcff4d2)
-![image-26](https://github.com/user-attachments/assets/514af65a-448f-462b-8a57-b9afd0a875de)
 
 __Ref Link__
 
