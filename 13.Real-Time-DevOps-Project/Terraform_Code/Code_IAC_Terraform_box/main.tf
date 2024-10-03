@@ -171,7 +171,7 @@ resource "aws_instance" "terrabox" {
   user_data              = templatefile("./terrabox_install.sh", {})
 
   tags = {
-    Name = "terrabox-SVR"
+    Name = "Jenkins-SVR"
   }
 
   root_block_device {
@@ -206,7 +206,7 @@ resource "aws_instance" "terrabox" {
 }
 
 resource "aws_security_group" "TerraBox" {
-  name        = "terra-VM-SG"
+  name        = "Jenkins-VM-SG"
   description = "Allow inbound traffic"
 
   dynamic "ingress" {
@@ -244,10 +244,33 @@ resource "aws_security_group" "TerraBox" {
   }
 
   tags = {
-    Name = "terra-VM-SG"
+    Name = "Jenkins-VM-SG"
   }
 }
 
-output "instance_ip" {
+
+resource "aws_instance" "agent" {
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = "t2.micro" # EC2 size as per your requirement
+  key_name               = "MYLABKEY" # Change key name as per your setup
+  vpc_security_group_ids = [aws_security_group.TerraBox.id]
+  iam_instance_profile   = aws_iam_instance_profile.k8s_cluster_instance_profile.name
+  user_data              = templatefile("./agent_install.sh", {})
+
+  tags = {
+    Name = "Jenkins_Agent-SVR"
+  }
+
+  root_block_device {
+    volume_size = 25
+  }
+}
+
+output "Jenkins-SVR_instance_ip" {
   value = aws_instance.terrabox.public_ip
 }
+
+output "Jenkins_Agent_instance_ip" {
+  value = aws_instance.agent.public_ip
+}
+

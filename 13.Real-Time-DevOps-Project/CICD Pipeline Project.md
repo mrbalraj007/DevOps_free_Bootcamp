@@ -1,77 +1,198 @@
-# <span style="color: Yellow;"> Wanderlust Mega Project: End-to-End Implementation Using DevSecOps </span>
-In this blog post, we’ll walk you through the process of deploying a Kubernetes application using Jenkins. This guide will help you set up a CI/CD pipeline for deploying services to a Kubernetes cluster using ArgoCD. We’ll cover creating roles, binding them to service accounts, and setting up a Jenkins pipeline for automation.
+# <span style="color: Yellow;"> Building a Three-Tier Blogging App with DevSecOps: The WanderLust Mega Project" </span>
+"WanderLust is a travel blog web application developed using the ```MERN stack (MongoDB, Express.js, React, and Node.js)```. This project is designed to foster open-source contributions, enhance React development skills, and provide hands-on experience with Git."
 
 ## <span style="color: Yellow;"> Prerequisites </span>
-  
-- [x] [Clone repository for terraform code](https://github.com/mrbalraj007/DevOps_free_Bootcamp/tree/main/09.Real-Time-DevOps-Project/Terraform_Code/04.Code_IAC_Terraform_box) 
-- [x] [App Repo](https://github.com/mrbalraj007/Microservice)
-- [x] __Jenkins Installation__: Ensure Jenkins is installed and running.
-- [x] __Kubernetes Cluster__: Have a Kubernetes cluster set up and accessible.
-- [x] __Kubernetes CLI (kubectl)__: Install and configure kubectl on your system.
-- [x] __Jenkins Kubernetes Plugin__: Install the Kubernetes plugin for Jenkins to enable Kubernetes integration.
-- [x] __Service Account__: Create a Kubernetes service account with appropriate roles and permissions.
-- [x] __Token Generation__: Generate a token for the service account to be used by Jenkins for authentication.
+Before diving into this project, here are some skills and tools you should be familiar with:
 
+- [x] [Clone repository for terraform code](https://github.com/mrbalraj007/DevOps_free_Bootcamp/tree/main/13.Real-Time-DevOps-Project/Terraform_Code/Code_IAC_Terraform_box)<br>
+  __Note__: Replace resource names and variables as per your requirement in terraform code
+  - from k8s_setup_file/main.tf (i.e ```balraj```*).
+  - from Virtual machine main.tf (i.e keyname- ```MYLABKEY```*)
 
+- [x] [App Repo](https://github.com/mrbalraj007/Wanderlust-Mega-Project.git)
+
+https://github.com/mrbalraj007/django-notes-app.git
+
+- [x] __Git and GitHub__: You'll need to know the basics of Git for version control and GitHub for managing your repository.
+- [x] __MERN Stack (MongoDB, Express, React, Node.js)__: A solid understanding of React for front-end development and how it integrates with MongoDB, Express, and Node.js is essential.
+- [x] __Docker__: Familiarity with containerization using Docker to package the application and its dependencies.
+- [x] __Jenkins__: Understanding continuous integration (CI) and how to set up Jenkins for automating the build and test processes.
+- [x] __Kubernetes (AWS EKS)__: Some experience with deploying and managing containerized applications using Kubernetes, especially with Amazon EKS.
+- [x] __Helm__: Helm charts knowledge is required for deploying applications on Kubernetes, particularly for monitoring with tools like Prometheus and Grafana.
+- [x] __Security Tools__: OWASP Dependency Check for identifying vulnerabilities, SonarQube for code quality analysis, and Trivy for scanning Docker images.
+- [x] __ArgoCD__: Familiarity with ArgoCD for continuous delivery (CD) to manage the Kubernetes application deployment.
+- [x] __Redis__: Basic knowledge of Redis for caching to improve application performance.
 
 ## <span style="color: Yellow;"> Key Points
-- __Create a Kubernetes Role__: Define permissions for resources.
-- __Bind Role to Service Account__: Assign permissions to the service account.
-- __Generate and Use a Token__: Authenticate the service account.
-- __Set Up Jenkins Pipeline__: Automate deployment and verification.
+- GitHub – for code version control and collaboration
+- Docker – for containerizing applications
+- Jenkins – for continuous integration (CI)
+- OWASP Dependency-Check – for identifying vulnerable dependencies
+- SonarQube – for code quality and security analysis
+- Trivy – for filesystem scanning and security checks
+- ArgoCD – for continuous deployment (CD)
+- Redis – for caching services
+- AWS EKS – for managing Kubernetes clusters
+- Helm – for managing monitoring tools like Prometheus and Grafana
 
 ## <span style="color: Yellow;">Setting Up the Environment </span>
-I have created a Terraform file to set up the entire environment, including the installation of required applications, tools, and the EKS cluster automatically created.
+I have created a Terraform code to set up the entire environment, including the installation of required applications, tools, and the EKS cluster automatically created.
 
-<!-- - [x] Setting Up the Virtual Machines (EC2)
+**Note** &rArr;<span style="color: Green;"> EKS cluster creation will take approx. 10 to 15 minutes.
+
+- &rArr; <span style="color: brown;">Two EC2 machine will be created named as "Jenkins Server & Agent"
+- &rArr;<span style="color: brown;"> Docker Install
+- &rArr;<span style="color: brown;"> Trivy Install
+- &rArr;<span style="color: brown;"> Helm Install
+- &rArr;<span style="color: brown;"> SonarQube install as in a container
+- &rArr;<span style="color: brown;"> ArgoCD
+- &rArr;<span style="color: brown;"> EKS Cluster Setup
+- &rArr;<span style="color: brown;"> Prometheus install using Helm
+- &rArr;<span style="color: brown;"> Grafana install using Helm
+
+### <span style="color: Yellow;">Setting Up the Virtual Machines (EC2)
 
 First, we'll create the necessary virtual machines using ```terraform```. 
 
 Below is a terraform configuration:
 
-Once you [clone repo](https://github.com/mrbalraj007/DevOps_free_Bootcamp.git) then go to folder *<span style="color: cyan;">"09.Real-Time-DevOps-Project/Terraform_Code/04.Code_IAC_Terraform_box"</span>* and run the terraform command.
+Once you [clone repo](https://github.com/mrbalraj007/DevOps_free_Bootcamp.git) then go to folder *<span style="color: cyan;">"13.Real-Time-DevOps-Project/Terraform_Code/Code_IAC_Terraform_box"</span>* and run the terraform command.
 ```bash
-cd Terraform_Code/
+cd Terraform_Code/Code_IAC_Terraform_box
 
 $ ls -l
-Mode                 LastWriteTime         Length Name
-----                 -------------         ------ ----
-da---l          26/08/24   9:48 AM                04.Code_IAC_Terraform_box
+da---l          29/09/24  12:02 PM                k8s_setup_file
+-a---l          29/09/24  10:44 AM            507 .gitignore
+-a---l          01/10/24  10:50 AM           3771 agent_install.sh
+-a---l          01/10/24  10:59 AM           8149 main.tf
+-a---l          16/07/21   4:53 PM           1696 MYLABKEY.pem
+-a---l          25/07/24   9:16 PM            239 provider.tf
+-a---l          01/10/24  11:26 AM          10257 terrabox_install.sh
 ```
 
-<!-- __<span style="color: Red;">Note__</span> &rArr; Make sure to run ```main.tf``` from outside the folders; do not go inside the folders.
+__<span style="color: Red;">Note__</span> &rArr; Make sure to run ```main.tf``` from inside the folders.
 
 ```bash
-cd 09.Real-Time-DevOps-Project/Terraform_Code/04.Code_IAC_Terraform_box"
+13.Real-Time-DevOps-Project/Terraform_Code/Code_IAC_Terraform_box/
 
-Mode                 LastWriteTime         Length Name
-----                 -------------         ------ ----
-da---l          02/09/24  12:10 PM                .terraform
-da---l          02/09/24   5:59 PM                k8s_setup_file
--a---l          21/08/24   2:56 PM            500 .gitignore
--a---l          04/09/24   7:08 PM           6965 main.tf
--a---l          04/09/24   7:18 PM           4184 terrabox_install.sh
+da---l          29/09/24  12:02 PM                k8s_setup_file
+-a---l          29/09/24  10:44 AM            507 .gitignore
+-a---l          01/10/24  10:50 AM           3771 agent_install.sh
+-a---l          01/10/24  10:59 AM           8149 main.tf
+-a---l          16/07/21   4:53 PM           1696 MYLABKEY.pem
+-a---l          25/07/24   9:16 PM            239 provider.tf
+-a---l          01/10/24  11:26 AM          10257 terrabox_install.sh
 ```
 You need to run ```main.tf``` file using following terraform command.
 
-#### Now, run the following command.
+Now, run the following command.
 ```bash
 terraform init
 terraform fmt
 terraform validate
 terraform plan
-terraform apply --auto-approve
-``` -->
+terraform apply 
+# Optional <terraform apply --auto-approve>
+```
 -------
-### __Environment Setup__
-|HostName|OS|
-|:----:|:----:|
-|terrabox-svr| Ubuntu 24 LTS|
+Once you run the terraform command, then we will verify the following things to make sure everything is setup via a terraform.
 
-> * Password for the **root** account on all these virtual machines is **xxxxxxx**
-> * Perform all the commands as root user unless otherwise specified
+### <span style="color: Orange;"> Inspect the ```Cloud-Init``` logs</span>: 
+Once connected to EC2 instance then you can check the status of the ```user_data``` script by inspecting the [log files](13.Real-Time-DevOps-Project\cloud-init-output.log).
+```bash
+# Primary log file for cloud-init
+sudo tail -f /var/log/cloud-init-output.log
+```
+- If the user_data script runs successfully, you will see output logs and any errors encountered during execution.
+- If there’s an error, this log will provide clues about what failed.
 
-![alt text](image-23.png)
+Outcome of "```cloud-init-output.log```"
+![alt text](image.png)
+![alt text](image-1.png)
+
+
+### <span style="color: cyan;"> Verify the Installation 
+
+- [x] <span style="color: brown;"> Docker version
+```bash
+ubuntu@ip-172-31-95-197:~$ docker --version
+Docker version 24.0.7, build 24.0.7-0ubuntu4.1
+
+
+docker ps -a
+ubuntu@ip-172-31-94-25:~$ docker ps
+```
+
+- [x] <span style="color: brown;"> trivy version
+```bash
+ubuntu@ip-172-31-89-97:~$ trivy version
+Version: 0.55.2
+```
+- [x] <span style="color: brown;"> Helm version
+```bash
+ubuntu@ip-172-31-89-97:~$ helm version
+version.BuildInfo{Version:"v3.16.1", GitCommit:"5a5449dc42be07001fd5771d56429132984ab3ab", GitTreeState:"clean", GoVersion:"go1.22.7"}
+```
+- [x] <span style="color: brown;"> Terraform version
+```bash
+ubuntu@ip-172-31-89-97:~$ terraform version
+Terraform v1.9.6
+on linux_amd64
+```
+- [x] <span style="color: brown;"> eksctl version
+```bash
+ubuntu@ip-172-31-89-97:~$ eksctl version
+0.191.0
+```
+- [x] <span style="color: brown;"> kubectl version
+```bash
+ubuntu@ip-172-31-89-97:~$ kubectl version
+Client Version: v1.31.1
+Kustomize Version: v5.4.2
+```
+- [x] <span style="color: brown;"> aws cli version
+```bash
+ubuntu@ip-172-31-89-97:~$ aws version
+usage: aws [options] <command> <subcommand> [<subcommand> ...] [parameters]
+To see help text, you can run:
+  aws help
+  aws <command> help
+  aws <command> <subcommand> help
+```
+
+- [x] <span style="color: brown;"> Verify the EKS cluster
+
+After Terraform deploys the instance and the cluster is set up, you can SSH into the instance and run:
+
+```bash
+aws eks update-kubeconfig --name <cluster-name> --region 
+<region>
+```
+
+On the virtual machine, Go to directory ```k8s_setup_file``` and open the file ```cat apply.log``` to verify the cluster is created or not.
+```sh
+ubuntu@ip-172-31-90-126:~/k8s_setup_file$ pwd
+/home/ubuntu/k8s_setup_file
+ubuntu@ip-172-31-90-126:~/k8s_setup_file$
+```
+Once EKS cluster is setup then need to run the following command to make it intract with EKS.
+
+```sh
+aws eks update-kubeconfig --name balraj-cluster --region us-east-1
+```
+The ```aws eks update-kubeconfig``` command is used to configure your local kubectl tool to interact with an Amazon EKS (Elastic Kubernetes Service) cluster. It updates or creates a kubeconfig file that contains the necessary authentication information to allow kubectl to communicate with your specified EKS cluster.
+
+<span style="color: Orange;"> What happens when you run this command:</span><br>
+The AWS CLI retrieves the required connection information for the EKS cluster (such as the API server endpoint and certificate) and updates the kubeconfig file located at ~/.kube/config (by default).
+It configures the authentication details needed to connect kubectl to your EKS cluster using IAM roles.
+After running this command, you will be able to interact with your EKS cluster using kubectl commands, such as ```kubectl get nodes``` or ```kubectl get pods```.
+
+```sh
+kubectl get nodes
+kubectl cluster-info
+kubectl config get-contexts
+```
+![alt text](image-2.png)
 
 <details><summary><b><span style="color: Orange;">Change the hostname: (optional)</b></summary><br>
 
@@ -79,7 +200,8 @@ sudo terraform show
 
 
 ```bash
-sudo hostnamectl set-hostname Jenkins
+sudo hostnamectl set-hostname jenkins-svr
+sudo hostnamectl set-hostname jenkins-agent
 ```
 - Update the /etc/hosts file:
   - Open the file with a text editor, for example:
@@ -105,21 +227,287 @@ apt update
 </details>
 
 ## <span style="color: yellow;"> Setup the Jenkins </span>
-Notedown the public address of the VM and access it in browser
+Access Jenkins via http://<your-server-ip>:8080. Retrieve the initial admin password using:
 ```bash
-<publicIP of VM :8080>
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 ```
-![alt text](image.png)
-
-will run this command on VM ```sudo cat /var/lib/jenkins/secrets/initialAdminPassword``` to get the first time password.
-
-![alt text](image-1.png)
+![alt text](image-5.png)
+![alt text](image-6.png)
 
 
-<!-- eksctl utils associate-iam-oidc-provider \
-    --region us-east-1 \
-    --cluster balraj-cluster \
-    --approve -->
+### <span style="color: yellow;"> Setup the Jenkins agent</span>
+- [Set the password](https://www.cyberciti.biz/faq/change-root-password-ubuntu-linux/) for user "ubuntu" on both Jenkins Master and Agent machines.
+```sh
+sudo passwd ubuntu
+```  
+  ![alt text](image-3.png)
+
+- Need to do the password-less authentication between both servers.
+```bash
+sudo su
+cat /etc/ssh/sshd_config | grep "PasswordAuthentication"
+echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
+cat /etc/ssh/sshd_config | grep "PasswordAuthentication"
+
+cat /etc/ssh/sshd_config | grep "PermitRootLogin"
+echo "PermitRootLogin yes"  >> /etc/ssh/sshd_config
+cat /etc/ssh/sshd_config | grep "PermitRootLogin"
+```
+- Restart the sshd reservices.<br>
+```bash
+systemctl daemon-reload
+      or 
+sudo service ssh restart 
+```
+- Generate the ssh key and share with agent.
+```bash
+ssh-keygen
+```
+- Copy the public ssh key from Jenkins to Agent.
+    - Public key from Jenkins master.
+```bash
+ubuntu@ip-172-31-89-97:~$ cat ~/.ssh/id_ed25519.pub
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG4BFDIh47LkE6huSzi6ryMKcw+Rj1+6ErnplFbOK5Nz ubuntu@ip-172-31-89-97
+```
+From Agent.
+![alt text](image-4.png)
+
+Now, try to do the ssh to agent, and it should be connected without any credentials.
+```bash
+ssh ubuntu@<private IP address of agent VM>
+```
+![alt text](image-7.png)
+
+Open Jenkins UI and configure the agent.
+Dashboard> Manage Jenkins> Nodes
+
+Remote root directory: define the path.
+Launch method: Launch agents via ssh
+- Host: public IP address of agent VM
+- Credential of the agent. (will create the credential)
+    - Kind: SSH Username with private key
+    - private key from Jenkins Master server.
+  ![alt text](image-10.png)
+- Host Key Verification Strategy: Non Verifying Verification Strategy
+
+![alt text](image-8.png)
+
+![alt text](image-9.png)
+![alt text](image-11.png)
+
+Congratulations; Agent is successfully configured and alive.
+![alt text](image-12.png)
+
+### <span style="color: cyan;"> Install the plugin in Jenkins </span>
+
+```sh
+Blue Ocean
+Pipeline: Stage View
+```
+
+- Run any job and verify that job is executing on agent node.
+   - create a below pipeline and build it and verify the outcomes in agent machine.
+```bash
+pipeline {
+    agent { label "balraj"}
+
+    stages {
+        stage('code') {
+            steps {
+                echo 'This is cloning the code'
+                git branch: 'main', url: 'https://github.com/mrbalraj007/django-notes-app.git'
+                echo "This is cloning the code"
+            }
+        }
+    }
+}
+```
+![alt text](image-13.png)
+
+- Build an Docker image.
+add the following state in main pipeline
+ ```sh
+          stage('build') {
+            steps {
+                echo 'This is building the docker image'
+                sh "docker build -t notes-app:latest ."
+                echo "Image has been created successfully"
+            }
+        }
+```
+![alt text](image-14.png)
+
+- Add the below the deploy the image.
+```sh
+ stage('test') {
+            steps {
+                echo 'This is testing the code'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'This is deploying the code'
+                sh 'docker run -d -p 8000:8000 notes-app:latest '
+            }
+        }
+```
+![alt text](image-15.png)
+
+```bash
+pipeline {
+    agent { label "balraj"}
+
+    stages {
+        stage('code') {
+            steps {
+                echo 'This is cloning the code'
+                git branch: 'main', url: 'https://github.com/mrbalraj007/django-notes-app.git'
+                echo "This is cloning the code"
+            }
+        }
+        stage('build') {
+            steps {
+                echo 'This is building the docker image'
+                sh "docker build -t notes-app:latest ."
+                echo "Image has been created successfully"
+            }
+        }
+        stage('test') {
+            steps {
+                echo 'This is testing the code'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'This is deploying the code'
+                sh 'docker run -d -p 8000:8000 notes-app:latest '
+            }
+        }
+    }
+}
+```
+Now, try to access it via 8000 port
+<agent Public Ipaddress:8000>
+![alt text](image-16.png)
+
+If you rerun the build, then you will get an error because port 8000 has already been used. So we will use here Docker Compose.
+
+![alt text](image-17.png)
+
+here is the updated pipeline
+```bash
+pipeline {
+    agent { label "balraj"}
+
+    stages {
+        stage('code') {
+            steps {
+                echo 'This is cloning the code'
+                git branch: 'main', url: 'https://github.com/mrbalraj007/django-notes-app.git'
+                echo "This is cloning the code"
+            }
+        }
+        stage('build') {
+            steps {
+                echo 'This is building the docker image'
+                sh "docker build -t notes-app:latest ."
+                echo "Image has been created successfully"
+            }
+        }
+        stage('test') {
+            steps {
+                echo 'This is testing the code'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'This is deploying the code'
+                sh 'docker compose up -d'
+            }
+        }
+    }
+}
+```
+Kill the existing image/deployment before build/executing it.
+```bash
+docker container ls
+docker stop aa48f961a5de && docker rm aa48f961a5de
+```
+![alt text](image-18.png)
+![alt text](image-19.png)
+
+- Push image to Docker hub.
+   - create crdential in Jenkins for Dockerhub
+![alt text](image-20.png)
+
+- bind credential in pipeline
+```bash
+pipeline {
+    agent { label "balraj"}
+
+    stages {
+        stage('code') {
+            steps {
+                echo 'This is cloning the code'
+                git branch: 'main', url: 'https://github.com/mrbalraj007/django-notes-app.git'
+                echo "This is cloning the code"
+            }
+        }
+        stage('build') {
+            steps {
+                echo 'This is building the docker image'
+                sh "docker build -t notes-app:latest ."
+                echo "Image has been created successfully"
+            }
+        }
+        stage('test') {
+            steps {
+                echo 'This is testing the code'
+            }
+        }
+        stage('Push to DockerHub') {
+            steps {
+                echo "This is pushing image to Docker Hub"
+                withCredentials([usernamePassword(credentialsId:"dockerHubCred",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubUser")]){
+                sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
+                sh "docker image tag notes-app:latest ${env.dockerHubUser}/notes-app:latest"
+                sh "docker push ${env.dockerHubUser}/notes-app:latest"
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'This is deploying the code'
+                sh 'docker compose up -d'
+            }
+        }
+    }
+}
+```
+![alt text](image-21.png)
+
+- Creating a [webhook](https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks) for Jenkins in Github
+- Go to repo setting and click on webhooks
+  PayloadURL: http://54.144.163.163:8080/github-webhook/   (Jenkins URL with port)
+- Content type: Application/Json
+![alt text](image-22.png)
+
+I was getting a 302 error message, and when I followed the below procedure, it fixed itself.
+I clicked on webhooks and clicked on the recent deliveries and clicked on redeliver and issue fixed.
+![alt text](image-23.png)
+![alt text](image-24.png)
+
+Now, we have to tick this option in Jenkins: "GitHub hook trigger for GITScm polling."
+![alt text](image-25.png)
+
+Try to modify anything in Github repo and build should be auto trigger.
+
+![alt text](image-26.png)
+
+it works :-)
+
+
+
 
 ### <span style="color: cyan;"> Install the plugin in Jenkins </span>
 
@@ -140,8 +528,6 @@ Pipeline: Stage View
 >
 > docker version: latest
   
-![alt text](image-2.png)
-
 ### <span style="color: cyan;"> Set docker cred in Jenkins </span>
 -    Dashboard>Manage Jenkins > Credentials> System>
     Global credentials (unrestricted) &rArr; Click on "New credentials"
@@ -155,7 +541,7 @@ Pipeline: Stage View
 > 
 > Description:docker-cred
 
-![alt text](image-3.png)
+
 
 ### <span style="color: cyan;"> Creating a multipipeline in Jenkins:</span>
 
@@ -163,9 +549,6 @@ Pipeline: Stage View
 > 
 > item type: Multibranch pipeline
 > 
-![alt text](image-4.png)
-![alt text](image-5.png)
-![alt text](image-6.png)
 
 Syntax to configure the __webhooks__ in ```github``` 
 ```JENKINS_URL/multibranch-webhook-trigger/invoke?token=[Trigger token]```
@@ -173,34 +556,44 @@ Syntax to configure the __webhooks__ in ```github```
 http://18.234.174.99:8080/multibranch-webhook-trigger/invoke?token=singh
 ```
 go to github repo > setting> webhooks
-![alt text](image-7.png)
-![alt text](image-8.png)
 
 Once you configure __webhook__ then build the pipeline and you will see successfull build.
-![alt text](image-9.png)
 
 - Images view from ```Docker Hub```
-![alt text](image-10.png)
+
+## <span style="color: yellow;">Managing Docker and Kubernetes Pods
+
+### <span style="color: Cyan;">Check Docker containers running:</span>
+```sh
+docker ps
+```
+```bash
+ubuntu@ip-172-31-81-94:~$ docker ps
+```
+
+
+##### <span style="color: Cyan;">List all Kubernetes pods in all namespaces:</span>
+```sh
+kubectl get pods -A
+```
+- To get the existing namespace 
+```sh
+kubectl get namespace
+```
+```bash
+ubuntu@ip-172-31-81-94:~$ kubectl get namespace
+NAME                   STATUS   AGE
+argocd                 Active   7m11s
+default                Active   7m24s
+kube-node-lease        Active   7m24s
+kube-public            Active   7m24s
+kube-system            Active   7m24s
+kubernetes-dashboard   Active   7m1s
+local-path-storage     Active   7m20s
+monitoring             Active   6m54s
+```
 
 ## <span style="color: yellow;"> Setup the EKS Cluster </span>
-On the virtual machine, Go to directory ```k8s_setup_file``` and open the file ```cat apply.log``` to verify the cluster is created or not.
-```sh
-ubuntu@ip-172-31-90-126:~/k8s_setup_file$ pwd
-/home/ubuntu/k8s_setup_file
-ubuntu@ip-172-31-90-126:~/k8s_setup_file$
-```
-Once EKS cluster is setup then need to run the following command to make it intract with EKS.
-
-```sh
-aws eks update-kubeconfig --name <cluster-name> --region 
-<region>
-```
-The ```aws eks update-kubeconfig``` command is used to configure your local kubectl tool to interact with an Amazon EKS (Elastic Kubernetes Service) cluster. It updates or creates a kubeconfig file that contains the necessary authentication information to allow kubectl to communicate with your specified EKS cluster.
-
-#### <span style="color: Orange;"> What happens when you run this command:</span>
-The AWS CLI retrieves the required connection information for the EKS cluster (such as the API server endpoint and certificate) and updates the kubeconfig file located at ~/.kube/config (by default).
-It configures the authentication details needed to connect kubectl to your EKS cluster using IAM roles.
-After running this command, you will be able to interact with your EKS cluster using kubectl commands, such as ```kubectl get nodes``` or ```kubectl get pods```.
 
 
 ### <span style="color: cyan;"> Create Namespace:</span>
@@ -223,7 +616,6 @@ metadata:
 
 >> kubectl apply -f svc.yml
 
-![alt text](image-12.png)
 
 ### <span style="color: cyan;"> Create Role and Role Binding:</span>
 > Creating a Kubernetes Role</span>
@@ -280,7 +672,6 @@ rules:
 ```bash
 kubectl apply -f role.yaml
 ```
-![alt text](image-13.png)
 
 ### <span style="color: cyan;"> Assigning the Role to a Service Account:
 
@@ -304,7 +695,7 @@ subjects:
   kind: ServiceAccount
   name: jenkins 
 ```
-![alt text](image-14.png)
+
 
 
 ### <span style="color: cyan;"> [Creating a Token for Authentication](https://kubernetes.io/docs/reference/access-authn-authz/service-accounts-admin/#:~:text=To%20create%20a%20non%2Dexpiring,with%20that%20generated%20token%20data.): 
@@ -327,7 +718,6 @@ metadata:
 ```bash
 kubectl apply -f secret.yml -n webapps
 ```
-![alt text](image-15.png)
 
 - Retrieve the token using ```kubectl describe secret <secret-name> -n webapps```.
 
@@ -352,7 +742,7 @@ mysecretname   kubernetes.io/service-account-token   3      3m33s
 ```bash
 kubectl describe secret mysecretname -n webapps
 ```
-![alt text](image-16.png)
+
 
 will save token somewhere, because we will be using the same token in CI/CD pipeline.
 ```bash
@@ -380,13 +770,13 @@ Dashboard> Manage Jenkins> Credentials> System> Global credentials (unrestricted
 > 
 > Description:k8-token
 
-![alt text](image-18.png)
+
 
 Finally, set up a Jenkins pipeline to automate deployment:
 
 Create a ```dummy Jenkins Pipeline```: Define stages for deployment and verification.
 
-![alt text](image-17.png)
+
 
 add the following in pipeline
 ```bash
@@ -414,64 +804,59 @@ pipeline {
     }
 ```
 Same pipeline will add into the git repo in ```main branch```
-![alt text](image-19.png)
+
 
 Commit and Run: Commit the Jenkinsfile and let Jenkins pick it up. Monitor the deployment process and check the application URL once it’s up and running.
 
-![alt text](image-21.png)
+
 
 ## <span style="color: Yellow;"> Deployment Verification
 
 - Once the pipeline is set up, Jenkins will deploy the microservices and provide a URL to access the application.
 
-![alt text](image-22.png)
+
 
 - will browser the LB URL and website should be accessible.
-![alt text](image-20.png)
+
 
 ## <span style="color: Yellow;"> Environment Cleanup:
-- As we are using Terraform, we will use the following command to delete the EKS cluster first, then delete the virtual machine.
+- As we are using Terraform, we will use the following command to delete 
+   - __```EKS cluster```__ first 
+   - then delete the __```virtual machine```__.
+
+- To clean up, delete the ```AWS EKS cluster```
+   -   Login into the EC2 instance and change the directory to /k8s_setup_file, and run the following command to delete the cluste.
 ```bash
-terraform destroy --auto-approve
+cd /k8s_setup_file
+sudo terraform destroy --auto-approve
 ```
-
-- To clean up, delete the Kubernetes cluster with ```eksctl delete cluster --name <cluster-name> --region <region>```.
-
-
-##### <span style="color: Yellow;"> *I got below error message while deleting the EKS cluster; you may be experiencing the same, so the solution is to ```manually delete the load balancer``` in the AWS console and ```delete the VPC```.*
-
-![alt text](image-24.png)
-
-
-#### Now, time to delete the Virtual machine.
-
-Go to folder *<span style="color: cyan;">"09.Real-Time-DevOps-Project/Terraform_Code/04.Code_IAC_Terraform_box"</span>* and run the terraform command.
+#### Now, time to delete the ```Virtual machine```.
+Go to folder *<span style="color: cyan;">"13.Real-Time-DevOps-Project/Terraform_Code/Code_IAC_Terraform_box"</span>* and run the terraform command.
 ```bash
 cd Terraform_Code/
 
 $ ls -l
 Mode                 LastWriteTime         Length Name
 ----                 -------------         ------ ----
-da---l          26/08/24   9:48 AM                04.Code_IAC_Terraform_box
-
-
+da---l          26/09/24   9:48 AM                Code_IAC_Terraform_box
 
 Terraform destroy --auto-approve
 ```
 
-
 ## <span style="color: Yellow;"> Key Takeaways
-- __Automation__: The pipeline automates the deployment process, making it easier to manage multiple microservices.
-- __Flexibility__: The use of Jenkins and Kubernetes allows for flexible and scalable deployment strategies.
-- __Efficiency__: Implementing automated CI/CD pipelines improves deployment speed and reliability.
+- __Automated pipelines__: This project will help you understand how to build a fully automated CI/CD pipeline from code to deployment.
+- __Security Integration__: The importance of embedding security tools like OWASP and Trivy in the DevOps pipeline ensures secure code delivery.
+- __Real-world implementation__: You’ll gain hands-on experience using modern tools in a real-world cloud environment.
+  
 ## <span style="color: Yellow;"> What to Avoid
-- __Hardcoding Secrets__: Avoid hardcoding sensitive information like tokens in your pipeline scripts. Use Jenkins credentials and Kubernetes secrets.
-- __Long Sleep Periods__: Instead of using long sleep periods in your pipeline, consider using appropriate Kubernetes checks to confirm the status of deployments.
+- __Skipping security checks__: Security is a core part of DevSecOps. Ignoring dependency checks or filesystem scans can lead to vulnerabilities in production.
+- __Improper resource management__: In AWS EKS, over-provisioning resources can lead to unnecessary costs. Make sure to properly configure autoscaling and resource limits.
+- __Manual interventions__: Automating processes like testing, scanning, and deployments are key in DevSecOps. Manual steps can introduce errors or delays.
+  
 ## <span style="color: Yellow;"> Key Benefits
-- __Streamlined Deployment__: Automates the deployment of multiple microservices with minimal manual intervention.
-- __Improved Efficiency__: Reduces deployment time and ensures consistency across environments.
-- __Scalability__: Easily scales to handle large numbers of microservices and complex deployment scenarios.
-
+- __Improved security__: Using DevSecOps practices ensures that security is considered from the beginning, not as an afterthought.
+- __Faster delivery__: With CI/CD tools like Jenkins and ArgoCD, you can deliver software updates and features much faster.
+- __Scalability__: AWS EKS allows you to easily scale your Kubernetes clusters based on demand, ensuring high availability.
 
 ## <span style="color: Yellow;"> Conclusion
 
@@ -483,22 +868,26 @@ If you found this guide helpful, please like and subscribe to my blog for more c
 
 __Ref Link__
 
-- [YouTube Link](https://www.youtube.com/watch?v=SO3XIJCtmNs&t=498s "11 Microservice CICD Pipeline DevOps Project | Ultimate DevOps Pipeline")
-- [End-to-End Multibranch Pipeline Project Creation](https://www.jenkins.io/doc/tutorials/build-a-multibranch-pipeline-project/)
-- [Jenkins Multibranch Pipeline With Git Tutorial](https://www.cloudbees.com/blog/jenkins-multibranch-pipeline-with-git-tutorial)
-- [Set up kubectl and eksctl](https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html)
-
-*******************************************
-Once you run the terraform command, then we will verify the following things to make sure everything is setup via a terraform.
-
-###### <span style="color: Cyan;"> Inspect the ```Cloud-Init``` logs</span>: 
-Once connected to EC2 instance then you can check the status of the ```user_data``` script by inspecting the log files.
-```bash
-# Primary log file for cloud-init
-sudo tail -f /var/log/cloud-init-output.log
-```
-- If the user_data script runs successfully, you will see output logs and any errors encountered during execution.
-- If there’s an error, this log will provide clues about what failed.
+- [YouTube Link](https://www.youtube.com/watch?v=XaSdKR2fOU4&t=21621s "DevOps Production CICD Pipelines")
 
 
-aws eks update-kubeconfig --name balraj-cluster --region us-east-1
+
+
+Prometheus and Grafana:
+
+Access Grafana via http://<your-server-ip>:31000 and Prometheus via http://<your-server-ip>:30000.
+
+
+ArgoCD:
+
+After installation, you can port-forward to access the ArgoCD UI:
+
+bash
+Copy code
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+Then, navigate to http://localhost:8080 in your browser.
+
+
+SSH Access:
+
+If you require SSH access to your worker nodes, ensure that the ec2_ssh_key_name variable is defined and that the corresponding SSH key pair exists in AWS.

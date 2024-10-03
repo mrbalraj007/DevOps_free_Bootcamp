@@ -1,4 +1,7 @@
 # <span style="color: Yellow;"> Simple Notes App for Community: End-to-End Implementation using CI/CD" </span>
+
+![alt text](Project10.gif)
+
 This project involves creating a Simple Notes App for a community, using CI/CD (Continuous Integration and Continuous Deployment) pipelines. 
 
 ## <span style="color: Yellow;"> Prerequisites </span>

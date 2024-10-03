@@ -58,6 +58,7 @@ install_package "docker.io"
 
 # Configure Docker permissions
 print_message "Configuring Docker permissions"
+sudo chown $USER /var/run/docker.sock
 sudo usermod -aG docker "$USER" || echo "User '$USER' is already in the 'docker' group."
 
 # Enable and start Docker service
