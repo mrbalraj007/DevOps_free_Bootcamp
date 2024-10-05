@@ -356,9 +356,6 @@ https://github.com/mrbalraj007/Jenkins_SharedLib.git
 ![alt text](image-49.png)
 ![alt text](image-50.png)
 
-
-<img src="https://github.com/DevMadhup/Jenkins_SharedLib/blob/main/assests/Sharedlib-config-2.png" />
-
 ### How to use it in Jenkins pipeline
 - Go to your declarative pipeline
 - Add **@Library('Shared') _** at the very first line of your jenkins pipeline.
