@@ -348,7 +348,7 @@ pipeline {
 
   **Name:** Shared <br>
   **Default version:** \<branch name><br>
-  **Project repository:** https://github.com/DevMadhup/Jenkins_SharedLib.git <br>
+  **Project repository:** https://github.com/mrbalraj007/Jenkins_SharedLib.git <br>
 ****
 ![alt text](image-48.png)
 
