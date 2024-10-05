@@ -59,7 +59,7 @@ install_package "docker.io"
 # Configure Docker permissions
 print_message "Configuring Docker permissions"
 sudo chown $USER /var/run/docker.sock
-sudo usermod -aG docker "$USER" || echo "User '$USER' is already in the 'docker' group."
+sudo usermod -aG docker $USER && newgrp docker || echo "User '$USER' is already in the 'docker' group."
 
 # Enable and start Docker service
 sudo systemctl enable docker
@@ -221,6 +221,12 @@ echo "kubectl is configured and the cluster is ready."
 print_message "Installing ArgoCD"
 kubectl create namespace argocd || echo "Namespace 'argocd' already exists."
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+## Install ArgoCD CLI
+sudo curl --silent --location -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/download/v2.4.7/argocd-linux-amd64
+sudo chmod +x /usr/local/bin/argocd
+print_message "Check argocd services"
+kubectl get svc -n argocd
 
 ## Install Kubernetes Dashboard
 print_message "Installing Kubernetes Dashboard"

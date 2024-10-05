@@ -46,7 +46,7 @@ install_package "docker.io"
 # Configure Docker permissions
 print_message "Configuring Docker permissions"
 sudo chown $USER /var/run/docker.sock
-sudo usermod -aG docker "$USER" || echo "User '$USER' is already in the 'docker' group."
+sudo usermod -aG docker $USER && newgrp docker || echo "User '$USER' is already in the 'docker' group."
 
 # Enable and start Docker service
 sudo systemctl enable docker
@@ -59,6 +59,17 @@ sudo apt-get install docker-compose-v2
 print_message "Installing necessary dependencies"
 sudo apt update -y
 sudo apt-get install -y gnupg software-properties-common curl apt-transport-https ca-certificates tree unzip wget lsb-release
+
+# Install Trivy
+print_message "Installing Trivy"
+if ! command_exists trivy; then
+    wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+    echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/trivy.list
+    sudo apt-get update
+    sudo apt-get install -y trivy
+else
+    echo "Trivy is already installed."
+fi
 
 # Install Terraform
 print_message "Installing Terraform"

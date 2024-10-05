@@ -1,4 +1,4 @@
-# <span style="color: Yellow;"> Building a Three-Tier Blogging App with DevSecOps: The WanderLust Mega Project" </span>
+# <span style="color: Yellow;"> Building a Three-Tier Blogging App with DevSecOps: The **WanderLust** Mega Project </span>
 "WanderLust is a travel blog web application developed using the ```MERN stack (MongoDB, Express.js, React, and Node.js)```. This project is designed to foster open-source contributions, enhance React development skills, and provide hands-on experience with Git."
 
 ## <span style="color: Yellow;"> Prerequisites </span>
@@ -10,8 +10,6 @@ Before diving into this project, here are some skills and tools you should be fa
   - from Virtual machine main.tf (i.e keyname- ```MYLABKEY```*)
 
 - [x] [App Repo](https://github.com/mrbalraj007/Wanderlust-Mega-Project.git)
-
-https://github.com/mrbalraj007/django-notes-app.git
 
 - [x] __Git and GitHub__: You'll need to know the basics of Git for version control and GitHub for managing your repository.
 - [x] __MERN Stack (MongoDB, Express, React, Node.js)__: A solid understanding of React for front-end development and how it integrates with MongoDB, Express, and Node.js is essential.
@@ -40,7 +38,7 @@ I have created a Terraform code to set up the entire environment, including the 
 
 **Note** &rArr;<span style="color: Green;"> EKS cluster creation will take approx. 10 to 15 minutes.
 
-- &rArr; <span style="color: brown;">Two EC2 machine will be created named as "Jenkins Server & Agent"
+- &rArr; <span style="color: brown;">Two EC2 machines will be created named as "Jenkins Server & Agent"
 - &rArr;<span style="color: brown;"> Docker Install
 - &rArr;<span style="color: brown;"> Trivy Install
 - &rArr;<span style="color: brown;"> Helm Install
@@ -95,6 +93,10 @@ terraform apply
 # Optional <terraform apply --auto-approve>
 ```
 -------
+
+![alt text](image-14.png)
+
+
 Once you run the terraform command, then we will verify the following things to make sure everything is setup via a terraform.
 
 ### <span style="color: Orange;"> Inspect the ```Cloud-Init``` logs</span>: 
@@ -162,18 +164,18 @@ To see help text, you can run:
 
 - [x] <span style="color: brown;"> Verify the EKS cluster
 
-After Terraform deploys the instance and the cluster is set up, you can SSH into the instance and run:
-
-```bash
-aws eks update-kubeconfig --name <cluster-name> --region 
-<region>
-```
-
 On the virtual machine, Go to directory ```k8s_setup_file``` and open the file ```cat apply.log``` to verify the cluster is created or not.
 ```sh
 ubuntu@ip-172-31-90-126:~/k8s_setup_file$ pwd
 /home/ubuntu/k8s_setup_file
 ubuntu@ip-172-31-90-126:~/k8s_setup_file$
+```
+
+After Terraform deploys the instance and the cluster is set up, you can SSH into the instance and run:
+
+```bash
+aws eks update-kubeconfig --name <cluster-name> --region 
+<region>
 ```
 Once EKS cluster is setup then need to run the following command to make it intract with EKS.
 
@@ -278,7 +280,7 @@ ssh ubuntu@<private IP address of agent VM>
 ```
 ![alt text](image-7.png)
 
-Open Jenkins UI and configure the agent.
+Open ```Jenkins UI ```and configure the agent.
 Dashboard> Manage Jenkins> Nodes
 
 Remote root directory: define the path.
@@ -303,6 +305,12 @@ Congratulations; Agent is successfully configured and alive.
 ```sh
 Blue Ocean
 Pipeline: Stage View
+Docker
+Docker Pipeline
+Kubernetes
+Kubernetes CLI
+OWASP Dependency-Check
+SonarQube Scanner
 ```
 
 - Run any job and verify that job is executing on agent node.
@@ -324,201 +332,517 @@ pipeline {
 ```
 ![alt text](image-13.png)
 
-- Build an Docker image.
-add the following state in main pipeline
- ```sh
-          stage('build') {
-            steps {
-                echo 'This is building the docker image'
-                sh "docker build -t notes-app:latest ."
-                echo "Image has been created successfully"
-            }
-        }
-```
-![alt text](image-14.png)
+## <span style="color: yellow;">Jenkins Shared Library
+- Shared libraries in Jenkins Pipelines are reusable pieces of code that can be organized into functions and classes.
+- These libraries allow you to encapsulate common logic, making it easier to maintain and share across multiple pipelines and projects.
+- Shared library must be inside the **vars** directory in your github repository
+- Shared library uses **groovy** syntax and file name ends with **.groovy** extension. 
 
-- Add the below the deploy the image.
-```sh
- stage('test') {
-            steps {
-                echo 'This is testing the code'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                echo 'This is deploying the code'
-                sh 'docker run -d -p 8000:8000 notes-app:latest '
-            }
-        }
-```
+
+### <span style="color: cyan;">How to create and use shared library in Jenkins.
+
+### How to create Shared library
+- Login to your Jenkins dashboard. <a href="">Jenkins Installation</a>
+- Go to **Manage Jenkins** --> **System** and search for **Global Trusted Pipeline Libraries**.
+<img src="https://github.com/DevMadhup/Jenkins_SharedLib/blob/main/assests/Sharedlib-config-1.png" />
+
+  **Name:** Shared <br>
+  **Default version:** \<branch name><br>
+  **Project repository:** https://github.com/DevMadhup/Jenkins_SharedLib.git <br>
+****
+![alt text](image-48.png)
+
+https://github.com/mrbalraj007/Jenkins_SharedLib.git
+![alt text](image-49.png)
+![alt text](image-50.png)
+
+
+<img src="https://github.com/DevMadhup/Jenkins_SharedLib/blob/main/assests/Sharedlib-config-2.png" />
+
+### How to use it in Jenkins pipeline
+- Go to your declarative pipeline
+- Add **@Library('Shared') _** at the very first line of your jenkins pipeline.
+<img src="https://github.com/DevMadhup/Jenkins_SharedLib/blob/main/assests/shared-lib-in-pipeline.png" />
+
+**Note:** @Library() _ is the syntax to use shared library.
+
+
+
+### <span style="color: cyan;"> Configure SonarQube </span>
+
+<public IP address: 9000>
+
 ![alt text](image-15.png)
-
-```bash
-pipeline {
-    agent { label "balraj"}
-
-    stages {
-        stage('code') {
-            steps {
-                echo 'This is cloning the code'
-                git branch: 'main', url: 'https://github.com/mrbalraj007/django-notes-app.git'
-                echo "This is cloning the code"
-            }
-        }
-        stage('build') {
-            steps {
-                echo 'This is building the docker image'
-                sh "docker build -t notes-app:latest ."
-                echo "Image has been created successfully"
-            }
-        }
-        stage('test') {
-            steps {
-                echo 'This is testing the code'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                echo 'This is deploying the code'
-                sh 'docker run -d -p 8000:8000 notes-app:latest '
-            }
-        }
-    }
-}
-```
-Now, try to access it via 8000 port
-<agent Public Ipaddress:8000>
+default login : admin/admin
+change password
 ![alt text](image-16.png)
 
-If you rerun the build, then you will get an error because port 8000 has already been used. So we will use here Docker Compose.
+### <span style="color: cyan;"> Configure email:</span>
+
+Open a Jenkins UI and go to 
+    Dashboard
+    Manage Jenkins
+    Credentials
+    System
+    Global credentials (unrestricted)
 
 ![alt text](image-17.png)
 
-here is the updated pipeline
-```bash
-pipeline {
-    agent { label "balraj"}
+##### <span style="color: cyan;">Configure email notification </span>
+    Dashboard
+    Manage Jenkins
+    System
 
-    stages {
-        stage('code') {
-            steps {
-                echo 'This is cloning the code'
-                git branch: 'main', url: 'https://github.com/mrbalraj007/django-notes-app.git'
-                echo "This is cloning the code"
-            }
-        }
-        stage('build') {
-            steps {
-                echo 'This is building the docker image'
-                sh "docker build -t notes-app:latest ."
-                echo "Image has been created successfully"
-            }
-        }
-        stage('test') {
-            steps {
-                echo 'This is testing the code'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                echo 'This is deploying the code'
-                sh 'docker compose up -d'
-            }
-        }
-    }
-}
-```
-Kill the existing image/deployment before build/executing it.
-```bash
-docker container ls
-docker stop aa48f961a5de && docker rm aa48f961a5de
-```
+Search for "Extended E-mail Notification"
+
 ![alt text](image-18.png)
 ![alt text](image-19.png)
-
-- Push image to Docker hub.
-   - create crdential in Jenkins for Dockerhub
 ![alt text](image-20.png)
 
-- bind credential in pipeline
-```bash
-pipeline {
-    agent { label "balraj"}
-
-    stages {
-        stage('code') {
-            steps {
-                echo 'This is cloning the code'
-                git branch: 'main', url: 'https://github.com/mrbalraj007/django-notes-app.git'
-                echo "This is cloning the code"
-            }
-        }
-        stage('build') {
-            steps {
-                echo 'This is building the docker image'
-                sh "docker build -t notes-app:latest ."
-                echo "Image has been created successfully"
-            }
-        }
-        stage('test') {
-            steps {
-                echo 'This is testing the code'
-            }
-        }
-        stage('Push to DockerHub') {
-            steps {
-                echo "This is pushing image to Docker Hub"
-                withCredentials([usernamePassword(credentialsId:"dockerHubCred",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubUser")]){
-                sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
-                sh "docker image tag notes-app:latest ${env.dockerHubUser}/notes-app:latest"
-                sh "docker push ${env.dockerHubUser}/notes-app:latest"
-                }
-            }
-        }
-        stage('Deploy') {
-            steps {
-                echo 'This is deploying the code'
-                sh 'docker compose up -d'
-            }
-        }
-    }
-}
-```
+Open Gmail ID and have look for notification email:
 ![alt text](image-21.png)
 
-- Creating a [webhook](https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks) for Jenkins in Github
-- Go to repo setting and click on webhooks
-  PayloadURL: http://54.144.163.163:8080/github-webhook/   (Jenkins URL with port)
-- Content type: Application/Json
+### <span style="color: cyan;"> Configure OWASP:</span>
+Dashboard
+Manage Jenkins
+Tools
+
+search for ```Dependency-Check installations ```
 ![alt text](image-22.png)
 
-I was getting a 302 error message, and when I followed the below procedure, it fixed itself.
-I clicked on webhooks and clicked on the recent deliveries and clicked on redeliver and issue fixed.
 ![alt text](image-23.png)
-![alt text](image-24.png)
 
-Now, we have to tick this option in Jenkins: "GitHub hook trigger for GITScm polling."
+### <span style="color: cyan;"> Integrate SonarQube in Jenkins.</span>
+Go to Sonarqube and generate the token
+![alt text](image-24.png)
 ![alt text](image-25.png)
 
-Try to modify anything in Github repo and build should be auto trigger.
+squ_14bc93fbd3ddfa87367e1c19d54ff560f9dacffb
 
 ![alt text](image-26.png)
 
-it works :-)
+now, open Jenkins UI and create a credential for sonarqube
+Dashboard
+Manage Jenkins
+Credentials
+System
+Global credentials (unrestricted)
+
+![alt text](image-27.png)
+
+#### <span style="color: cyan;"> Configure the sonarqube scanner in Jenkins.</span>
+
+Dashboard
+Manage Jenkins
+Tools
+
+Search for ```SonarQube Scanner installations``` 
+
+![alt text](image-28.png)
+
+![alt text](image-29.png)
+
+#### <span style="color: cyan;"> Configure the Github in Jenkins.</span>
+First generate the token first in github and configure it in Jenkins
+Generate a token in Github
+
+Now, open Jenkins UI
+    Dashboard
+    Manage Jenkins
+    Credentials
+    System
+    Global credentials (unrestricted)
+
+![alt text](image-30.png)
 
 
+#### <span style="color: cyan;"> Configure the sonarqube server in Jenkins.</span>
+On Jenkins UI:
+    Dashboard
+    Manage Jenkins
+    System
+
+Search for ```SonarQube installations``` 
+![alt text](image-31.png)
+![alt text](image-32.png)
 
 
-### <span style="color: cyan;"> Install the plugin in Jenkins </span>
+Now, we will confire the ```webhook``` in Sonarqube
+Open SonarQube UI:
 
-```sh
-Docker
-Docker Pipeline
-Kubernetes
-Kubernetes CLI
-Multibranch Scan Webhook Trigger
-Pipeline: Stage View
+![alt text](image-33.png)
+![alt text](image-34.png)
+
+
+### <span style="color: cyan;"> Configure the ArgoCD.</span>
+- Get a argocd namespace
+```bash
+kubectl get namespace
 ```
+![alt text](image-35.png)
+
+- Get the argocd pods
+```bash
+kubectl get pods -n argocd
+```
+![alt text](image-36.png)
+
+- Check argocd services
+```bash
+kubectl get svc -n argocd
+```
+![alt text](image-37.png)
+
+**Change argocd server's service from ClusterIP to NodePort**
+```bash
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
+kubectl get svc -n argocd
+```
+![alt text](image-38.png)
+
+Now, try to access ArgoCd in browser.
+<public-ip-worker>:<port>
+![alt text](image-41.png)
+
+**Note**: I was not able to access argocd in browser and noticed that port was not allowed.
+You need to select any of the EKS cluster node and go to security group
+Select the SG "sg-0838bf9c407b4b3e4" (You need to select yours one) and allow the all port range.
+![alt text](image-39.png)
+
+Now, try to access ArgoCd in browser.
+![alt text](image-40.png)
+```bash
+https://44.192.109.76:31230/
+```
+Default login would be admin/admin
+- To get the initial password of argocd server
+```bash
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+```
+![alt text](image-42.png)
+
+![alt text](image-43.png)
+
+Update the password for argocd
+![alt text](image-44.png)
+
+
+### <span style="color: cyan;"> Configure the repositories in Argocd </span>
+![alt text](image-45.png)
+
+[Application Repo](https://github.com/mrbalraj007/Wanderlust-Mega-Project.git)
+
+![alt text](image-46.png)
+
+![alt text](image-47.png)
+
+
+Update this jenkins file as per your requirement.
+https://github.com/mrbalraj007/Wanderlust-Mega-Project/blob/main/Jenkinsfile
+
+
+
+### <span style="color: cyan;"> Generate the docker Token and update in Jenkins.</span>
+    Dashboard
+    Manage Jenkins
+    Credentials
+    System
+    Global credentials (unrestricted)
+
+![alt text](image-51.png)
+
+
+## <span style="color: Red;"> Troubleshooting while run CI Pipeline </span>
+
+I was getting an error while running the CI job first time because due to missing required environment variables: ```FRONTEND_DOCKER_TAG``` and ```BACKEND_DOCKER_TAG```. 
+
+Steps to Fix
+Ensure Required Parameters Are Provided:
+
+[!Important]
+First time, when you run the pipeline, then the pipeline will fail because the parameter is not given. Try a second time and pass the parameter.
+
+![alt text](image-52.png)
+
+![alt text](image-54.png)
+
+[!Note]
+When I ran it again and got the below error message saying that Trivy was not found, I noticed that Trivy didn't install on the Jenkins agent machine. So, I have updated the Terraform script, and the pipeline should work.
+
+![alt text](image-55.png)
+
+Now, I got below error message "permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Post "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/build?". I have updated the Terraform script.
+
+![alt text](image-56.png)
+
+Solution:  
+```bash
+sudo usermod -aG docker $USER && newgrp docker
+```
+![alt text](image-57.png)
+
+But I was still getting same error message to fix the issue.
+![alt text](image-57.png)
+
+Solution:  
+```bash
+sudo systemctl restart jenkins
+```
+
+![alt text](image-61.png)
+![alt text](image-60.png)
+
+![alt text](image-59.png)
+
+For CD Job
+
+```Gitops``` folder
+
+copy the Jenkins pipeline from git repo and build a pipeline named as ```Wanderlust-CD```.
+
+Now, run the ```Wanderlust-CI``` pipeline
+
+![alt text](image-63.png)
+
+Got email for successful deployment
+![alt text](image-62.png)
+
+### <span style="color: Cyan;"> Connect ```wonderlast cluster``` to ArgoCD.
+Now, we will connect(create) the cluster to ArgoCD.
+
+on Jenkins Master Node, run the following command 
+```sh
+ kubectl get nodes
+NAME                         STATUS   ROLES    AGE     VERSION
+ip-10-0-1-239.ec2.internal   Ready    <none>   3h48m   v1.30.4-eks-a737599
+ip-10-0-2-128.ec2.internal   Ready    <none>   3h47m   v1.30.4-eks-a737599
+ip-10-0-2-92.ec2.internal    Ready    <none>   3h48m   v1.30.4-eks-a737599
+ubuntu@ip-172-31-95-57:~$
+```
+#### <span style="color: Cyan;"> ArgoCD CLI login
+```bash
+argocd login argocd URL:port --username admin
+```
+- in myLab.
+```bash
+argocd login 44.192.109.76:31230 --username admin
+```
+will promt for yes/No , type y and supply the password for argocd.
+![alt text](image-64.png)
+
+- now, we will check the how many cluster have in argocd.
+```bash
+argocd cluster list
+```
+![alt text](image-65.png)
+
+- To get the wonderlust cluster name
+```bash
+kubectl config get-contexts
+```
+```bash
+ubuntu@ip-172-31-95-57:~$ kubectl config get-contexts
+CURRENT   NAME                                                        CLUSTER                                                     AUTHINFO                                                    NAMESPACE
+*         arn:aws:eks:us-east-1:373160674113:cluster/balraj-cluster   arn:aws:eks:us-east-1:373160674113:cluster/balraj-cluster   arn:aws:eks:us-east-1:373160674113:cluster/balraj-cluster
+ubuntu@ip-172-31-95-57:~$
+```
+- To add the wonderlust cluster name into argocd
+```bash
+argocd cluster add <your existing cluster name> --name <new cluster name>
+```
+```bash
+argocd cluster add arn:aws:eks:us-east-1:373160674113:cluster/balraj-cluster --name wonderlust-eks-cluster
+```
+it will ask you to type type Yes/No...type `y`
+
+```bash
+ubuntu@ip-172-31-95-57:~$ argocd cluster add arn:aws:eks:us-east-1:373160674113:cluster/balraj-cluster --name wonderlust-eks-cluster
+WARNING: This will create a service account `argocd-manager` on the cluster referenced by context `arn:aws:eks:us-east-1:373160674113:cluster/balraj-cluster` with full cluster level privileges. Do you want to continue [y/N]? y
+INFO[0010] ServiceAccount "argocd-manager" created in namespace "kube-system"
+INFO[0010] ClusterRole "argocd-manager-role" created
+INFO[0010] ClusterRoleBinding "argocd-manager-role-binding" created
+INFO[0015] Created bearer token secret for ServiceAccount "argocd-manager"
+Cluster 'https://9B7F2E2AB5BAFB3C44524B0AEA69BA1E.gr7.us-east-1.eks.amazonaws.com' added
+ubuntu@ip-172-31-95-57:~$
+```
+it will create a namespace, roles (RBAC),service and token.
+
+- Now, check how many cluster is showing 
+```bash
+ubuntu@ip-172-31-95-57:~$ argocd cluster list
+SERVER                                                                    NAME                    VERSION  STATUS   MESSAGE                                                  PROJECT
+https://9B7F2E2AB5BAFB3C44524B0AEA69BA1E.gr7.us-east-1.eks.amazonaws.com  wonderlust-eks-cluster           Unknown  Cluster has no applications and is not being monitored.
+https://kubernetes.default.svc                                            in-cluster                       Unknown  Cluster has no applications and is not being monitored.
+ubuntu@ip-172-31-95-57:~$
+```
+Now, go to ```argocd``` UI and refresh the page and you will see two cluster.
+
+![alt text](image-66.png)
+
+![alt text](image-67.png)
+
+### <span style="color: Cyan;"> Deploy application through argocd.
+
+- Now, we will add the application.
+
+![alt text](image-68.png)
+![alt text](image-69.png)
+![alt text](image-70.png)
+
+- Health of the application
+![alt text](image-71.png)
+![alt text](image-72.png)
+
+
+### <span style="color: Cyan;"> Verify application.
+- Now, time to acces the application 
+```bash
+<worker-public-ip>:31000
+```
+![alt text](image-73.png)
+![alt text](image-74.png)
+
+Congratulations! :-) You have deployed the application successfully.
+
+
+### <span style="color: Yellow;"> Configure observability (Monitoring)
+
+#### <span style="color: Cyan;">To get the namespace
+```bash
+kubectl get ns
+```
+```sh
+ubuntu@ip-172-31-95-57:~$ kubectl get ns
+NAME                   STATUS   AGE
+argocd                 Active   4h34m
+default                Active   4h39m
+kube-node-lease        Active   4h39m
+kube-public            Active   4h39m
+kube-system            Active   4h39m
+kubernetes-dashboard   Active   4h34m
+prometheus             Active   4h34m
+wanderlust             Active   22m
+ubuntu@ip-172-31-95-57:~$
+```
+
+#### <span style="color: Cyan;">To get pods in prometheus
+```bash
+kubectl get pods -n prometheus
+```
+```sh
+kubectl get pods -n prometheus
+NAME                                                     READY   STATUS    RESTARTS   AGE
+alertmanager-stable-kube-prometheus-sta-alertmanager-0   2/2     Running   0          4h35m
+prometheus-stable-kube-prometheus-sta-prometheus-0       2/2     Running   0          4h35m
+stable-grafana-86b6cdc46c-76wt5                          3/3     Running   0          4h35m
+stable-kube-prometheus-sta-operator-58fc7ddb6b-clcqq     1/1     Running   0          4h35m
+stable-kube-state-metrics-b65996c8d-fnvqs                1/1     Running   0          4h35m
+stable-prometheus-node-exporter-pjrwr                    1/1     Running   0          4h35m
+stable-prometheus-node-exporter-w44sw                    1/1     Running   0          4h35m
+stable-prometheus-node-exporter-wpkkm                    1/1     Running   0          4h35m
+```
+#### <span style="color: Cyan;"> To get service in prometheus
+```bash
+kubectl get svc -n prometheus
+```
+![alt text](image-75.png)
+
+
+#### <span style="color: Cyan;"> Expose Prometheus and Grafana to the external world through Node Port
+> [!Important]
+> change it from Cluster IP to NodePort after changing make sure you save the file and open the assigned nodeport to the service.
+
+- For prometheus
+```bash
+kubectl patch svc stable-kube-prometheus-sta-prometheus -n prometheus -p '{"spec": {"type": "NodePort"}}'
+kubectl get svc -n prometheus
+```
+![alt text](image-76.png)
+
+- For Grafana
+```bash
+kubectl patch svc stable-grafana -n prometheus -p '{"spec": {"type": "NodePort"}}'
+kubectl get svc -n prometheus
+```
+![alt text](image-77.png)
+
+#### <span style="color: Cyan;"> Verify Prometheus and Grafana accessibility
+```bash
+<worker-public-ip>:31205  # Prometheus <br>
+<worker-public-ip>:32242  # Grafana 
+```
+**Note**- (always check in ```kubectl get svc -n prometheus```, it is running on which port)
+
+
+http://44.192.109.76:31205/graph
+![alt text](image-78.png)
+
+
+http://44.192.109.76:32242/
+![alt text](image-79.png)
+
+**Note**--> to get login password for grafan, you need to run the following command
+```bash
+kubectl get secret --namespace prometheus stable-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+```
+[!Note]
+Default user login name is ```admin```
+
+![alt text](image-80.png)
+
+Dashboard:
+![alt text](image-82.png)
+![alt text](image-81.png)
+![alt text](image-83.png)
+
+
+Email Notification: 
+![alt text](image-85.png)
+
+![alt text](image-86.png)
+
+![alt text](image-87.png)
+![alt text](image-88.png)
+![alt text](image-89.png)
+![alt text](image-90.png)
+![alt text](image-91.png)
+![alt text](image-92.png)
+![alt text](image-93.png)
+
+![alt text](image-94.png)
+![alt text](image-95.png)
+
+
+![alt text](image-96.png)
+
+
+
+
+![alt text](image-84.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### <span style="color: cyan;"> Configure tools in Jenkins </span>
 - Configure the docker
@@ -824,8 +1148,8 @@ Commit and Run: Commit the Jenkinsfile and let Jenkins pick it up. Monitor the d
    - __```EKS cluster```__ first 
    - then delete the __```virtual machine```__.
 
-- To clean up, delete the ```AWS EKS cluster```
-   -   Login into the EC2 instance and change the directory to /k8s_setup_file, and run the following command to delete the cluste.
+#### To delete ```AWS EKS cluster```
+   -   Login into the Jenkins Master EC2 instance and change the directory to /k8s_setup_file, and run the following command to delete the cluste.
 ```bash
 cd /k8s_setup_file
 sudo terraform destroy --auto-approve
@@ -870,10 +1194,9 @@ __Ref Link__
 
 - [YouTube Link](https://www.youtube.com/watch?v=XaSdKR2fOU4&t=21621s "DevOps Production CICD Pipelines")
 
+- [DevOps-Tools-Installations Guide](https://github.com/DevMadhup/DevOps-Tools-Installations)
 
-
-
-Prometheus and Grafana:
+<!-- Prometheus and Grafana:
 
 Access Grafana via http://<your-server-ip>:31000 and Prometheus via http://<your-server-ip>:30000.
 
@@ -882,12 +1205,12 @@ ArgoCD:
 
 After installation, you can port-forward to access the ArgoCD UI:
 
-bash
-Copy code
+```bash
 kubectl port-forward svc/argocd-server -n argocd 8080:443
+```
 Then, navigate to http://localhost:8080 in your browser.
 
 
 SSH Access:
 
-If you require SSH access to your worker nodes, ensure that the ec2_ssh_key_name variable is defined and that the corresponding SSH key pair exists in AWS.
+If you require SSH access to your worker nodes, ensure that the ec2_ssh_key_name variable is defined and that the corresponding SSH key pair exists in AWS. -->
