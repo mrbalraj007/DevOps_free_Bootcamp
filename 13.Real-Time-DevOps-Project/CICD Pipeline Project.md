@@ -94,7 +94,7 @@ terraform apply
 ```
 -------
 
-![alt text](image-14.png)
+![image-14](https://github.com/user-attachments/assets/2178b2cb-52b5-4080-88bd-1dc49d97f309)
 
 
 Once you run the terraform command, then we will verify the following things to make sure everything is setup via a terraform.
@@ -109,8 +109,8 @@ sudo tail -f /var/log/cloud-init-output.log
 - If there’s an error, this log will provide clues about what failed.
 
 Outcome of "```cloud-init-output.log```"
-![alt text](image.png)
-![alt text](image-1.png)
+![image](https://github.com/user-attachments/assets/cf3ccb19-be9f-4bb4-aa61-1e65287ad1b9)
+![image-1](https://github.com/user-attachments/assets/7c4ad4a6-4882-4d48-90f3-2eac2fe65aad)
 
 
 ### <span style="color: cyan;"> Verify the Installation 
@@ -194,7 +194,7 @@ kubectl get nodes
 kubectl cluster-info
 kubectl config get-contexts
 ```
-![alt text](image-2.png)
+![image-2](https://github.com/user-attachments/assets/e6afb5c4-9a16-45f6-9d06-fe9fcf19761b)
 
 <details><summary><b><span style="color: Orange;">Change the hostname: (optional)</b></summary><br>
 
@@ -233,8 +233,8 @@ Access Jenkins via http://<your-server-ip>:8080. Retrieve the initial admin pass
 ```bash
 sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 ```
-![alt text](image-5.png)
-![alt text](image-6.png)
+![image-5](https://github.com/user-attachments/assets/72a2d1c3-d62b-4d1f-bedc-c6677f2f4efd)
+![image-6](https://github.com/user-attachments/assets/d448fd1b-ae89-4540-b486-9a35f24b76dd)
 
 
 ### <span style="color: yellow;"> Setup the Jenkins agent</span>
@@ -242,7 +242,7 @@ sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 ```sh
 sudo passwd ubuntu
 ```  
-  ![alt text](image-3.png)
+![image-3](https://github.com/user-attachments/assets/478fa108-42ab-4692-bb4c-f976fb3eab21)
 
 - Need to do the password-less authentication between both servers.
 ```bash
@@ -272,35 +272,36 @@ ubuntu@ip-172-31-89-97:~$ cat ~/.ssh/id_ed25519.pub
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG4BFDIh47LkE6huSzi6ryMKcw+Rj1+6ErnplFbOK5Nz ubuntu@ip-172-31-89-97
 ```
 From Agent.
-![alt text](image-4.png)
+![image-4](https://github.com/user-attachments/assets/c0a17dfe-f269-4b5e-94e9-e0faf3811493)
 
 Now, try to do the ssh to agent, and it should be connected without any credentials.
 ```bash
 ssh ubuntu@<private IP address of agent VM>
 ```
-![alt text](image-7.png)
+![image-7](https://github.com/user-attachments/assets/df183ecc-e83b-4227-8ec6-588a153c9b66)
 
-Open ```Jenkins UI ```and configure the agent.
+Open ```Jenkins UI ```and configure the agent. <br>
 Dashboard> Manage Jenkins> Nodes
 
-Remote root directory: define the path.
+Remote root directory: define the path where folder would be created.
 Launch method: Launch agents via ssh
 - Host: public IP address of agent VM
 - Credential of the agent. (will create the credential)
     - Kind: SSH Username with private key
     - private key from Jenkins Master server.
-  ![alt text](image-10.png)
+      ![image-10](https://github.com/user-attachments/assets/bd69d0e9-882e-4e97-8a68-2c051e1e1d8a)
 - Host Key Verification Strategy: Non Verifying Verification Strategy
 
-![alt text](image-8.png)
+![image-8](https://github.com/user-attachments/assets/7538787b-ae2a-4e72-846f-7cb8ea655710)
+![image-9](https://github.com/user-attachments/assets/bbf9d2c3-97af-44bb-abe2-8844463d6bca)
+![image-11](https://github.com/user-attachments/assets/20cfaef4-560a-4ab8-8063-022c5bccf290)
 
-![alt text](image-9.png)
-![alt text](image-11.png)
+**Congratulations**; Agent is successfully configured and alive. :-)
 
-Congratulations; Agent is successfully configured and alive.
-![alt text](image-12.png)
+![image-12](https://github.com/user-attachments/assets/07748e09-e45e-4f1d-9d43-22d6750524e4)
 
 ### <span style="color: cyan;"> Install the plugin in Jenkins </span>
+Manage Jenkins > Plugins view> Under the Available tab, plugins available for download from the configured Update Center can be searched and considered:
 
 ```sh
 Blue Ocean
@@ -330,7 +331,7 @@ pipeline {
     }
 }
 ```
-![alt text](image-13.png)
+![image-13](https://github.com/user-attachments/assets/32e8d38f-dacc-4570-8643-322b298737c9)
 
 ## <span style="color: yellow;">Jenkins Shared Library
 - Shared libraries in Jenkins Pipelines are reusable pieces of code that can be organized into functions and classes.
@@ -341,63 +342,52 @@ pipeline {
 
 ### <span style="color: cyan;">How to create and use shared library in Jenkins.
 
-### How to create Shared library
+#### How to create Shared library
 - Login to your Jenkins dashboard. <a href="">Jenkins Installation</a>
 - Go to **Manage Jenkins** --> **System** and search for **Global Trusted Pipeline Libraries**.
-<img src="https://github.com/DevMadhup/Jenkins_SharedLib/blob/main/assests/Sharedlib-config-1.png" />
+![image-48](https://github.com/user-attachments/assets/9d0e6c2f-99cf-43e7-ae1a-d097d8245018)
+
 
   **Name:** Shared <br>
   **Default version:** \<branch name><br>
   **Project repository:** https://github.com/mrbalraj007/Jenkins_SharedLib.git <br>
-****
-![alt text](image-48.png)
+![image-49](https://github.com/user-attachments/assets/04b0e8ac-4964-4e3c-8757-87187309b1f5)
+![image-50](https://github.com/user-attachments/assets/a32e63e2-f992-4a61-90fc-ade1e9e146ce)
 
-https://github.com/mrbalraj007/Jenkins_SharedLib.git
-![alt text](image-49.png)
-![alt text](image-50.png)
-
-### How to use it in Jenkins pipeline
+#### How to use it in Jenkins pipeline
 - Go to your declarative pipeline
 - Add **@Library('Shared') _** at the very first line of your jenkins pipeline.
-<img src="https://github.com/DevMadhup/Jenkins_SharedLib/blob/main/assests/shared-lib-in-pipeline.png" />
+![image-58](https://github.com/user-attachments/assets/4955ffab-cbab-42df-b822-dfdd03c0336a)
 
 **Note:** @Library() _ is the syntax to use shared library.
-
 
 
 ### <span style="color: cyan;"> Configure SonarQube </span>
 
 <public IP address: 9000>
 
-![alt text](image-15.png)
-default login : admin/admin
-change password
-![alt text](image-16.png)
+![image-15](https://github.com/user-attachments/assets/ab812f25-e5ec-4346-a4b6-967883a343a2)
+  default login : admin/admin <br>
+  You have to change password as per below screenshot
+![image-16](https://github.com/user-attachments/assets/f35e952a-249a-4788-b9d4-fbaa1348f5ca)
 
 ### <span style="color: cyan;"> Configure email:</span>
-
 Open a Jenkins UI and go to 
-    Dashboard
-    Manage Jenkins
-    Credentials
-    System
-    Global credentials (unrestricted)
+    Dashboard> Manage Jenkins> Credentials> System> Global credentials (unrestricted) <br>
 
-![alt text](image-17.png)
+![image-17](https://github.com/user-attachments/assets/6d87f8a3-ac4b-4e08-863a-db7af794396b)
 
 ##### <span style="color: cyan;">Configure email notification </span>
-    Dashboard
-    Manage Jenkins
-    System
+    Dashboard> Manage Jenkins> System
+Search for "```Extended E-mail Notification```"
 
-Search for "Extended E-mail Notification"
+![image-18](https://github.com/user-attachments/assets/b7090f49-f40c-4994-9260-83f87841d15a)
+![image-19](https://github.com/user-attachments/assets/03d1a791-7bfc-4078-8852-5f1aaf6dc8a3)
+![image-20](https://github.com/user-attachments/assets/e180f343-8884-44b1-a4b5-ab50e5d8bddd)
 
-![alt text](image-18.png)
-![alt text](image-19.png)
-![alt text](image-20.png)
 
 Open Gmail ID and have look for notification email:
-![alt text](image-21.png)
+![image-21](https://github.com/user-attachments/assets/7c79a48a-9304-44c7-95ff-4967b93cfd78)
 
 ### <span style="color: cyan;"> Configure OWASP:</span>
 Dashboard
@@ -405,109 +395,115 @@ Manage Jenkins
 Tools
 
 search for ```Dependency-Check installations ```
-![alt text](image-22.png)
-
-![alt text](image-23.png)
+![image-22](https://github.com/user-attachments/assets/2db469b4-d5cd-4b4a-94f8-e10367283df9)
+![image-23](https://github.com/user-attachments/assets/d8e0c4aa-5eba-42fc-866c-9b9efd07aecd)
 
 ### <span style="color: cyan;"> Integrate SonarQube in Jenkins.</span>
 Go to Sonarqube and generate the token
-![alt text](image-24.png)
-![alt text](image-25.png)
 
-squ_14bc93fbd3ddfa87367e1c19d54ff560f9dacffb
+> Administration> Security> users>
 
-![alt text](image-26.png)
+![image-24](https://github.com/user-attachments/assets/30d99980-a369-4409-bb73-14b943fbfe14)
+![image-25](https://github.com/user-attachments/assets/3b4d4339-2e5c-4fb4-916b-05259ff52100)
+![image-26](https://github.com/user-attachments/assets/8d8e4a99-6de7-452f-af08-e32a70d129b3)
 
 now, open Jenkins UI and create a credential for sonarqube
-Dashboard
-Manage Jenkins
-Credentials
-System
-Global credentials (unrestricted)
 
-![alt text](image-27.png)
+> Dashboard> Manage Jenkins> Credentials> System> Global credentials (unrestricted)
+
+![image-27](https://github.com/user-attachments/assets/9dc502f1-fa13-4e79-b209-1fa669dc53ab)
 
 #### <span style="color: cyan;"> Configure the sonarqube scanner in Jenkins.</span>
-
-Dashboard
-Manage Jenkins
-Tools
+> Dashboard> Manage Jenkins> Tools
 
 Search for ```SonarQube Scanner installations``` 
 
-![alt text](image-28.png)
-
-![alt text](image-29.png)
+![image-28](https://github.com/user-attachments/assets/a6eb21a9-c5e9-4e3d-89c5-da58a5b5cfa2)
+![image-29](https://github.com/user-attachments/assets/51ced903-061b-409d-ae05-867f24dc2253)
 
 #### <span style="color: cyan;"> Configure the Github in Jenkins.</span>
 First generate the token first in github and configure it in Jenkins
-Generate a token in Github
+
+[Generate a token in Github](https://docs.catalyst.zoho.com/en/tutorials/githubbot/java/generate-personal-access-token/)
 
 Now, open Jenkins UI
-    Dashboard
-    Manage Jenkins
-    Credentials
-    System
-    Global credentials (unrestricted)
+  > Dashboard> Manage Jenkins> Credentials> System> Global credentials (unrestricted)
 
-![alt text](image-30.png)
+![image-30](https://github.com/user-attachments/assets/b5df0219-7925-448c-84b2-5b3c92ded7c7)
 
 
 #### <span style="color: cyan;"> Configure the sonarqube server in Jenkins.</span>
 On Jenkins UI:
-    Dashboard
-    Manage Jenkins
-    System
-
-Search for ```SonarQube installations``` 
-![alt text](image-31.png)
-![alt text](image-32.png)
-
+  > Dashboard> Manage Jenkins> System > Search for ```SonarQube installations``` 
+![image-31](https://github.com/user-attachments/assets/b3f27eb2-a87c-4e9f-8472-ae7f638cd86a)
+![image-32](https://github.com/user-attachments/assets/1cb62ce5-d282-454e-a7ef-c139e5e89a41)
 
 Now, we will confire the ```webhook``` in Sonarqube
 Open SonarQube UI:
 
-![alt text](image-33.png)
-![alt text](image-34.png)
+![image-33](https://github.com/user-attachments/assets/723238a3-0263-46a8-939b-c7bf96e24cdb)
+![image-34](https://github.com/user-attachments/assets/b45774d9-a8e8-42b5-bdf3-b922864edc15)
 
+### <span style="color: cyan;"> [Generate docker Token](https://www.geeksforgeeks.org/create-and-manage-docker-access-tokens/) and update in Jenkins.</span>
+  > Dashboard> Manage Jenkins> Credentials> System> Global credentials (unrestricted)
+
+- Configure the docker
+> Name- docker
+> [x] install automatically
+> docker version: latest
+### <span style="color: cyan;"> Set docker cred in Jenkins </span>
+-    Dashboard>Manage Jenkins > Credentials> System>
+    Global credentials (unrestricted) &rArr; Click on "New credentials"
+> kind: "username with password"
+> username: your docker login ID
+> password: docker token
+> Id: docker-cred #it would be used in pipeline
+> Description:docker-cred
+![image-51](https://github.com/user-attachments/assets/fab143ab-7f19-48c4-8e4e-d83c3c155318)
 
 ### <span style="color: cyan;"> Configure the ArgoCD.</span>
 - Get a argocd namespace
 ```bash
 kubectl get namespace
 ```
-![alt text](image-35.png)
+![image-35](https://github.com/user-attachments/assets/a98d58fd-450b-483c-a67a-bc3dfcd22234)
 
 - Get the argocd pods
 ```bash
 kubectl get pods -n argocd
 ```
-![alt text](image-36.png)
+![image-36](https://github.com/user-attachments/assets/39fa9c36-452c-4269-9c75-7f901bd62a0e)
 
 - Check argocd services
 ```bash
 kubectl get svc -n argocd
 ```
-![alt text](image-37.png)
+![image-37](https://github.com/user-attachments/assets/2514c953-495d-4a6e-9022-21cb63cd73ca)
 
 **Change argocd server's service from ClusterIP to NodePort**
 ```bash
 kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
 kubectl get svc -n argocd
 ```
-![alt text](image-38.png)
+![image-38](https://github.com/user-attachments/assets/b5206012-e59c-4fe4-a064-0be210fc945a)
 
 Now, try to access ArgoCd in browser.
 <public-ip-worker>:<port>
-![alt text](image-41.png)
+![image-41](https://github.com/user-attachments/assets/27386486-cc2b-42c3-86bd-24dd6a010184)
 
 **Note**: I was not able to access argocd in browser and noticed that port was not allowed.
 You need to select any of the EKS cluster node and go to security group
 Select the SG "sg-0838bf9c407b4b3e4" (You need to select yours one) and allow the all port range.
-![alt text](image-39.png)
+
+![image-39](https://github.com/user-attachments/assets/6f67913d-9c26-4211-9e12-3a48cfc2a77a)
 
 Now, try to access ArgoCd in browser.
-![alt text](image-40.png)
+![image-40](https://github.com/user-attachments/assets/92687012-ec81-42fc-bd44-98b03743d477)
+
+```bash
+https://<IP address>:31230
+```
+
 ```bash
 https://44.192.109.76:31230/
 ```
@@ -516,40 +512,175 @@ Default login would be admin/admin
 ```bash
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
 ```
-![alt text](image-42.png)
-
-![alt text](image-43.png)
+![image-42](https://github.com/user-attachments/assets/83c4015d-e2ba-49df-a63f-fb8d6e76bdf3)
+![image-43](https://github.com/user-attachments/assets/dfa4c0ae-7718-4f34-b1bb-e62bfdfc0a3e)
 
 Update the password for argocd
-![alt text](image-44.png)
+![image-44](https://github.com/user-attachments/assets/f1bfeb23-2826-469c-b8a4-770e20deb043)
 
 
 ### <span style="color: cyan;"> Configure the repositories in Argocd </span>
-![alt text](image-45.png)
+![image-45](https://github.com/user-attachments/assets/e847c940-cba6-4c66-a3f3-e53c1e9f48c9)
 
 [Application Repo](https://github.com/mrbalraj007/Wanderlust-Mega-Project.git)
 
-![alt text](image-46.png)
+![image-46](https://github.com/user-attachments/assets/9fff6e2b-7368-48f8-8308-34666a1a6dd0)
+![image-47](https://github.com/user-attachments/assets/ff3fd254-ae42-4fdb-a715-a927b6c447eb)
 
-![alt text](image-47.png)
+### <span style="color: Cyan;"> For CI Pipeline
+Update this [jenkins file](https://github.com/mrbalraj007/Wanderlust-Mega-Project/blob/main/Jenkinsfile) as per your requirement.
+
+Go to folder ```Wanderlust-Mega-Project``` and copy the Jenkins pipeline from git repo and build a pipeline named as ```Wanderlust-CI```.
+
+Make sure, you will change the following details before change it.
+```sh
+- label
+- git repo
+- Docker image tag
+```
+Complete pipeline
+```bash
+@Library('Shared') _
+pipeline {
+    agent {label 'Balraj'}
+    
+    environment{
+        SONAR_HOME = tool "Sonar"
+    }
+    
+    parameters {
+        string(name: 'FRONTEND_DOCKER_TAG', defaultValue: '', description: 'Setting docker image for latest push')
+        string(name: 'BACKEND_DOCKER_TAG', defaultValue: '', description: 'Setting docker image for latest push')
+    }
+    
+    stages {
+        stage("Validate Parameters") {
+            steps {
+                script {
+                    if (params.FRONTEND_DOCKER_TAG == '' || params.BACKEND_DOCKER_TAG == '') {
+                        error("FRONTEND_DOCKER_TAG and BACKEND_DOCKER_TAG must be provided.")
+                    }
+                }
+            }
+        }
+        stage("Workspace cleanup"){
+            steps{
+                script{
+                    cleanWs()
+                }
+            }
+        }
+        
+        stage('Git: Code Checkout') {
+            steps {
+                script{
+                    code_checkout("https://github.com/mrbalraj007/Wanderlust-Mega-Project.git","main")
+                }
+            }
+        }
+        
+        stage("Trivy: Filesystem scan"){
+            steps{
+                script{
+                    trivy_scan()
+                }
+            }
+        }
+
+        stage("OWASP: Dependency check"){
+            steps{
+                script{
+                    owasp_dependency()
+                }
+            }
+        }
+        
+        stage("SonarQube: Code Analysis"){
+            steps{
+                script{
+                    sonarqube_analysis("Sonar","wanderlust","wanderlust")
+                }
+            }
+        }
+        
+        stage("SonarQube: Code Quality Gates"){
+            steps{
+                script{
+                    sonarqube_code_quality()
+                }
+            }
+        }
+        
+        stage('Exporting environment variables') {
+            parallel{
+                stage("Backend env setup"){
+                    steps {
+                        script{
+                            dir("Automations"){
+                                sh "bash updatebackendnew.sh"
+                            }
+                        }
+                    }
+                }
+                
+                stage("Frontend env setup"){
+                    steps {
+                        script{
+                            dir("Automations"){
+                                sh "bash updatefrontendnew.sh"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        stage("Docker: Build Images"){
+            steps{
+                script{
+                        dir('backend'){
+                            docker_build("wanderlust-backend-beta","${params.BACKEND_DOCKER_TAG}","balrajsi")
+                        }
+                    
+                        dir('frontend'){
+                            docker_build("wanderlust-frontend-beta","${params.FRONTEND_DOCKER_TAG}","balrajsi")
+                        }
+                }
+            }
+        }
+        
+        stage("Docker: Push to DockerHub"){
+            steps{
+                script{
+                    docker_push("wanderlust-backend-beta","${params.BACKEND_DOCKER_TAG}","balrajsi") 
+                    docker_push("wanderlust-frontend-beta","${params.FRONTEND_DOCKER_TAG}","balrajsi")
+                }
+            }
+        }
+    }
+    post{
+        success{
+            archiveArtifacts artifacts: '*.xml', followSymlinks: false
+            build job: "Wanderlust-CD", parameters: [
+                string(name: 'FRONTEND_DOCKER_TAG', value: "${params.FRONTEND_DOCKER_TAG}"),
+                string(name: 'BACKEND_DOCKER_TAG', value: "${params.BACKEND_DOCKER_TAG}")
+            ]
+        }
+    }
+}
+```
 
 
-Update this jenkins file as per your requirement.
-https://github.com/mrbalraj007/Wanderlust-Mega-Project/blob/main/Jenkinsfile
+#### <span style="color: Cyan;"> ```Update Instnace ID``` in Automations folder
+Go to folder ```Automations``` and update the instance ID in both bash scripts. Instance ID would be EC2 EKS instance.
 
+- Automations/updatebackendnew.sh
+![image-97](https://github.com/user-attachments/assets/272a6dfc-9e67-4ff0-a620-6c6770ac3f05)
 
+- Automations/updatefrontendnew.sh
+![image-98](https://github.com/user-attachments/assets/0ef1416a-9067-443d-a048-a951cfbedd09)
 
-### <span style="color: cyan;"> Generate the docker Token and update in Jenkins.</span>
-    Dashboard
-    Manage Jenkins
-    Credentials
-    System
-    Global credentials (unrestricted)
-
-![alt text](image-51.png)
-
-
-## <span style="color: Red;"> Troubleshooting while run CI Pipeline </span>
+<details><summary><b><span style="color: Red;"> Troubleshooting while run CI Pipeline </span></b></summary><br>
 
 I was getting an error while running the CI job first time because due to missing required environment variables: ```FRONTEND_DOCKER_TAG``` and ```BACKEND_DOCKER_TAG```. 
 
@@ -559,50 +690,187 @@ Ensure Required Parameters Are Provided:
 [!Important]
 First time, when you run the pipeline, then the pipeline will fail because the parameter is not given. Try a second time and pass the parameter.
 
-![alt text](image-52.png)
-
-![alt text](image-54.png)
+![image-52](https://github.com/user-attachments/assets/8baef4d1-a1dc-4bbd-855f-4aef31ffef4a)
+![image-54](https://github.com/user-attachments/assets/45fe49cf-22e9-4369-9d65-cc7f27e9c2ee)
 
 [!Note]
 When I ran it again and got the below error message saying that Trivy was not found, I noticed that Trivy didn't install on the Jenkins agent machine. So, I have updated the Terraform script, and the pipeline should work.
 
-![alt text](image-55.png)
+![image-55](https://github.com/user-attachments/assets/ef2238b8-befb-44a5-bb99-7fe1d275adf3)
 
 Now, I got below error message "permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Post "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/build?". I have updated the Terraform script.
 
-![alt text](image-56.png)
+![image-56](https://github.com/user-attachments/assets/152a3cd6-d8de-4767-9353-e56ad904d88e)
 
 Solution:  
 ```bash
 sudo usermod -aG docker $USER && newgrp docker
 ```
-![alt text](image-57.png)
+![image-57](https://github.com/user-attachments/assets/c9a07ab5-df76-4ee0-b6db-c7c648f3d590)
 
 But I was still getting same error message to fix the issue.
-![alt text](image-57.png)
+![image-57](https://github.com/user-attachments/assets/c9a07ab5-df76-4ee0-b6db-c7c648f3d590)
 
 Solution:  
 ```bash
 sudo systemctl restart jenkins
 ```
+![image-61](https://github.com/user-attachments/assets/bfa8c204-7813-4818-8e10-2322ec6100b2)
+![image-60](https://github.com/user-attachments/assets/83626827-311e-4699-98af-78db465d73ef)
+</details>
 
-![alt text](image-61.png)
-![alt text](image-60.png)
+### <span style="color: Cyan;"> For CD Pipeline
 
-![alt text](image-59.png)
+Go to folder ```Gitops``` and copy the Jenkins pipeline from git repo and build a pipeline named as ```Wanderlust-CD```.
 
-For CD Job
+make sure, you will change the following details before change it.
+```sh
+- git repo
+- email adddress
+```
+Complete pipeline
+```sh
+@Library('Shared') _
+pipeline {
+    agent {label 'Balraj'}
+    
+    parameters {
+        string(name: 'FRONTEND_DOCKER_TAG', defaultValue: '', description: 'Frontend Docker tag of the image built by the CI job')
+        string(name: 'BACKEND_DOCKER_TAG', defaultValue: '', description: 'Backend Docker tag of the image built by the CI job')
+    }
 
-```Gitops``` folder
-
-copy the Jenkins pipeline from git repo and build a pipeline named as ```Wanderlust-CD```.
+    stages {
+        stage("Workspace cleanup"){
+            steps{
+                script{
+                    cleanWs()
+                }
+            }
+        }
+        
+        stage('Git: Code Checkout') {
+            steps {
+                script{
+                    code_checkout("https://github.com/mrbalraj007/Wanderlust-Mega-Project.git","main")
+                }
+            }
+        }
+        
+        stage('Verify: Docker Image Tags') {
+            steps {
+                script{
+                    echo "FRONTEND_DOCKER_TAG: ${params.FRONTEND_DOCKER_TAG}"
+                    echo "BACKEND_DOCKER_TAG: ${params.BACKEND_DOCKER_TAG}"
+                }
+            }
+        }
+        
+        
+        stage("Update: Kubernetes manifests"){
+            steps{
+                script{
+                    dir('kubernetes'){
+                        sh """
+                            sed -i -e s/wanderlust-backend-beta.*/wanderlust-backend-beta:${params.BACKEND_DOCKER_TAG}/g backend.yaml
+                        """
+                    }
+                    
+                    dir('kubernetes'){
+                        sh """
+                            sed -i -e s/wanderlust-frontend-beta.*/wanderlust-frontend-beta:${params.FRONTEND_DOCKER_TAG}/g frontend.yaml
+                        """
+                    }
+                    
+                }
+            }
+        }
+        
+        stage("Git: Code update and push to GitHub"){
+            steps{
+                script{
+                    withCredentials([gitUsernamePassword(credentialsId: 'Github-cred', gitToolName: 'Default')]) {
+                        sh '''
+                        echo "Checking repository status: "
+                        git status
+                    
+                        echo "Adding changes to git: "
+                        git add .
+                        
+                        echo "Commiting changes: "
+                        git commit -m "Updated environment variables"
+                        
+                        echo "Pushing changes to github: "
+                        git push https://github.com/mrbalraj007/Wanderlust-Mega-Project.git main
+                    '''
+                    }
+                }
+            }
+        }
+    }
+  post {
+        success {
+            script {
+                emailext attachLog: true,
+                from: 'raj10ace@gmail.com',
+                subject: "Wanderlust Application has been updated and deployed - '${currentBuild.result}'",
+                body: """
+                    <html>
+                    <body>
+                        <div style="background-color: #FFA07A; padding: 10px; margin-bottom: 10px;">
+                            <p style="color: black; font-weight: bold;">Project: ${env.JOB_NAME}</p>
+                        </div>
+                        <div style="background-color: #90EE90; padding: 10px; margin-bottom: 10px;">
+                            <p style="color: black; font-weight: bold;">Build Number: ${env.BUILD_NUMBER}</p>
+                        </div>
+                        <div style="background-color: #87CEEB; padding: 10px; margin-bottom: 10px;">
+                            <p style="color: black; font-weight: bold;">URL: ${env.BUILD_URL}</p>
+                        </div>
+                    </body>
+                    </html>
+            """,
+            to: 'raj10ace@gmail.com',
+            mimeType: 'text/html'
+            }
+        }
+      failure {
+            script {
+                emailext attachLog: true,
+                from: 'raj10ace@gmail.com',
+                subject: "Wanderlust Application build failed - '${currentBuild.result}'",
+                body: """
+                    <html>
+                    <body>
+                        <div style="background-color: #FFA07A; padding: 10px; margin-bottom: 10px;">
+                            <p style="color: black; font-weight: bold;">Project: ${env.JOB_NAME}</p>
+                        </div>
+                        <div style="background-color: #90EE90; padding: 10px; margin-bottom: 10px;">
+                            <p style="color: black; font-weight: bold;">Build Number: ${env.BUILD_NUMBER}</p>
+                        </div>
+                    </body>
+                    </html>
+            """,
+            to: 'raj10ace@gmail.com',
+            mimeType: 'text/html'
+            }
+        }
+    }
+}
+```
 
 Now, run the ```Wanderlust-CI``` pipeline
 
-![alt text](image-63.png)
+When you run the next pipeline, then it will ask you to supply the tag version ```v6```.
 
-Got email for successful deployment
-![alt text](image-62.png)
+![image-84](https://github.com/user-attachments/assets/0591dd37-abf2-4e5f-9f16-21eed0336f1a)
+
+![image-91](https://github.com/user-attachments/assets/8d9759ea-0910-41f8-9f0b-08f6c66579d3)
+![image-89](https://github.com/user-attachments/assets/c97c2489-b5a3-4469-a185-e59dcdb49e19)
+![image-63](https://github.com/user-attachments/assets/50d1bb9a-8bdd-4b78-a6bf-92f518986dd2)
+![image-86](https://github.com/user-attachments/assets/4f7a5054-3424-436e-bf42-8fbe9e28b1d6)
+![image-90](https://github.com/user-attachments/assets/42c3a897-ed51-41d8-8234-15685f0ba5ca)
+
+- Got email for successful deployment
+![image-62](https://github.com/user-attachments/assets/5a7498ae-70fd-4d23-a792-68ce624519d3)
 
 ### <span style="color: Cyan;"> Connect ```wonderlast cluster``` to ArgoCD.
 Now, we will connect(create) the cluster to ArgoCD.
@@ -625,13 +893,13 @@ argocd login argocd URL:port --username admin
 argocd login 44.192.109.76:31230 --username admin
 ```
 will promt for yes/No , type y and supply the password for argocd.
-![alt text](image-64.png)
+![image-64](https://github.com/user-attachments/assets/a2834b21-ef09-43b0-ae74-c57c1aa10fbc)
 
 - now, we will check the how many cluster have in argocd.
 ```bash
 argocd cluster list
 ```
-![alt text](image-65.png)
+![image-65](https://github.com/user-attachments/assets/7ca9c126-1baa-4fd0-bfd7-33465db0a7b5)
 
 - To get the wonderlust cluster name
 ```bash
@@ -650,7 +918,7 @@ argocd cluster add <your existing cluster name> --name <new cluster name>
 ```bash
 argocd cluster add arn:aws:eks:us-east-1:373160674113:cluster/balraj-cluster --name wonderlust-eks-cluster
 ```
-it will ask you to type type Yes/No...type `y`
+It will ask you to type Yes/No... type ```y```.
 
 ```bash
 ubuntu@ip-172-31-95-57:~$ argocd cluster add arn:aws:eks:us-east-1:373160674113:cluster/balraj-cluster --name wonderlust-eks-cluster
@@ -674,35 +942,51 @@ ubuntu@ip-172-31-95-57:~$
 ```
 Now, go to ```argocd``` UI and refresh the page and you will see two cluster.
 
-![alt text](image-66.png)
-
-![alt text](image-67.png)
+![image-66](https://github.com/user-attachments/assets/bd005f2e-e744-492e-82aa-440027c618c4)
+![image-67](https://github.com/user-attachments/assets/fa6538d4-184c-4274-8860-33f65231c637)
 
 ### <span style="color: Cyan;"> Deploy application through argocd.
 
-- Now, we will add the application.
+- Now, we will add the application first.
 
-![alt text](image-68.png)
-![alt text](image-69.png)
-![alt text](image-70.png)
+![image-68](https://github.com/user-attachments/assets/9e754b40-7930-4b13-8eff-79ca398f9bb7)
+![image-69](https://github.com/user-attachments/assets/4ca6caa8-6504-4072-9126-9129ebc3e5f9)
+![image-70](https://github.com/user-attachments/assets/86f8716c-99b1-4726-8578-02c8c7bd5f73)
 
 - Health of the application
-![alt text](image-71.png)
-![alt text](image-72.png)
-
+![image-71](https://github.com/user-attachments/assets/18b30b65-071e-4325-968f-5c06ef6abf3a)
+![image-72](https://github.com/user-attachments/assets/9865cef3-bd95-485e-a9f9-7bbef3e5b507)
 
 ### <span style="color: Cyan;"> Verify application.
 - Now, time to acces the application 
 ```bash
 <worker-public-ip>:31000
 ```
-![alt text](image-73.png)
-![alt text](image-74.png)
+![image-73](https://github.com/user-attachments/assets/91821346-7de8-42f0-9291-7186fa6327bf)
+![image-74](https://github.com/user-attachments/assets/92483591-4dba-40cc-b288-36e03c5d1209)
+![image-94](https://github.com/user-attachments/assets/8d2b97a1-548a-4c92-bab0-54af1e6746b3)
+![image-95](https://github.com/user-attachments/assets/e2b803ef-a96e-453c-b172-8d9584038786)
 
 Congratulations! :-) You have deployed the application successfully.
 
+### <span style="color: Yellow;"> Status in Sonarqube
+![image-87](https://github.com/user-attachments/assets/7d83ac6e-f80a-417e-82dc-701505487181)
+![image-88](https://github.com/user-attachments/assets/068c904d-b517-401e-b3c7-692b203d83c2)
+
+### <span style="color: Yellow;"> Image status in DockerHub
+![image-59](https://github.com/user-attachments/assets/4e785490-5537-458e-9b9d-5bbe9d4194cd)
 
 ### <span style="color: Yellow;"> Configure observability (Monitoring)
+
+#### <span style="color: Cyan;">List all Kubernetes pods in all namespaces:</span>
+```sh
+kubectl get pods -A
+```
+- To get the existing namespace 
+```sh
+kubectl get namespace
+```
+![image-93](https://github.com/user-attachments/assets/de8c9b60-01c8-4462-8fd1-71a1d6a9f163)
 
 #### <span style="color: Cyan;">To get the namespace
 ```bash
@@ -742,7 +1026,7 @@ stable-prometheus-node-exporter-wpkkm                    1/1     Running   0    
 ```bash
 kubectl get svc -n prometheus
 ```
-![alt text](image-75.png)
+![image-75](https://github.com/user-attachments/assets/138efa3e-c5f3-4502-a034-c17df6787d09)
 
 
 #### <span style="color: Cyan;"> Expose Prometheus and Grafana to the external world through Node Port
@@ -754,14 +1038,14 @@ kubectl get svc -n prometheus
 kubectl patch svc stable-kube-prometheus-sta-prometheus -n prometheus -p '{"spec": {"type": "NodePort"}}'
 kubectl get svc -n prometheus
 ```
-![alt text](image-76.png)
+![image-76](https://github.com/user-attachments/assets/1a2c0673-2d10-42c4-a34a-5d8ddfb20af1)
 
 - For Grafana
 ```bash
 kubectl patch svc stable-grafana -n prometheus -p '{"spec": {"type": "NodePort"}}'
 kubectl get svc -n prometheus
 ```
-![alt text](image-77.png)
+![image-77](https://github.com/user-attachments/assets/a4238371-e9a3-4df0-b3ec-71496922e129)
 
 #### <span style="color: Cyan;"> Verify Prometheus and Grafana accessibility
 ```bash
@@ -772,11 +1056,11 @@ kubectl get svc -n prometheus
 
 
 http://44.192.109.76:31205/graph
-![alt text](image-78.png)
+![image-78](https://github.com/user-attachments/assets/2712b6a8-f46b-46c3-abbf-19396b3b1d53)
 
 
 http://44.192.109.76:32242/
-![alt text](image-79.png)
+![image-79](https://github.com/user-attachments/assets/7dde347c-acb5-4c6b-a691-190d933780b8)
 
 **Note**--> to get login password for grafan, you need to run the following command
 ```bash
@@ -785,360 +1069,24 @@ kubectl get secret --namespace prometheus stable-grafana -o jsonpath="{.data.adm
 [!Note]
 Default user login name is ```admin```
 
-![alt text](image-80.png)
+![image-80](https://github.com/user-attachments/assets/a53a4add-5f78-4580-87b7-d7f0e9c30c23)
 
 Dashboard:
-![alt text](image-82.png)
-![alt text](image-81.png)
-![alt text](image-83.png)
+![image-82](https://github.com/user-attachments/assets/59ca56c6-7c16-4f2c-b5cf-d4f3852c1ae2)
+![image-81](https://github.com/user-attachments/assets/57b157cf-2bf0-452e-b59b-754527db350d)
+![image-83](https://github.com/user-attachments/assets/f5b31774-4973-4fd6-886c-7d5c51d9718a)
 
 
-Email Notification: 
-![alt text](image-85.png)
+### <span style="color: Yellow;">Email Notification for successfull deployment: 
+![image-85](https://github.com/user-attachments/assets/f1ba3683-367d-4c67-878e-5ff2a927b4cb)
 
-![alt text](image-86.png)
+### <span style="color: Yellow;"> Resources used in AWS:
 
-![alt text](image-87.png)
-![alt text](image-88.png)
-![alt text](image-89.png)
-![alt text](image-90.png)
-![alt text](image-91.png)
-![alt text](image-92.png)
-![alt text](image-93.png)
+- EC2 instances
+![image-96](https://github.com/user-attachments/assets/249a7607-25e3-48b6-89ed-6fd0ec45ef2e)
 
-![alt text](image-94.png)
-![alt text](image-95.png)
-
-
-![alt text](image-96.png)
-
-
-
-
-![alt text](image-84.png)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### <span style="color: cyan;"> Configure tools in Jenkins </span>
-- Configure the docker
-> Name- docker
-
-> [x] install automatically
->
-> docker version: latest
-  
-### <span style="color: cyan;"> Set docker cred in Jenkins </span>
--    Dashboard>Manage Jenkins > Credentials> System>
-    Global credentials (unrestricted) &rArr; Click on "New credentials"
-> kind: "username with password"
-
-> username: your docker login ID
-> 
-> password: docker token
-> 
-> Id: docker-cred #it would be used in pipeline
-> 
-> Description:docker-cred
-
-
-
-### <span style="color: cyan;"> Creating a multipipeline in Jenkins:</span>
-
-> name: microservice-ecommerce
-> 
-> item type: Multibranch pipeline
-> 
-
-Syntax to configure the __webhooks__ in ```github``` 
-```JENKINS_URL/multibranch-webhook-trigger/invoke?token=[Trigger token]```
-```bash
-http://18.234.174.99:8080/multibranch-webhook-trigger/invoke?token=singh
-```
-go to github repo > setting> webhooks
-
-Once you configure __webhook__ then build the pipeline and you will see successfull build.
-
-- Images view from ```Docker Hub```
-
-## <span style="color: yellow;">Managing Docker and Kubernetes Pods
-
-### <span style="color: Cyan;">Check Docker containers running:</span>
-```sh
-docker ps
-```
-```bash
-ubuntu@ip-172-31-81-94:~$ docker ps
-```
-
-
-##### <span style="color: Cyan;">List all Kubernetes pods in all namespaces:</span>
-```sh
-kubectl get pods -A
-```
-- To get the existing namespace 
-```sh
-kubectl get namespace
-```
-```bash
-ubuntu@ip-172-31-81-94:~$ kubectl get namespace
-NAME                   STATUS   AGE
-argocd                 Active   7m11s
-default                Active   7m24s
-kube-node-lease        Active   7m24s
-kube-public            Active   7m24s
-kube-system            Active   7m24s
-kubernetes-dashboard   Active   7m1s
-local-path-storage     Active   7m20s
-monitoring             Active   6m54s
-```
-
-## <span style="color: yellow;"> Setup the EKS Cluster </span>
-
-
-### <span style="color: cyan;"> Create Namespace:</span>
-```bash
-kubectl create namespace webapps
-```
-
-### <span style="color: cyan;"> Create Service Account:</span>
-```bash
-# vi svc.yml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: jenkins
-  namespace: webapps
-```
-*__Steps__*:
-> create a vi svc.yml and paste the above svc.yml content
->> run the following command
-
->> kubectl apply -f svc.yml
-
-
-### <span style="color: cyan;"> Create Role and Role Binding:</span>
-> Creating a Kubernetes Role</span>
-
-To start, you'll need to define a role in Kubernetes that specifies the permissions for the resources you'll manage. Here's how to do it:
-
-Create a YAML File: Define the role with necessary permissions (e.g., ```get, list, watch, create, update, patch, delete```).
-
-We start by defining a Kubernetes Role with specific permissions using a YAML file.
-
-- Create a role.yaml file to specify what resources the role can access and what actions it can perform (e.g., ```list, create, delete```).
--  Apply this configuration with ```kubectl apply -f role.yaml```.
-
-```bash
-# vi role.yml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: app-role
-  namespace: webapps
-rules:
-  - apiGroups:
-        - ""
-        - apps
-        - autoscaling
-        - batch
-        - extensions
-        - policy
-        - rbac.authorization.k8s.io
-    resources:
-      - pods
-      - componentstatuses
-      - configmaps
-      - daemonsets
-      - deployments
-      - events
-      - endpoints
-      - horizontalpodautoscalers
-      - ingress
-      - jobs
-      - limitranges
-      - namespaces
-      - nodes
-      - pods
-      - persistentvolumes
-      - persistentvolumeclaims
-      - resourcequotas
-      - replicasets
-      - replicationcontrollers
-      - serviceaccounts
-      - services
-    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
-```
-```bash
-kubectl apply -f role.yaml
-```
-
-### <span style="color: cyan;"> Assigning the Role to a Service Account:
-
-- We need to bind the created role to a service account using RoleBinding.
-- Create a ```bind.yaml``` file to link the role with the service account.
-- Apply this configuration with ```kubectl apply -f bind.yaml```.
-
-```bash
-vi bind.yml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: app-rolebinding
-  namespace: webapps 
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: app-role 
-subjects:
-- namespace: webapps 
-  kind: ServiceAccount
-  name: jenkins 
-```
-
-
-
-### <span style="color: cyan;"> [Creating a Token for Authentication](https://kubernetes.io/docs/reference/access-authn-authz/service-accounts-admin/#:~:text=To%20create%20a%20non%2Dexpiring,with%20that%20generated%20token%20data.): 
-
-- Generate a token for the service account to authenticate with Kubernetes.
-- Use a YAML file to create a Kubernetes Secret that stores the token.
-  
-- Apply this configuration with ```kubectl apply -f secret.yaml```.
-```bash
-# vi secret.yml
-apiVersion: v1
-kind: Secret
-type: kubernetes.io/service-account-token
-metadata:
-  name: mysecretname
-  annotations:
-    kubernetes.io/service-account.name: jenkins
-```
-- while applying, makesure, we will use namespace as below
-```bash
-kubectl apply -f secret.yml -n webapps
-```
-
-- Retrieve the token using ```kubectl describe secret <secret-name> -n webapps```.
-
-```sh
-ubuntu@ip-172-31-90-126:~$ kubectl get namespace
-NAME              STATUS   AGE
-default           Active   51m
-kube-node-lease   Active   51m
-kube-public       Active   51m
-kube-system       Active   51m
-webapps           Active   22m
-
-ubuntu@ip-172-31-90-126:~$ kubectl get namespace webapps
-NAME      STATUS   AGE
-webapps   Active   22m
-ubuntu@ip-172-31-90-126:~$
-
-ubuntu@ip-172-31-90-126:~$ kubectl get secret -n webapps
-NAME           TYPE                                  DATA   AGE
-mysecretname   kubernetes.io/service-account-token   3      3m33s
-```
-```bash
-kubectl describe secret mysecretname -n webapps
-```
-
-
-will save token somewhere, because we will be using the same token in CI/CD pipeline.
-```bash
-kubectl describe secret mysecretname -n webapps | grep token
-
-Type:  kubernetes.io/service-account-token
-token:      eyJhbGciOiJSUzI1NiIsImtpZCI6InhpWmNCYi1ZaEFNaFJ0eWpmQVFvSFR0ZFlQbGJZSjNndXpEM3hCUDJhVkUifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJ3ZWJhcHBzIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6Im15c2VjcmV0bmFtZSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJqZW5raW5zIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiZWJjZmM4OTUtOTk4My00ZTIxLThmMTMtN2VhZTgzZmJmZWFjIiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50OndlYmFwcHM6amVua2lucyJ9.Q4a0Er2viPrfPKZ7vW93FuC_P4S2uYXHkY9v37qvR69DLPXYgEJx9aXa2z2-WlKUt12WdRW-Gv53hAvF2hZjt8REwgqbe98Dohv1PmDLwxlycqj_WjCxTSFxobZqeDqHXo3VF6SawSTNPETx4WnXDqMjqyOKk0LHI-Sxi6CIOMVi4mlZUXWCEiyywE75RlK-E25yqTU9FB4M3hZ_v2cMNedyDOz2IITdLosr17L9HyvPo6-kmOk1qmrSryXwD9pX4cw4cRgiNZR3p5wy_9TF2WOxDsnKzuyjOOCBP1AKbdp673eJI20mGQS2EB8HFx13ql8f_pZn5-Bl82o0s83fBA
-```
-
-## <span style="color: Cyan;"> Setting Up Jenkins CD Pipeline:
-
-- Create a Jenkins pipeline to handle the deployment process.
-- Define the pipeline stages: deploy to Kubernetes and verify deployment.
-- Configure Jenkins to use the service account token for Kubernetes API interactions.
-- Use the pipeline syntax to apply Kubernetes configurations and monitor the deployment.
-  
-### <span style="color: Yellow;"> Configure the K8s token in Jenkins
-
-Dashboard> Manage Jenkins> Credentials> System> Global credentials (unrestricted)
-> kind: "Secret Text"
-
-> Secret: Paste your token which you get from secert
-
-> Id: k8-token #it would be used in pipeline
-> 
-> Description:k8-token
-
-
-
-Finally, set up a Jenkins pipeline to automate deployment:
-
-Create a ```dummy Jenkins Pipeline```: Define stages for deployment and verification.
-
-
-
-add the following in pipeline
-```bash
-pipeline {
-    agent any
-
-    stages {
-        stage('Deploy to Kubernets') {
-            steps {
-                withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: 'balraj-cluster', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', serverUrl: 'https://7A88D591B76582F68E890F414CBE194C.gr7.us-east-1.eks.amazonaws.com']]) {
-                     sh "kubectl apply -f deployment-service.yml"
-                     sleep 60
-               }
-            }
-        }    
-  
-        stage('Verify Deployment') {
-            steps {
-                withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: 'balraj-cluster', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', serverUrl: 'https://7A88D591B76582F68E890F414CBE194C.gr7.us-east-1.eks.amazonaws.com']]) {
-                     sh "kubectl get svc -n webapps"
-                }
-            }
-        }
-      }
-    }
-```
-Same pipeline will add into the git repo in ```main branch```
-
-
-Commit and Run: Commit the Jenkinsfile and let Jenkins pick it up. Monitor the deployment process and check the application URL once it’s up and running.
-
-
-
-## <span style="color: Yellow;"> Deployment Verification
-
-- Once the pipeline is set up, Jenkins will deploy the microservices and provide a URL to access the application.
-
-
-
-- will browser the LB URL and website should be accessible.
-
+- EKS Cluster 
+![image-92](https://github.com/user-attachments/assets/7474696b-66d1-4a4c-93c6-09c08355a733)
 
 ## <span style="color: Yellow;"> Environment Cleanup:
 - As we are using Terraform, we will use the following command to delete 
