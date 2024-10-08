@@ -682,9 +682,9 @@ Go to folder ```Automations``` and update the instance ID in both bash scripts. 
 - Automations/updatefrontendnew.sh
 ![image-98](https://github.com/user-attachments/assets/0ef1416a-9067-443d-a048-a951cfbedd09)
 
-<details><summary><b><span style="color: Red;"> Troubleshooting while run CI Pipeline </span></b></summary><br>
+<details><summary><b><span style="color: Red;"> Troubleshooting while running CI Pipeline </span></b></summary><br>
 
-I was getting an error while running the CI job first time because due to missing required environment variables: ```FRONTEND_DOCKER_TAG``` and ```BACKEND_DOCKER_TAG```. 
+I was getting an error while running the CI job first time due to missing required environment variables: ```FRONTEND_DOCKER_TAG``` and ```BACKEND_DOCKER_TAG```. 
 
 Steps to Fix
 Ensure Required Parameters Are Provided:
