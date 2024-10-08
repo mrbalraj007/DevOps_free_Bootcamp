@@ -1,7 +1,7 @@
 # <span style="color: Yellow;"> Building a Three-Tier Blogging App with DevSecOps: The **WanderLust** Mega Project </span>
 "WanderLust is a travel blog web application developed using the ```MERN stack (MongoDB, Express.js, React, and Node.js)```. This project is designed to foster open-source contributions, enhance React development skills, and provide hands-on experience with Git."
 
-![alt text](Project11.gif)
+![Project11](https://github.com/user-attachments/assets/89c8e789-8030-4494-9ef4-d4299c4e87dc)
 
 ## <span style="color: Yellow;"> Prerequisites </span>
 Before diving into this project, here are some skills and tools you should be familiar with:
