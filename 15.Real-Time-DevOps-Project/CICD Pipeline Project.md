@@ -4,7 +4,7 @@ In this blog, we will explore how to set up a Blue-Green deployment pipeline usi
 ## <span style="color: Yellow;"> Prerequisites </span>
 Before diving into this project, here are some skills and tools you should be familiar with:
 
-- [x] [Clone repository for terraform code](https://github.com/mrbalraj007/DevOps_free_Bootcamp/tree/main/13.Real-Time-DevOps-Project/Terraform_Code/Code_IAC_Terraform_box)<br>
+- [x] [Clone repository for terraform code](https://github.com/mrbalraj007/DevOps_free_Bootcamp/tree/main/15.Real-Time-DevOps-Project/Terraform_Code/Code_IAC_Terraform_box)<br>
   __Note__: Replace resource names and variables as per your requirement in terraform code
   - from k8s_setup_file/main.tf (i.e ```balraj```*).
   - from Virtual machine main.tf (i.e keyname- ```MYLABKEY```*)
@@ -59,29 +59,25 @@ I have created a Terraform code to set up the entire environment, including the 
 - &rArr;<span style="color: brown;"> Docker Install
 - &rArr;<span style="color: brown;"> Trivy Install
 - &rArr;<span style="color: brown;"> SonarQube install as in a container
-- &rArr;<span style="color: brown;"> ArgoCD
 - &rArr;<span style="color: brown;"> EKS Cluster Setup
-- &rArr;<span style="color: brown;"> Prometheus install using Helm
-- &rArr;<span style="color: brown;"> Grafana install using Helm
+- &rArr;<span style="color: brown;"> Nexus Install
 
-### <span style="color: Yellow;">Setting Up the Virtual Machines (EC2)
+### <span style="color: Yellow;"> EC2 Instances creation
 
 First, we'll create the necessary virtual machines using ```terraform```. 
 
 Below is a terraform configuration:
 
-Once you [clone repo](https://github.com/mrbalraj007/DevOps_free_Bootcamp.git) then go to folder *<span style="color: cyan;">"13.Real-Time-DevOps-Project/Terraform_Code/Code_IAC_Terraform_box"</span>* and run the terraform command.
+Once you [clone repo](https://github.com/mrbalraj007/DevOps_free_Bootcamp.git) then go to folder *<span style="color: cyan;">"15.Real-Time-DevOps-Project/Terraform_Code/Code_IAC_Terraform_box"</span>* and run the terraform command.
 ```bash
 cd Terraform_Code/Code_IAC_Terraform_box
 
 $ ls -l
-da---l          29/09/24  12:02 PM                k8s_setup_file
+da---l          07/10/24   4:43 PM                k8s_setup_file
+da---l          07/10/24   4:01 PM                scripts
 -a---l          29/09/24  10:44 AM            507 .gitignore
--a---l          01/10/24  10:50 AM           3771 agent_install.sh
--a---l          01/10/24  10:59 AM           8149 main.tf
+-a---l          09/10/24  10:57 AM           8351 main.tf
 -a---l          16/07/21   4:53 PM           1696 MYLABKEY.pem
--a---l          25/07/24   9:16 PM            239 provider.tf
--a---l          01/10/24  11:26 AM          10257 terrabox_install.sh
 ```
 
 __<span style="color: Red;">Note__</span> &rArr; Make sure to run ```main.tf``` from inside the folders.
@@ -89,13 +85,11 @@ __<span style="color: Red;">Note__</span> &rArr; Make sure to run ```main.tf``` 
 ```bash
 13.Real-Time-DevOps-Project/Terraform_Code/Code_IAC_Terraform_box/
 
-da---l          29/09/24  12:02 PM                k8s_setup_file
+da---l          07/10/24   4:43 PM                k8s_setup_file
+da---l          07/10/24   4:01 PM                scripts
 -a---l          29/09/24  10:44 AM            507 .gitignore
--a---l          01/10/24  10:50 AM           3771 agent_install.sh
--a---l          01/10/24  10:59 AM           8149 main.tf
+-a---l          09/10/24  10:57 AM           8351 main.tf
 -a---l          16/07/21   4:53 PM           1696 MYLABKEY.pem
--a---l          25/07/24   9:16 PM            239 provider.tf
--a---l          01/10/24  11:26 AM          10257 terrabox_install.sh
 ```
 You need to run ```main.tf``` file using following terraform command.
 
@@ -109,7 +103,7 @@ terraform apply
 # Optional <terraform apply --auto-approve>
 ```
 -------
-
+![image](https://github.com/user-attachments/assets/e611b2da-88fb-47c2-989f-ad58b6d42f90)
 
 
 Once you run the terraform command, then we will verify the following things to make sure everything is setup via a terraform.
@@ -119,14 +113,17 @@ Once connected to EC2 instance then you can check the status of the ```user_data
 ```bash
 # Primary log file for cloud-init
 sudo tail -f /var/log/cloud-init-output.log
+                    or 
+sudo cat /var/log/cloud-init-output.log | more
 ```
 - If the user_data script runs successfully, you will see output logs and any errors encountered during execution.
 - If there’s an error, this log will provide clues about what failed.
 
 Outcome of "```cloud-init-output.log```"
-![image](https://github.com/user-attachments/assets/cf3ccb19-be9f-4bb4-aa61-1e65287ad1b9)
-![image-1](https://github.com/user-attachments/assets/7c4ad4a6-4882-4d48-90f3-2eac2fe65aad)
 
+- From Terraform:
+![image-1](https://github.com/user-attachments/assets/e3229a10-2c30-4694-ad3b-99ae0e35252d)
+![image-2](https://github.com/user-attachments/assets/a1082c77-1607-4093-b8a7-41c94e358473)
 
 ### <span style="color: cyan;"> Verify the Installation 
 
@@ -179,14 +176,14 @@ To see help text, you can run:
 
 - [x] <span style="color: brown;"> Verify the EKS cluster
 
-On the virtual machine, Go to directory ```k8s_setup_file``` and open the file ```cat apply.log``` to verify the cluster is created or not.
+On the ```Terraform``` virtual machine, Go to directory ```k8s_setup_file``` and open the file ```cat apply.log``` to verify the cluster is created or not.
 ```sh
 ubuntu@ip-172-31-90-126:~/k8s_setup_file$ pwd
 /home/ubuntu/k8s_setup_file
-ubuntu@ip-172-31-90-126:~/k8s_setup_file$
+ubuntu@ip-172-31-90-126:~/k8s_setup_file$ cd ..
 ```
 
-After Terraform deploys the instance and the cluster is set up, you can SSH into the instance and run:
+After Terraform deploys on the instance, now it's time to setup the cluster. You can SSH into the instance and run:
 
 ```bash
 aws eks update-kubeconfig --name <cluster-name> --region 
@@ -209,16 +206,17 @@ kubectl get nodes
 kubectl cluster-info
 kubectl config get-contexts
 ```
-![image-2](https://github.com/user-attachments/assets/e6afb5c4-9a16-45f6-9d06-fe9fcf19761b)
+![image-3](https://github.com/user-attachments/assets/4818cf2e-c970-4309-96e3-84d3a7ccd7a7)
 
 <details><summary><b><span style="color: Orange;">Change the hostname: (optional)</b></summary><br>
 
 sudo terraform show
 
-
 ```bash
 sudo hostnamectl set-hostname jenkins-svr
-sudo hostnamectl set-hostname jenkins-agent
+sudo hostnamectl set-hostname terraform
+sudo hostnamectl set-hostname sonarqube
+sudo hostnamectl set-hostname nexus
 ```
 - Update the /etc/hosts file:
   - Open the file with a text editor, for example:
@@ -235,21 +233,19 @@ Verify the change:
 ```bash
 hostnamectl
 ```
-
-Update the package
-```bash
-sudo -i
-apt update 
-```
 </details>
 
 ## <span style="color: yellow;"> Setup the Jenkins </span>
+Go to Jenkins EC2 and run the following command 
 Access Jenkins via http://<your-server-ip>:8080. Retrieve the initial admin password using:
 ```bash
 sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 ```
-![image-5](https://github.com/user-attachments/assets/72a2d1c3-d62b-4d1f-bedc-c6677f2f4efd)
-![image-6](https://github.com/user-attachments/assets/d448fd1b-ae89-4540-b486-9a35f24b76dd)
+![image-4](https://github.com/user-attachments/assets/1fc5315b-0fe1-4a5a-bb7c-fd20645adbb4)
+![image-5](https://github.com/user-attachments/assets/82ae7f28-7cae-476e-99ae-b1d1596c379e)
+![image-6](https://github.com/user-attachments/assets/c966a1b3-96a2-4dc6-8329-a3b8f4ee93e3)
+![image-7](https://github.com/user-attachments/assets/867887a1-9d3e-4d22-b37f-b63fac896620)
+![image-8](https://github.com/user-attachments/assets/fc64c254-8d92-4e20-9ce0-76b1938a466a)
 
 ### <span style="color: cyan;"> Install the plugin in Jenkins </span>
 Manage Jenkins > Plugins view> Under the Available tab, plugins available for download from the configured Update Center can be searched and considered:
@@ -263,28 +259,30 @@ Kubernetes
 Kubernetes CLI
 OWASP Dependency-Check
 SonarQube Scanner
+Config File Provider
+Maven Integration
+Pipeline Maven Integration
 ```
 
 - Run any job and verify that job is executing on agent node.
    - create a below pipeline and build it and verify the outcomes in agent machine.
 ```bash
 pipeline {
-    agent { label "balraj"}
+    agent any
 
     stages {
         stage('code') {
             steps {
                 echo 'This is cloning the code'
-                git branch: 'main', url: 'https://github.com/mrbalraj007/django-notes-app.git'
+                git branch: 'main', url: 'https://github.com/mrbalraj007/Blue-Green-Deployment.git'
                 echo "This is cloning the code"
             }
         }
     }
 }
 ```
-![image-13](https://github.com/user-attachments/assets/32e8d38f-dacc-4570-8643-322b298737c9)
 
-
+![image-9](https://github.com/user-attachments/assets/2ba675e9-7ccb-4fb2-b8e1-2d8fd3bb29a7)
 
 ### <span style="color: cyan;"> Configure SonarQube </span>
 
@@ -295,13 +293,1074 @@ pipeline {
   You have to change password as per below screenshot
 ![image-16](https://github.com/user-attachments/assets/f35e952a-249a-4788-b9d4-fbaa1348f5ca)
 
+
+### <span style="color: cyan;"> Configure Nexus </span>
+<public IP address: 8180>
+
+  default login : admin <br>
+  You have to change password as per below screenshot
+![image-10](https://github.com/user-attachments/assets/336ff105-2225-4d51-a802-4e8e3bc7d280)
+
+login into Nexus EC2 instance
+```bash
+ubuntu@ip-172-31-16-90:~$ sudo docker ps
+CONTAINER ID   IMAGE             COMMAND                  CREATED          STATUS          PORTS                                       NAMES
+515e835cd107   sonatype/nexus3   "/opt/sonatype/nexus…"   13 minutes ago   Up 13 minutes   0.0.0.0:8081->8081/tcp, :::8081->8081/tcp   Nexus-Server
+ubuntu@ip-172-31-16-90:~$
+```
+```sh
+sudo docker exec -it <container ID> /bin/bash
+```
+
+```bash
+ubuntu@ip-172-31-16-90:~$ sudo docker exec -it 515e835cd107 /bin/bash
+bash-4.4$ ls
+nexus  sonatype-work  start-nexus-repository-manager.sh
+bash-4.4$ cd nexus/
+bash-4.4$ ls
+NOTICE.txt  OSS-LICENSE.txt  PRO-LICENSE.txt  bin  deploy  etc  lib  public  replicator  system
+bash-4.4$ cd ..
+bash-4.4$ ls
+nexus  sonatype-work  start-nexus-repository-manager.sh
+bash-4.4$ cd sonatype-work/
+bash-4.4$ ls
+nexus3
+bash-4.4$ cd nexus3/
+bash-4.4$ ls
+admin.password  cache  elasticsearch  generated-bundles  javaprefs  keystores  log   restore-from-backup
+blobs           db     etc            instances          karaf.pid  lock       port  tmp
+bash-4.4$ cat admin.password
+820af89c-cef2-472d-8ba8-3cf374bb1b20
+bash-4.4$
+```
+![image-11](https://github.com/user-attachments/assets/f6212fdf-be82-4aa5-84f9-483401bf80d5)
+![image-12](https://github.com/user-attachments/assets/41308ae1-e9da-4db4-833f-3494b88f7791)
+![image-13](https://github.com/user-attachments/assets/523cfd02-d7cc-4760-880d-0eb2c6121cf8)
+![image-14](https://github.com/user-attachments/assets/338ceb09-7bba-49be-8767-991b0bf89d4f)
+
+
+Configure the RBAC
+
+On to Terraform EC2
+```sh
+kubectl create ns webapps
+```
+
+- create a file svc.yml
+```sh
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: jenkins
+  namespace: webapps
+```
+```sh
+kubectl apply -f svc.yml
+serviceaccount/jenkins created
+```
+- to create a role
+```sh
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: app-role
+  namespace: webapps
+rules:
+  - apiGroups:
+        - ""
+        - apps
+        - autoscaling
+        - batch
+        - extensions
+        - policy
+        - rbac.authorization.k8s.io
+    resources:
+      - pods
+      - secrets
+      - componentstatuses
+      - configmaps
+      - daemonsets
+      - deployments
+      - events
+      - endpoints
+      - horizontalpodautoscalers
+      - ingress
+      - jobs
+      - limitranges
+      - namespaces
+      - nodes
+      - pods
+      - persistentvolumes
+      - persistentvolumeclaims
+      - resourcequotas
+      - replicasets
+      - replicationcontrollers
+      - serviceaccounts
+      - services
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+```
+```sh
+kubectl apply -f role.yml
+role.rbac.authorization.k8s.io/app-role created
+```
+- Bind the role to service account
+```sh
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: app-rolebinding
+  namespace: webapps 
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: app-role 
+subjects:
+- namespace: webapps 
+  kind: ServiceAccount
+  name: jenkins 
+``
+```sh
+kubectl apply -f bind.yml
+rolebinding.rbac.authorization.k8s.io/app-rolebinding created
+```
+```sh
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/service-account-token
+metadata:
+  name: mysecretname
+  annotations:
+    kubernetes.io/service-account.name: jenkins
+```
+```sh
+kubectl apply -f sec.yml -n webapps
+secret/mysecretname created
+```
+
+To get the token.
+
+```sh
+ kubectl get secret -n webapps
+NAME           TYPE                                  DATA   AGE
+mysecretname   kubernetes.io/service-account-token   3      63s
+ubuntu@ip-172-31-93-220:~$ kubectl describe secret mysecretname -n webapps
+Name:         mysecretname
+Namespace:    webapps
+Labels:       <none>
+Annotations:  kubernetes.io/service-account.name: jenkins
+              kubernetes.io/service-account.uid: afcdd665-2b33-4079-9905-736029df259b
+
+Type:  kubernetes.io/service-account-token
+
+Data
+====
+ca.crt:     1107 bytes
+namespace:  7 bytes
+token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IjFBZE9BWDhYRGxFejlQVkdrSWJXRDBYdVdrWVRaSThxdU42eGdpdnEwTjAifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJ3ZWJhcHBzIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6Im15c2VjcmV0bmFtZSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJqZW5raW5zIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiYWZjZGQ2NjUtMmIzMy00MDc5LTk5MDUtNzM2MDI5ZGYyNTliIiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50OndlYmFwcHM6amVua2lucyJ9.gJvKqVY4fnLCeMKX8tNGt1LfM6yYkgrIEf0tmLH5Q8HOQJIfs0JLWMEIGLQkMJx-0qpFRoOgznHn9cYHh1o_tnbbkEQdi1VACGTMmjBXbK-cscPMGK-lTnw7-wV-Y-lmeTw3PMRczBX3IqAdsyzUVPlKaXRpDA1t48FV1SXvvkTArK0exy-524B8WJ7SADYwogHMj41PYfaY5uMIkQlfDYz45Kb93tfvnbxeO7YnZ2biIqMF4FNI24kw_WutDiE6tsURXyYJf5oOq6mrtzTolb0grRuWPgoFPxbD-eV_5I4cO_1QYlyqxlJt8cbQnK1f5SIHzDZyhp_JYRghG_cd4Q
+```
+
+- add the token into jenkins
+
+    Dashboard
+    Manage Jenkins
+    Credentials
+    System
+    Global credentials (unrestricted)
+
+![image-16](https://github.com/user-attachments/assets/0978a3a8-5ebb-4086-aa00-75df0fb3a258)
+
+
+
+<!-- 
+- Create a ClusterRole for PV access
+```sh
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: persistent-volume-access
+rules:
+  - apiGroups: [""]
+    resources: ["persistentvolumes"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+```
+
+- Bind the clusterRole to Jenkins Service Account
+```sh
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: jenkins-persistent-volume-access
+subjects:
+  - kind: ServiceAccount
+    name: jenkins
+    namespace: webapps
+roleRef:
+  kind: ClusterRole
+  name: persistent-volume-access
+  apiGroup: rbac.authorization.k8s.io
+``` -->
+
+- build a pipeline.
+```sh
+```
+
+
+- configure the tools- 
+
+- maven
+Dashboard
+Manage Jenkins
+Tools
+![image-17](https://github.com/user-attachments/assets/cd0ad587-ed0d-4c44-a206-12b63e166247)
+![image-18](https://github.com/user-attachments/assets/8b4822d3-047b-4874-a059-d41ed6c9b3a9)
+
+
+- sonar-scanner
+Dashboard
+Manage Jenkins
+Tools
+![image-19](https://github.com/user-attachments/assets/c2b5c1f7-a306-46bc-b326-847fe80bd9a5)
+![image-20](https://github.com/user-attachments/assets/aed4baa6-f96e-4018-b16d-1ebd84aa47eb)
+
+- Sonar-Server
+    Dashboard
+    Manage Jenkins
+    System
+
+![image-25](https://github.com/user-attachments/assets/c1c489b3-6f9b-47c7-a3bf-89e8083ca787)
+![image-26](https://github.com/user-attachments/assets/46cbae72-16c5-41ac-9d38-0a0d2b319e6b)
+
+- Configure Nexus
+![image-27](https://github.com/user-attachments/assets/16816600-46a4-4a4a-afdb-52f3cda7a1bb)
+![image-28](https://github.com/user-attachments/assets/66d2fd3c-9e26-48f9-ac9b-2204243247d3)
+![image-29](https://github.com/user-attachments/assets/ddfa753d-0449-49e4-8c46-d51f5012021c)
+
+add credential to Nexus Server
+
+- Remove the comment from line 125 and paste it to line number after 118 as below-
+![image-30](https://github.com/user-attachments/assets/d775b2cf-c20b-479a-871f-63acc4d8d181)
+
+- for Java based application, we have to add the following two credentials.
+
+    <server>
+      <id>maven-releases</id>
+      <username>admin</username>
+      <password>S0nar!ube2024</password>
+    </server>
+    
+    <server>
+      <id>maven-snapshots</id>
+      <username>admin</username>
+      <password>S0nar!ube2024</password>
+    </server>
+
+![image-33](https://github.com/user-attachments/assets/ca5c3c12-e029-4c7a-8b0f-de4a3ffcdd99)
+
+
+How to get details, go to Nexus. 
+http://3.84.186.15:8081/repository/maven-releases/
+http://3.84.186.15:8081/repository/maven-snapshots/
+![image-31](https://github.com/user-attachments/assets/a602de33-55fe-40cf-aa44-c03adc691d04)
+![image-32](https://github.com/user-attachments/assets/e75a3cc7-0f02-441d-94e6-be82ceffff3a)
+
+Go to Application Repo and select the pom.xml
+![image-34](https://github.com/user-attachments/assets/159d6b98-a021-41db-9aca-26154fd084c1)
+
+
+- Configure the webhooks for code quality check
+Open sonarqube UI
+
+![image-35](https://github.com/user-attachments/assets/09eaef57-dd2d-4767-aa52-3b0c91925a6c)
+
+http://34.207.143.49:8080/sonarqube-webhook/
+![image-36](https://github.com/user-attachments/assets/7a1b460b-95ef-4ae2-80c6-d57d1d7f1bdb)
+
+
+
+
+
+
+
+- Setup the credentials
+      Dashboard
+    Manage Jenkins
+    Credentials
+    System
+    Global credentials (unrestricted)
+
+- Git hub
+![image-21](https://github.com/user-attachments/assets/57f32901-42b1-415e-b2f7-8ea36930e8c1)
+
+- Sonarqube 
+- Go to SonarQube UI
+
+![image-22](https://github.com/user-attachments/assets/ce86e0d2-af60-4c75-a6af-6fff31493e0f)
+![image-23](https://github.com/user-attachments/assets/e320ee44-beff-4288-a117-ed07e958b363)
+squ_27ff7e0844173c47f802fa7a581f4b648ddc1748
+
+
+![image-24](https://github.com/user-attachments/assets/b3a0605c-38b0-4353-977d-669a6aa41f76)
+
+
+- Docker 
+![image-43](https://github.com/user-attachments/assets/2cc29020-85be-4591-8f52-b0f763d9bd45)
+
+
+create a pipeline and build it
+```sh
+pipeline {
+    agent any
+    
+    tools {
+        maven 'maven3'
+    }
+    
+     parameters {
+        choice(name: 'DEPLOY_ENV', choices: ['blue', 'green'], description: 'Choose which environment to deploy: Blue or Green')
+        choice(name: 'DOCKER_TAG', choices: ['blue', 'green'], description: 'Choose the Docker image tag for the deployment')
+        booleanParam(name: 'SWITCH_TRAFFIC', defaultValue: false, description: 'Switch traffic between Blue and Green')
+    }
+    
+     environment {
+        IMAGE_NAME = "balrajsi/bankapp"
+        TAG = "${params.DOCKER_TAG}"  // The image tag now comes from the parameter 
+        SCANNER_HOME= tool 'sonar-scanner'
+    }
+    
+    
+    stages {
+        stage('Git Checkout') {
+            steps {
+                git branch: 'main', credentialsId: 'git-cred', url: 'https://github.com/mrbalraj007/Blue-Green-Deployment.git'
+            }
+        }
+        stage('Compile') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        
+        stage('tests') {
+            steps {
+                sh 'mvn test -DskipTests=true' 
+            }
+        }
+        stage('Trivy FS Scan') {
+            steps {
+                sh 'trivy fs --format table -o fs.html .'
+            }
+        }
+        stage('sonarqube analysis') {
+            steps {
+            withSonarQubeEnv('sonar') {
+                 sh "$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=nodejsmysql -Dsonar.projectName=nodejsmysql -Dsonar.java.binaries=target"
+                }    
+            }
+        }
+         stage('Quality Gate Check') {
+            steps {
+                timeout(time: 1, unit: 'NANOSECONDS') {
+                   waitForQualityGate abortPipeline: false 
+              }
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'mvn test -DskipTests=true'
+            }
+        }
+        stage('Publish Artifact to Nexus') {
+            steps {
+                withMaven(globalMavenSettingsConfig: 'meven-settings', jdk: '', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
+                   sh 'mvn deploy -DskipTests=true'     
+              }
+            }
+        }
+   }   
+}                       
+```
+![image-37](https://github.com/user-attachments/assets/a80fb77b-6c35-4b56-a783-79c9d34c1356)
+
+![image-40](https://github.com/user-attachments/assets/226197f3-d85c-4b1a-8bde-94ef25e74b6f)
+
+## Troubleshooting:
+The error I encountered is related to the SonarScanner failing to connect to the SonarQube server because the server URL is incorrectly specified. Specifically, the error indicates that no URL scheme (http or https) was found for the SonarQube server's address.
+
+I have configured it as below here http was missing:
+![image-38](https://github.com/user-attachments/assets/eaafabe1-09c5-4f80-afa0-bd182cd3bfa5)
+
+here is the updated screenshot:
+![image-39](https://github.com/user-attachments/assets/cba6e230-ec5c-4b5a-96f1-6a94284d7315)
+
+now, build it again. 
+![image-41](https://github.com/user-attachments/assets/58887d45-820b-4036-8b32-b5d410da9e96)
+![image-42](https://github.com/user-attachments/assets/7e8d8dc5-de00-43c1-9520-a8ddb5993a90)
+
+Note--> pipeline was aborted and noticed that syntex was missing in pipeline. I was using "NANOSECONDS" in pipeline and it should be hours.
+
+here is corrected pipeline.
+
+```sh
+pipeline {
+    agent any
+    
+    tools {
+        maven 'maven3'
+    }
+    
+     parameters {
+        choice(name: 'DEPLOY_ENV', choices: ['blue', 'green'], description: 'Choose which environment to deploy: Blue or Green')
+        choice(name: 'DOCKER_TAG', choices: ['blue', 'green'], description: 'Choose the Docker image tag for the deployment')
+        booleanParam(name: 'SWITCH_TRAFFIC', defaultValue: false, description: 'Switch traffic between Blue and Green')
+    }
+    
+     environment {
+        IMAGE_NAME = "balrajsi/bankapp"
+        TAG = "${params.DOCKER_TAG}"  // The image tag now comes from the parameter 
+        SCANNER_HOME= tool 'sonar-scanner'
+    }
+    
+    
+    stages {
+        stage('Git Checkout') {
+            steps {
+                git branch: 'main', credentialsId: 'git-cred', url: 'https://github.com/mrbalraj007/Blue-Green-Deployment.git'
+            }
+        }
+        stage('Compile') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        
+        stage('tests') {
+            steps {
+                sh 'mvn test -DskipTests=true' 
+            }
+        }
+        stage('Trivy FS Scan') {
+            steps {
+                sh 'trivy fs --format table -o fs.html .'
+            }
+        }
+        stage('sonarqube analysis') {
+            steps {
+            withSonarQubeEnv('sonar') {
+                 sh "$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=nodejsmysql -Dsonar.projectName=nodejsmysql -Dsonar.java.binaries=target"
+                }    
+            }
+        }
+         stage('Quality Gate Check') {
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                   waitForQualityGate abortPipeline: false 
+              }
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'mvn test -DskipTests=true'
+            }
+        }
+        stage('Publish Artifact to Nexus') {
+            steps {
+                withMaven(globalMavenSettingsConfig: 'meven-settings', jdk: '', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
+                   sh 'mvn deploy -DskipTests=true'     
+              }
+            }
+        }
+   }   
+} 
+```
+
+- add parameter in pipeline for blue and green environment
+```sh
+pipeline {
+    agent any
+    
+    tools {
+        maven 'maven3'
+    }
+    
+     parameters {
+        choice(name: 'DEPLOY_ENV', choices: ['blue', 'green'], description: 'Choose which environment to deploy: Blue or Green')
+        choice(name: 'DOCKER_TAG', choices: ['blue', 'green'], description: 'Choose the Docker image tag for the deployment')
+        booleanParam(name: 'SWITCH_TRAFFIC', defaultValue: false, description: 'Switch traffic between Blue and Green')
+    }
+    
+     environment {
+        IMAGE_NAME = "balrajsi/bankapp"
+        TAG = "${params.DOCKER_TAG}"  // The image tag now comes from the parameter 
+        SCANNER_HOME= tool 'sonar-scanner'
+    }
+    
+    
+    stages {
+        stage('Git Checkout') {
+            steps {
+                git branch: 'main', credentialsId: 'git-cred', url: 'https://github.com/mrbalraj007/Blue-Green-Deployment.git'
+            }
+        }
+        stage('Compile') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        
+        stage('tests') {
+            steps {
+                sh 'mvn test -DskipTests=true' 
+            }
+        }
+        stage('Trivy FS Scan') {
+            steps {
+                sh 'trivy fs --format table -o fs.html .'
+            }
+        }
+        stage('sonarqube analysis') {
+            steps {
+            withSonarQubeEnv('sonar') {
+                 sh "$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=nodejsmysql -Dsonar.projectName=nodejsmysql -Dsonar.java.binaries=target"
+                }    
+            }
+        }
+         stage('Quality Gate Check') {
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                    waitForQualityGate abortPipeline: false
+              }
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'mvn test -DskipTests=true'
+            }
+        }
+        stage('Publish Artifact to Nexus') {
+            steps {
+                withMaven(globalMavenSettingsConfig: 'meven-settings', jdk: '', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
+                   sh 'mvn deploy -DskipTests=true'     
+              }
+            }
+        }
+        stage('Docker Build and Tag') {
+            steps {
+               script{
+                  withDockerRegistry(credentialsId: 'docker-cred') {
+                      sh 'docker build -t ${IMAGE_NAME}:${TAG} .'
+                 }
+               }
+            }
+        }
+         stage('Trivy Image Scan') {
+            steps {
+                sh 'trivy image --format table -o fs.html ${IMAGE_NAME}:${TAG}'
+            }
+        }
+        stage('Docker push Image') {
+            steps {
+                script{
+                withDockerRegistry(credentialsId: 'docker-cred') {
+                      sh 'docker push ${IMAGE_NAME}:${TAG}'
+              }
+            }
+            }
+        }
+        
+   }   
+}        
+```
+![image-44](https://github.com/user-attachments/assets/2aabd326-8cbd-4598-98fa-544c70b157aa)
+
+
+Troubleshooting and Solution:
+Add the User to the Docker Group
+Run the following command to add the Jenkins user (replace jenkins if Jenkins is running under a different user) to the docker group:
+
+bash
+Copy code
+sudo usermod -aG docker jenkins
+
+Restart Jenkins and Docker
+After adding the Jenkins user to the docker group, restart Jenkins and Docker for the changes to take effect:
+
+bash
+Copy code
+sudo systemctl restart jenkins
+sudo systemctl restart docker
+d. Verify Membership
+You can verify if the user has been added to the docker group by running:
+
+bash
+Copy code
+groups jenkins
+
+Verify Permissions for /var/run/docker.sock
+Check the permissions on the Docker socket to ensure it is accessible by the docker group:
+
+bash
+Copy code
+ls -l /var/run/docker.sock
+It should show something like:
+
+arduino
+Copy code
+srw-rw---- 1 root docker 0 Oct  9 09:42 /var/run/docker.sock
+If the group is not docker, you may need to correct the ownership by running:
+
+bash
+Copy code
+sudo chown root:docker /var/run/docker.sock
+Ensure that group members have read and write permissions:
+
+bash
+Copy code
+sudo chmod 660 /var/run/docker.sock
+
+Test the Setup
+Once the above steps are complete, test the setup by running a simple Docker command in the Jenkins pipeline to verify that the issue is resolved:
+```sh
+Copy code
+pipeline {
+    agent any
+    stages {
+        stage('Test Docker') {
+            steps {
+                sh 'docker ps'
+            }
+        }
+    }
+}
+```
+![image-45](https://github.com/user-attachments/assets/b75856c3-2c98-4706-ba2b-7e23932afe28)
+
+
+Now, run the build again.
+
+![image-46](https://github.com/user-attachments/assets/8499853d-02d3-49b9-89f9-e24fa40510b1)
+
+Image view from Docker Hub: 
+![image-47](https://github.com/user-attachments/assets/06757c1d-fcb9-4e5d-a150-a3615ac5c936)
+
+View from SonarQube:
+![image-48](https://github.com/user-attachments/assets/b8c82caf-78e0-44cc-a5fb-35a4dd3532fa)
+
+View from Nexus:
+![image-49](https://github.com/user-attachments/assets/8d2936ab-40a6-4e51-ab7d-3619785de914)
+
+
+Add the MySQL Deployment, Service and SVC-APP in pipeline
+
+here is the complete pipeline.
+
+```sh
+pipeline {
+    agent any
+    
+    tools {
+        maven 'maven3'
+    }
+    
+     parameters {
+        choice(name: 'DEPLOY_ENV', choices: ['blue', 'green'], description: 'Choose which environment to deploy: Blue or Green')
+        choice(name: 'DOCKER_TAG', choices: ['blue', 'green'], description: 'Choose the Docker image tag for the deployment')
+        booleanParam(name: 'SWITCH_TRAFFIC', defaultValue: false, description: 'Switch traffic between Blue and Green')
+    }
+    
+     environment {
+        IMAGE_NAME = "balrajsi/bankapp"
+        TAG = "${params.DOCKER_TAG}"  // The image tag now comes from the parameter
+        KUBE_NAMESPACE = 'webapps'
+        SCANNER_HOME= tool 'sonar-scanner'
+    }
+    
+    
+    stages {
+        stage('Git Checkout') {
+            steps {
+                git branch: 'main', credentialsId: 'git-cred', url: 'https://github.com/mrbalraj007/Blue-Green-Deployment.git'
+            }
+        }
+        stage('Compile') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        
+        stage('tests') {
+            steps {
+                sh 'mvn test -DskipTests=true' 
+            }
+        }
+        stage('Trivy FS Scan') {
+            steps {
+                sh 'trivy fs --format table -o fs.html .'
+            }
+        }
+        stage('sonarqube analysis') {
+            steps {
+            withSonarQubeEnv('sonar') {
+                 sh "$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=nodejsmysql -Dsonar.projectName=nodejsmysql -Dsonar.java.binaries=target"
+                }    
+            }
+        }
+         stage('Quality Gate Check') {
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                    waitForQualityGate abortPipeline: false
+              }
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'mvn test -DskipTests=true'
+            }
+        }
+        stage('Publish Artifact to Nexus') {
+            steps {
+                withMaven(globalMavenSettingsConfig: 'meven-settings', jdk: '', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
+                   sh 'mvn deploy -DskipTests=true'     
+              }
+            }
+        }
+        stage('Docker Build and Tag') {
+            steps {
+               script{
+                  withDockerRegistry(credentialsId: 'docker-cred') {
+                      sh 'docker build -t ${IMAGE_NAME}:${TAG} .'
+                 }
+               }
+            }
+        }
+         stage('Trivy Image Scan') {
+            steps {
+                sh 'trivy image --format table -o fs.html ${IMAGE_NAME}:${TAG}'
+            }
+        }
+        stage('Docker push Image') {
+            steps {
+                script{
+                withDockerRegistry(credentialsId: 'docker-cred') {
+                      sh 'docker push ${IMAGE_NAME}:${TAG}'
+              }
+            }
+            }
+        }
+        stage('Deploy MySQL Deployment and Service') {
+            steps {
+                script {
+                    withKubeConfig(caCertificate: '', clusterName: 'balraj-cluster', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://46BCE22A20C7B7BD3991293F82452A40.gr7.us-east-1.eks.amazonaws.com') {
+                        sh "kubectl apply -f mysql-ds.yml -n ${KUBE_NAMESPACE}"  // Ensure you have the MySQL deployment YAML ready
+                    }
+                }
+            }
+        }
+        
+        stage('Deploy SVC-APP') {
+            steps {
+                script {
+                    withKubeConfig(caCertificate: '', clusterName: 'balraj-cluster', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://46BCE22A20C7B7BD3991293F82452A40.gr7.us-east-1.eks.amazonaws.com') {
+                        sh """ if ! kubectl get svc bankapp-service -n ${KUBE_NAMESPACE}; then
+                                kubectl apply -f bankapp-service.yml -n ${KUBE_NAMESPACE}
+                              fi
+                        """
+                   }
+                }
+            }
+        }
+        
+   }   
+}        
+```
+
+![image-50](https://github.com/user-attachments/assets/1c078ea1-e192-4d01-aa50-9166fea37512)
+![image-51](https://github.com/user-attachments/assets/e8f7a64c-369f-40a5-971a-17654693ed67)
+![image-52](https://github.com/user-attachments/assets/373fa8f0-24b7-424c-87a2-1a75b73241b8)
+
+```sh
+ubuntu@ip-172-31-93-220:~$ kubectl get pods -n webapps
+NAME                   READY   STATUS    RESTARTS   AGE
+mysql-f5c84b88-2jf6r   1/1     Running   0          24m
+```
+```sh
+ubuntu@ip-172-31-93-220:~$ kubectl get svc -n webapps
+NAME              TYPE           CLUSTER-IP      EXTERNAL-IP                                                             PORT(S)        AGE
+bankapp-service   LoadBalancer   172.20.249.93   aba6848fca700468f834ff45be100a18-73608189.us-east-1.elb.amazonaws.com   80:32657/TCP   24m
+mysql-service     ClusterIP      172.20.64.19    <none>                                                                  3306/TCP       24m
+ubuntu@ip-172-31-93-220:~$
+```
+```sh
+ubuntu@ip-172-31-93-220:~$ kubectl get nodes
+NAME                         STATUS   ROLES    AGE     VERSION
+ip-10-0-1-17.ec2.internal    Ready    <none>   4h15m   v1.30.4-eks-a737599
+ip-10-0-2-201.ec2.internal   Ready    <none>   4h15m   v1.30.4-eks-a737599
+ip-10-0-2-220.ec2.internal   Ready    <none>   4h15m   v1.30.4-eks-a737599
+```
+
+Deploy to K8s
+
+```sh
+pipeline {
+    agent any
+    
+    tools {
+        maven 'maven3'
+    }
+    
+     parameters {
+        choice(name: 'DEPLOY_ENV', choices: ['blue', 'green'], description: 'Choose which environment to deploy: Blue or Green')
+        choice(name: 'DOCKER_TAG', choices: ['blue', 'green'], description: 'Choose the Docker image tag for the deployment')
+        booleanParam(name: 'SWITCH_TRAFFIC', defaultValue: false, description: 'Switch traffic between Blue and Green')
+    }
+    
+     environment {
+        IMAGE_NAME = "balrajsi/bankapp"
+        TAG = "${params.DOCKER_TAG}"  // The image tag now comes from the parameter
+        KUBE_NAMESPACE = 'webapps'
+        SCANNER_HOME= tool 'sonar-scanner'
+    }
+    
+    
+    stages {
+        stage('Git Checkout') {
+            steps {
+                git branch: 'main', credentialsId: 'git-cred', url: 'https://github.com/mrbalraj007/Blue-Green-Deployment.git'
+            }
+        }
+        stage('Compile') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        
+        stage('tests') {
+            steps {
+                sh 'mvn test -DskipTests=true' 
+            }
+        }
+        stage('Trivy FS Scan') {
+            steps {
+                sh 'trivy fs --format table -o fs.html .'
+            }
+        }
+        stage('sonarqube analysis') {
+            steps {
+            withSonarQubeEnv('sonar') {
+                 sh "$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=nodejsmysql -Dsonar.projectName=nodejsmysql -Dsonar.java.binaries=target"
+                }    
+            }
+        }
+         stage('Quality Gate Check') {
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                    waitForQualityGate abortPipeline: false
+              }
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'mvn test -DskipTests=true'
+            }
+        }
+        stage('Publish Artifact to Nexus') {
+            steps {
+                withMaven(globalMavenSettingsConfig: 'meven-settings', jdk: '', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
+                   sh 'mvn deploy -DskipTests=true'     
+              }
+            }
+        }
+        stage('Docker Build and Tag') {
+            steps {
+               script{
+                  withDockerRegistry(credentialsId: 'docker-cred') {
+                      sh 'docker build -t ${IMAGE_NAME}:${TAG} .'
+                 }
+               }
+            }
+        }
+         stage('Trivy Image Scan') {
+            steps {
+                sh 'trivy image --format table -o fs.html ${IMAGE_NAME}:${TAG}'
+            }
+        }
+        stage('Docker push Image') {
+            steps {
+                script{
+                withDockerRegistry(credentialsId: 'docker-cred') {
+                      sh 'docker push ${IMAGE_NAME}:${TAG}'
+              }
+            }
+            }
+        }
+        stage('Deploy MySQL Deployment and Service') {
+            steps {
+                script {
+                    withKubeConfig(caCertificate: '', clusterName: 'balraj-cluster', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://46BCE22A20C7B7BD3991293F82452A40.gr7.us-east-1.eks.amazonaws.com') {
+                        sh "kubectl apply -f mysql-ds.yml -n ${KUBE_NAMESPACE}"  // Ensure you have the MySQL deployment YAML ready
+                    }
+                }
+            }
+        }
+        
+        stage('Deploy SVC-APP') {
+            steps {
+                script {
+                    withKubeConfig(caCertificate: '', clusterName: 'balraj-cluster', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://46BCE22A20C7B7BD3991293F82452A40.gr7.us-east-1.eks.amazonaws.com') {
+                        sh """ if ! kubectl get svc bankapp-service -n ${KUBE_NAMESPACE}; then
+                                kubectl apply -f bankapp-service.yml -n ${KUBE_NAMESPACE}
+                              fi
+                        """
+                   }
+                }
+            }
+        }
+         stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    def deploymentFile = ""
+                    if (params.DEPLOY_ENV == 'blue') {
+                        deploymentFile = 'app-deployment-blue.yml'
+                    } else {
+                        deploymentFile = 'app-deployment-green.yml'
+                    }
+
+                    withKubeConfig(caCertificate: '', clusterName: 'balraj-cluster', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://46BCE22A20C7B7BD3991293F82452A40.gr7.us-east-1.eks.amazonaws.com') {
+                        sh "kubectl apply -f ${deploymentFile} -n ${KUBE_NAMESPACE}"
+                    }
+                }
+            }
+        }
+        
+        stage('Switch Traffic Between Blue & Green Environment') {
+            when {
+                expression { return params.SWITCH_TRAFFIC }
+            }
+            steps {
+                script {
+                    def newEnv = params.DEPLOY_ENV
+
+                    // Always switch traffic based on DEPLOY_ENV
+                    withKubeConfig(caCertificate: '', clusterName: 'balraj-cluster', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://46BCE22A20C7B7BD3991293F82452A40.gr7.us-east-1.eks.amazonaws.com') {
+                        sh '''
+                            kubectl patch service bankapp-service -p "{\\"spec\\": {\\"selector\\": {\\"app\\": \\"bankapp\\", \\"version\\": \\"''' + newEnv + '''\\"}}}" -n ${KUBE_NAMESPACE}
+                        '''
+                    }
+                    echo "Traffic has been switched to the ${newEnv} environment."
+                }
+            }
+        }
+        
+        stage('Verify Deployment') {
+            steps {
+                script {
+                    def verifyEnv = params.DEPLOY_ENV
+                    withKubeConfig(caCertificate: '', clusterName: 'balraj-cluster', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://46BCE22A20C7B7BD3991293F82452A40.gr7.us-east-1.eks.amazonaws.com') {
+                        sh """
+                        kubectl get pods -l version=${verifyEnv} -n ${KUBE_NAMESPACE}
+                        kubectl get svc bankapp-service -n ${KUBE_NAMESPACE}
+                        """
+                    }
+                }
+            }
+        }
+   }   
+}        
+```
+![image-53](https://github.com/user-attachments/assets/d3fc75a1-0c38-4c07-a6b8-6de46b64d4bd)
+
+Now, try toa ccess it throught the URL (aba6848fca700468f834ff45be100a18-73608189.us-east-1.elb.amazonaws.com) in browser.
+```sh
+ubuntu@ip-172-31-93-220:~$ kubectl get svc -n webapps
+NAME              TYPE           CLUSTER-IP      EXTERNAL-IP                                                             PORT(S)        AGE
+bankapp-service   LoadBalancer   172.20.249.93   aba6848fca700468f834ff45be100a18-73608189.us-east-1.elb.amazonaws.com   80:32657/TCP   33m
+mysql-service     ClusterIP      172.20.64.19    <none>                                                                  3306/TCP       33m
+```
+![image-54](https://github.com/user-attachments/assets/85672827-0c28-4d1b-aec7-90694dd30cda)
+
+
+You have to run the pipeline for Green environment as well.
+![image-55](https://github.com/user-attachments/assets/8b0b01b3-ca44-489f-8465-3b18c8166338)
+![image-56](https://github.com/user-attachments/assets/90a55c20-f2a6-4d4a-aef5-e0d78b1b7ba1)
+
+
+Now, run it again with switch traffic
+![image-57](https://github.com/user-attachments/assets/ef72e499-b531-4a72-8ec6-b86ad16496b9)
+
+```sh
+ubuntu@ip-172-31-93-220:~$ kubectl get all -n webapps
+NAME                                 READY   STATUS    RESTARTS   AGE
+pod/bankapp-blue-bcc84fb84-9mbsk     1/1     Running   0          7m16s
+pod/bankapp-green-57bd8b8b58-45nrb   1/1     Running   0          5m10s
+pod/mysql-f5c84b88-2jf6r             1/1     Running   0          38m
+
+NAME                      TYPE           CLUSTER-IP      EXTERNAL-IP                                                             PORT(S)        AGE
+service/bankapp-service   LoadBalancer   172.20.249.93   aba6848fca700468f834ff45be100a18-73608189.us-east-1.elb.amazonaws.com   80:32657/TCP   38m
+service/mysql-service     ClusterIP      172.20.64.19    <none>                                                                  3306/TCP       38m
+
+NAME                            READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/bankapp-blue    1/1     1            1           7m16s
+deployment.apps/bankapp-green   1/1     1            1           5m10s
+deployment.apps/mysql           1/1     1            1           38m
+
+NAME                                       DESIRED   CURRENT   READY   AGE
+replicaset.apps/bankapp-blue-bcc84fb84     1         1         1       7m16s
+replicaset.apps/bankapp-green-57bd8b8b58   1         1         1       5m10s
+replicaset.apps/mysql-f5c84b88             1         1         1       38m
+ubuntu@ip-172-31-93-220:~$
+```
+![image-58](https://github.com/user-attachments/assets/6821c8b5-117e-4d18-8de2-b6c52706367f)
+![image-59](https://github.com/user-attachments/assets/2e66e62f-6d5d-4aa4-901e-bfa9d84bc2ec)
+
+
+
+I did the switch over to blue again and noticed their is no downtime
+![image-60](https://github.com/user-attachments/assets/131210df-d34d-4866-810c-537cd05e5359)
+
+```sh
+Every 2.0s: kubectl get all -n webapps                                                                                                                              ip-172-31-93-220: Wed Oct  9 04:52:24 2024
+
+NAME                                 READY   STATUS    RESTARTS   AGE
+pod/bankapp-blue-bcc84fb84-9mbsk     1/1     Running   0          11m
+pod/bankapp-green-57bd8b8b58-45nrb   1/1     Running   0          9m38s
+pod/mysql-f5c84b88-2jf6r             1/1     Running   0          43m
+
+NAME                      TYPE           CLUSTER-IP      EXTERNAL-IP                                                             PORT(S)        AGE
+service/bankapp-service   LoadBalancer   172.20.249.93   aba6848fca700468f834ff45be100a18-73608189.us-east-1.elb.amazonaws.com   80:32657/TCP   43m
+service/mysql-service     ClusterIP      172.20.64.19    <none>                                                                  3306/TCP       43m
+
+NAME                            READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/bankapp-blue    1/1     1            1           11m
+deployment.apps/bankapp-green   1/1     1            1           9m38s
+deployment.apps/mysql           1/1     1            1           43m
+
+NAME                                       DESIRED   CURRENT   READY   AGE
+replicaset.apps/bankapp-blue-bcc84fb84     1         1         1       11m
+replicaset.apps/bankapp-green-57bd8b8b58   1         1         1       9m38s
+replicaset.apps/mysql-f5c84b88             1         1         1       43m
+
+```
+![image-61](https://github.com/user-attachments/assets/aee77798-07f0-4c24-ac0d-842109c350d8)
+![image-62](https://github.com/user-attachments/assets/3b3ebd6f-21df-4300-a129-5d6a78c44410)
+![image-63](https://github.com/user-attachments/assets/913917ba-cea4-4f1b-82c3-db7166720674)
+![image-64](https://github.com/user-attachments/assets/14089ab0-3870-464e-a813-b4aca7eaffb9)
+![image-65](https://github.com/user-attachments/assets/b325403d-40c5-46a8-aa5b-f96b8c626f20)
+
+
+
+
+
+
+
+
+
+
 ### <span style="color: cyan;"> Configure email:</span>
 Open a Jenkins UI and go to 
     Dashboard> Manage Jenkins> Credentials> System> Global credentials (unrestricted) <br>
 
 ![image-17](https://github.com/user-attachments/assets/6d87f8a3-ac4b-4e08-863a-db7af794396b)
 
-##### <span style="color: cyan;">Configure email notification </span>
+#### <span style="color: cyan;">Configure email notification </span>
     Dashboard> Manage Jenkins> System
 Search for "```Extended E-mail Notification```"
 
@@ -312,15 +1371,6 @@ Search for "```Extended E-mail Notification```"
 
 Open Gmail ID and have look for notification email:
 ![image-21](https://github.com/user-attachments/assets/7c79a48a-9304-44c7-95ff-4967b93cfd78)
-
-### <span style="color: cyan;"> Configure OWASP:</span>
-Dashboard
-Manage Jenkins
-Tools
-
-search for ```Dependency-Check installations ```
-![image-22](https://github.com/user-attachments/assets/2db469b4-d5cd-4b4a-94f8-e10367283df9)
-![image-23](https://github.com/user-attachments/assets/d8e0c4aa-5eba-42fc-866c-9b9efd07aecd)
 
 ### <span style="color: cyan;"> Integrate SonarQube in Jenkins.</span>
 Go to Sonarqube and generate the token
@@ -385,437 +1435,8 @@ Open SonarQube UI:
 > Description:docker-cred
 ![image-51](https://github.com/user-attachments/assets/fab143ab-7f19-48c4-8e4e-d83c3c155318)
 
-### <span style="color: cyan;"> Configure the ArgoCD.</span>
-- Get a argocd namespace
-```bash
-kubectl get namespace
-```
-![image-35](https://github.com/user-attachments/assets/a98d58fd-450b-483c-a67a-bc3dfcd22234)
-
-- Get the argocd pods
-```bash
-kubectl get pods -n argocd
-```
-![image-36](https://github.com/user-attachments/assets/39fa9c36-452c-4269-9c75-7f901bd62a0e)
-
-- Check argocd services
-```bash
-kubectl get svc -n argocd
-```
-![image-37](https://github.com/user-attachments/assets/2514c953-495d-4a6e-9022-21cb63cd73ca)
-
-**Change argocd server's service from ClusterIP to NodePort**
-```bash
-kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
-kubectl get svc -n argocd
-```
-![image-38](https://github.com/user-attachments/assets/b5206012-e59c-4fe4-a064-0be210fc945a)
-
-Now, try to access ArgoCd in browser.
-<public-ip-worker>:<port>
-![image-41](https://github.com/user-attachments/assets/27386486-cc2b-42c3-86bd-24dd6a010184)
-
-**Note**: I was not able to access argocd in browser and noticed that port was not allowed.
-You need to select any of the EKS cluster node and go to security group
-Select the SG "sg-0838bf9c407b4b3e4" (You need to select yours one) and allow the all port range.
-
-![image-39](https://github.com/user-attachments/assets/6f67913d-9c26-4211-9e12-3a48cfc2a77a)
-
-Now, try to access ArgoCd in browser.
-![image-40](https://github.com/user-attachments/assets/92687012-ec81-42fc-bd44-98b03743d477)
-
-```bash
-https://<IP address>:31230
-```
-
-```bash
-https://44.192.109.76:31230/
-```
-Default login would be admin/admin
-- To get the initial password of argocd server
-```bash
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
-```
-![image-42](https://github.com/user-attachments/assets/83c4015d-e2ba-49df-a63f-fb8d6e76bdf3)
-![image-43](https://github.com/user-attachments/assets/dfa4c0ae-7718-4f34-b1bb-e62bfdfc0a3e)
-
-Update the password for argocd
-![image-44](https://github.com/user-attachments/assets/f1bfeb23-2826-469c-b8a4-770e20deb043)
 
 
-### <span style="color: cyan;"> Configure the repositories in Argocd </span>
-![image-45](https://github.com/user-attachments/assets/e847c940-cba6-4c66-a3f3-e53c1e9f48c9)
-
-[Application Repo](https://github.com/mrbalraj007/Wanderlust-Mega-Project.git)
-
-![image-46](https://github.com/user-attachments/assets/9fff6e2b-7368-48f8-8308-34666a1a6dd0)
-![image-47](https://github.com/user-attachments/assets/ff3fd254-ae42-4fdb-a715-a927b6c447eb)
-
-### <span style="color: Cyan;"> For CI Pipeline
-Update this [jenkins file](https://github.com/mrbalraj007/Wanderlust-Mega-Project/blob/main/Jenkinsfile) as per your requirement.
-
-Go to folder ```Wanderlust-Mega-Project``` and copy the Jenkins pipeline from git repo and build a pipeline named as ```Wanderlust-CI```.
-
-Make sure, you will change the following details before change it.
-```sh
-- label
-- git repo
-- Docker image tag
-```
-Complete pipeline
-```bash
-@Library('Shared') _
-pipeline {
-    agent {label 'Balraj'}
-    
-    environment{
-        SONAR_HOME = tool "Sonar"
-    }
-    
-    parameters {
-        string(name: 'FRONTEND_DOCKER_TAG', defaultValue: '', description: 'Setting docker image for latest push')
-        string(name: 'BACKEND_DOCKER_TAG', defaultValue: '', description: 'Setting docker image for latest push')
-    }
-    
-    stages {
-        stage("Validate Parameters") {
-            steps {
-                script {
-                    if (params.FRONTEND_DOCKER_TAG == '' || params.BACKEND_DOCKER_TAG == '') {
-                        error("FRONTEND_DOCKER_TAG and BACKEND_DOCKER_TAG must be provided.")
-                    }
-                }
-            }
-        }
-        stage("Workspace cleanup"){
-            steps{
-                script{
-                    cleanWs()
-                }
-            }
-        }
-        
-        stage('Git: Code Checkout') {
-            steps {
-                script{
-                    code_checkout("https://github.com/mrbalraj007/Wanderlust-Mega-Project.git","main")
-                }
-            }
-        }
-        
-        stage("Trivy: Filesystem scan"){
-            steps{
-                script{
-                    trivy_scan()
-                }
-            }
-        }
-
-        stage("OWASP: Dependency check"){
-            steps{
-                script{
-                    owasp_dependency()
-                }
-            }
-        }
-        
-        stage("SonarQube: Code Analysis"){
-            steps{
-                script{
-                    sonarqube_analysis("Sonar","wanderlust","wanderlust")
-                }
-            }
-        }
-        
-        stage("SonarQube: Code Quality Gates"){
-            steps{
-                script{
-                    sonarqube_code_quality()
-                }
-            }
-        }
-        
-        stage('Exporting environment variables') {
-            parallel{
-                stage("Backend env setup"){
-                    steps {
-                        script{
-                            dir("Automations"){
-                                sh "bash updatebackendnew.sh"
-                            }
-                        }
-                    }
-                }
-                
-                stage("Frontend env setup"){
-                    steps {
-                        script{
-                            dir("Automations"){
-                                sh "bash updatefrontendnew.sh"
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
-        stage("Docker: Build Images"){
-            steps{
-                script{
-                        dir('backend'){
-                            docker_build("wanderlust-backend-beta","${params.BACKEND_DOCKER_TAG}","balrajsi")
-                        }
-                    
-                        dir('frontend'){
-                            docker_build("wanderlust-frontend-beta","${params.FRONTEND_DOCKER_TAG}","balrajsi")
-                        }
-                }
-            }
-        }
-        
-        stage("Docker: Push to DockerHub"){
-            steps{
-                script{
-                    docker_push("wanderlust-backend-beta","${params.BACKEND_DOCKER_TAG}","balrajsi") 
-                    docker_push("wanderlust-frontend-beta","${params.FRONTEND_DOCKER_TAG}","balrajsi")
-                }
-            }
-        }
-    }
-    post{
-        success{
-            archiveArtifacts artifacts: '*.xml', followSymlinks: false
-            build job: "Wanderlust-CD", parameters: [
-                string(name: 'FRONTEND_DOCKER_TAG', value: "${params.FRONTEND_DOCKER_TAG}"),
-                string(name: 'BACKEND_DOCKER_TAG', value: "${params.BACKEND_DOCKER_TAG}")
-            ]
-        }
-    }
-}
-```
-
-### <span style="color: Cyan;"> For CD Pipeline
-
-Go to folder ```Gitops``` and copy the Jenkins pipeline from git repo and build a pipeline named as ```Wanderlust-CD```.
-
-make sure, you will change the following details before change it.
-```sh
-- git repo
-- email adddress
-```
-Complete pipeline
-```sh
-@Library('Shared') _
-pipeline {
-    agent {label 'Balraj'}
-    
-    parameters {
-        string(name: 'FRONTEND_DOCKER_TAG', defaultValue: '', description: 'Frontend Docker tag of the image built by the CI job')
-        string(name: 'BACKEND_DOCKER_TAG', defaultValue: '', description: 'Backend Docker tag of the image built by the CI job')
-    }
-
-    stages {
-        stage("Workspace cleanup"){
-            steps{
-                script{
-                    cleanWs()
-                }
-            }
-        }
-        
-        stage('Git: Code Checkout') {
-            steps {
-                script{
-                    code_checkout("https://github.com/mrbalraj007/Wanderlust-Mega-Project.git","main")
-                }
-            }
-        }
-        
-        stage('Verify: Docker Image Tags') {
-            steps {
-                script{
-                    echo "FRONTEND_DOCKER_TAG: ${params.FRONTEND_DOCKER_TAG}"
-                    echo "BACKEND_DOCKER_TAG: ${params.BACKEND_DOCKER_TAG}"
-                }
-            }
-        }
-        
-        
-        stage("Update: Kubernetes manifests"){
-            steps{
-                script{
-                    dir('kubernetes'){
-                        sh """
-                            sed -i -e s/wanderlust-backend-beta.*/wanderlust-backend-beta:${params.BACKEND_DOCKER_TAG}/g backend.yaml
-                        """
-                    }
-                    
-                    dir('kubernetes'){
-                        sh """
-                            sed -i -e s/wanderlust-frontend-beta.*/wanderlust-frontend-beta:${params.FRONTEND_DOCKER_TAG}/g frontend.yaml
-                        """
-                    }
-                    
-                }
-            }
-        }
-        
-        stage("Git: Code update and push to GitHub"){
-            steps{
-                script{
-                    withCredentials([gitUsernamePassword(credentialsId: 'Github-cred', gitToolName: 'Default')]) {
-                        sh '''
-                        echo "Checking repository status: "
-                        git status
-                    
-                        echo "Adding changes to git: "
-                        git add .
-                        
-                        echo "Commiting changes: "
-                        git commit -m "Updated environment variables"
-                        
-                        echo "Pushing changes to github: "
-                        git push https://github.com/mrbalraj007/Wanderlust-Mega-Project.git main
-                    '''
-                    }
-                }
-            }
-        }
-    }
-  post {
-        success {
-            script {
-                emailext attachLog: true,
-                from: 'raj10ace@gmail.com',
-                subject: "Wanderlust Application has been updated and deployed - '${currentBuild.result}'",
-                body: """
-                    <html>
-                    <body>
-                        <div style="background-color: #FFA07A; padding: 10px; margin-bottom: 10px;">
-                            <p style="color: black; font-weight: bold;">Project: ${env.JOB_NAME}</p>
-                        </div>
-                        <div style="background-color: #90EE90; padding: 10px; margin-bottom: 10px;">
-                            <p style="color: black; font-weight: bold;">Build Number: ${env.BUILD_NUMBER}</p>
-                        </div>
-                        <div style="background-color: #87CEEB; padding: 10px; margin-bottom: 10px;">
-                            <p style="color: black; font-weight: bold;">URL: ${env.BUILD_URL}</p>
-                        </div>
-                    </body>
-                    </html>
-            """,
-            to: 'raj10ace@gmail.com',
-            mimeType: 'text/html'
-            }
-        }
-      failure {
-            script {
-                emailext attachLog: true,
-                from: 'raj10ace@gmail.com',
-                subject: "Wanderlust Application build failed - '${currentBuild.result}'",
-                body: """
-                    <html>
-                    <body>
-                        <div style="background-color: #FFA07A; padding: 10px; margin-bottom: 10px;">
-                            <p style="color: black; font-weight: bold;">Project: ${env.JOB_NAME}</p>
-                        </div>
-                        <div style="background-color: #90EE90; padding: 10px; margin-bottom: 10px;">
-                            <p style="color: black; font-weight: bold;">Build Number: ${env.BUILD_NUMBER}</p>
-                        </div>
-                    </body>
-                    </html>
-            """,
-            to: 'raj10ace@gmail.com',
-            mimeType: 'text/html'
-            }
-        }
-    }
-}
-```
-
-Now, run the ```Wanderlust-CI``` pipeline
-
-When you run the next pipeline, then it will ask you to supply the tag version ```v6```.
-
-
-- Got email for successful deployment
-
-### <span style="color: Cyan;"> Connect ```wonderlast cluster``` to ArgoCD.
-Now, we will connect(create) the cluster to ArgoCD.
-
-on Jenkins Master Node, run the following command 
-```sh
- kubectl get nodes
-NAME                         STATUS   ROLES    AGE     VERSION
-ip-10-0-1-239.ec2.internal   Ready    <none>   3h48m   v1.30.4-eks-a737599
-ip-10-0-2-128.ec2.internal   Ready    <none>   3h47m   v1.30.4-eks-a737599
-ip-10-0-2-92.ec2.internal    Ready    <none>   3h48m   v1.30.4-eks-a737599
-ubuntu@ip-172-31-95-57:~$
-```
-#### <span style="color: Cyan;"> ArgoCD CLI login
-```bash
-argocd login argocd URL:port --username admin
-```
-- in myLab.
-```bash
-argocd login 44.192.109.76:31230 --username admin
-```
-will promt for yes/No , type y and supply the password for argocd.
-
-
-- now, we will check the how many cluster have in argocd.
-```bash
-argocd cluster list
-```
-
-
-- To get the wonderlust cluster name
-```bash
-kubectl config get-contexts
-```
-```bash
-ubuntu@ip-172-31-95-57:~$ kubectl config get-contexts
-CURRENT   NAME                                                        CLUSTER                                                     AUTHINFO                                                    NAMESPACE
-*         arn:aws:eks:us-east-1:373160674113:cluster/balraj-cluster   arn:aws:eks:us-east-1:373160674113:cluster/balraj-cluster   arn:aws:eks:us-east-1:373160674113:cluster/balraj-cluster
-ubuntu@ip-172-31-95-57:~$
-```
-- To add the wonderlust cluster name into argocd
-```bash
-argocd cluster add <your existing cluster name> --name <new cluster name>
-```
-```bash
-argocd cluster add arn:aws:eks:us-east-1:373160674113:cluster/balraj-cluster --name wonderlust-eks-cluster
-```
-It will ask you to type Yes/No... type ```y```.
-
-```bash
-ubuntu@ip-172-31-95-57:~$ argocd cluster add arn:aws:eks:us-east-1:373160674113:cluster/balraj-cluster --name wonderlust-eks-cluster
-WARNING: This will create a service account `argocd-manager` on the cluster referenced by context `arn:aws:eks:us-east-1:373160674113:cluster/balraj-cluster` with full cluster level privileges. Do you want to continue [y/N]? y
-INFO[0010] ServiceAccount "argocd-manager" created in namespace "kube-system"
-INFO[0010] ClusterRole "argocd-manager-role" created
-INFO[0010] ClusterRoleBinding "argocd-manager-role-binding" created
-INFO[0015] Created bearer token secret for ServiceAccount "argocd-manager"
-Cluster 'https://9B7F2E2AB5BAFB3C44524B0AEA69BA1E.gr7.us-east-1.eks.amazonaws.com' added
-ubuntu@ip-172-31-95-57:~$
-```
-it will create a namespace, roles (RBAC),service and token.
-
-- Now, check how many cluster is showing 
-```bash
-ubuntu@ip-172-31-95-57:~$ argocd cluster list
-SERVER                                                                    NAME                    VERSION  STATUS   MESSAGE                                                  PROJECT
-https://9B7F2E2AB5BAFB3C44524B0AEA69BA1E.gr7.us-east-1.eks.amazonaws.com  wonderlust-eks-cluster           Unknown  Cluster has no applications and is not being monitored.
-https://kubernetes.default.svc                                            in-cluster                       Unknown  Cluster has no applications and is not being monitored.
-ubuntu@ip-172-31-95-57:~$
-```
-Now, go to ```argocd``` UI and refresh the page and you will see two cluster.
-
-
-### <span style="color: Cyan;"> Deploy application through argocd.
-
-- Now, we will add the application first.
-
-
-- Health of the application
 
 
 ### <span style="color: Cyan;"> Verify application.
@@ -833,103 +1454,6 @@ Congratulations! :-) You have deployed the application successfully.
 ### <span style="color: Yellow;"> Image status in DockerHub
 
 
-### <span style="color: Yellow;"> Configure observability (Monitoring)
-
-#### <span style="color: Cyan;">List all Kubernetes pods in all namespaces:</span>
-```sh
-kubectl get pods -A
-```
-- To get the existing namespace 
-```sh
-kubectl get namespace
-```
-
-
-#### <span style="color: Cyan;">To get the namespace
-```bash
-kubectl get ns
-```
-```sh
-ubuntu@ip-172-31-95-57:~$ kubectl get ns
-NAME                   STATUS   AGE
-argocd                 Active   4h34m
-default                Active   4h39m
-kube-node-lease        Active   4h39m
-kube-public            Active   4h39m
-kube-system            Active   4h39m
-kubernetes-dashboard   Active   4h34m
-prometheus             Active   4h34m
-wanderlust             Active   22m
-ubuntu@ip-172-31-95-57:~$
-```
-
-#### <span style="color: Cyan;">To get pods in prometheus
-```bash
-kubectl get pods -n prometheus
-```
-```sh
-kubectl get pods -n prometheus
-NAME                                                     READY   STATUS    RESTARTS   AGE
-alertmanager-stable-kube-prometheus-sta-alertmanager-0   2/2     Running   0          4h35m
-prometheus-stable-kube-prometheus-sta-prometheus-0       2/2     Running   0          4h35m
-stable-grafana-86b6cdc46c-76wt5                          3/3     Running   0          4h35m
-stable-kube-prometheus-sta-operator-58fc7ddb6b-clcqq     1/1     Running   0          4h35m
-stable-kube-state-metrics-b65996c8d-fnvqs                1/1     Running   0          4h35m
-stable-prometheus-node-exporter-pjrwr                    1/1     Running   0          4h35m
-stable-prometheus-node-exporter-w44sw                    1/1     Running   0          4h35m
-stable-prometheus-node-exporter-wpkkm                    1/1     Running   0          4h35m
-```
-#### <span style="color: Cyan;"> To get service in prometheus
-```bash
-kubectl get svc -n prometheus
-```
-
-
-#### <span style="color: Cyan;"> Expose Prometheus and Grafana to the external world through Node Port
-> [!Important]
-> change it from Cluster IP to NodePort after changing make sure you save the file and open the assigned nodeport to the service.
-
-- For prometheus
-```bash
-kubectl patch svc stable-kube-prometheus-sta-prometheus -n prometheus -p '{"spec": {"type": "NodePort"}}'
-kubectl get svc -n prometheus
-```
-
-- For Grafana
-```bash
-kubectl patch svc stable-grafana -n prometheus -p '{"spec": {"type": "NodePort"}}'
-kubectl get svc -n prometheus
-```
-
-
-#### <span style="color: Cyan;"> Verify Prometheus and Grafana accessibility
-```bash
-<worker-public-ip>:31205  # Prometheus <br>
-<worker-public-ip>:32242  # Grafana 
-```
-**Note**- (always check in ```kubectl get svc -n prometheus```, it is running on which port)
-
-
-http://44.192.109.76:31205/graph
-
-
-http://44.192.109.76:32242/
-
-
-**Note**--> to get login password for grafan, you need to run the following command
-```bash
-kubectl get secret --namespace prometheus stable-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
-```
-[!Note]
-Default user login name is ```admin```
-
-
-
-Dashboard:
-
-
-
-### <span style="color: Yellow;">Email Notification for successfull deployment: 
 
 
 ### <span style="color: Yellow;"> Resources used in AWS:
@@ -963,6 +1487,14 @@ da---l          26/09/24   9:48 AM                Code_IAC_Terraform_box
 Terraform destroy --auto-approve
 ```
 
+![image-15](https://github.com/user-attachments/assets/5a9bd484-ee80-4500-a309-203ff89d09c1)
+
+
+![image-67](https://github.com/user-attachments/assets/7d3f41e5-a4c5-4bdd-91a8-b8f139629340)
+
+
+![image-66](https://github.com/user-attachments/assets/f7b3ea90-2260-46f0-b330-266d4654a02a)
+
 ## <span style="color: Yellow;"> Conclusion
 
 Setting up a Blue-Green deployment pipeline with Jenkins and Kubernetes can significantly enhance your application deployment process. This approach not only reduces downtime but also provides a safety net for quick rollbacks.
@@ -975,3 +1507,33 @@ __Ref Link__
 
 - [YouTube Link](https://www.youtube.com/watch?v=tstBG7RC9as&list=PLJcpyd04zn7p_nI0hoYRcqSqVS_9_eLaR&index=134 " Blue-Green Deployment CICD Pipeline")
 
+
+*********
+
+Terraform will perform the following actions:
+
+  # aws_vpc.vpc will be destroyed
+  - resource "aws_vpc" "vpc" {
+      - arn                                  = "arn:aws:ec2:us-east-1:373160674113:vpc/vpc-0913492e3cadc766c" -> null
+      - assign_generated_ipv6_cidr_block     = false -> null
+      - cidr_block                           = "10.0.0.0/16" -> null
+      - default_network_acl_id               = "acl-0a1c6acbc417b28a1" -> null
+      - default_route_table_id               = "rtb-04eaa216490fc9ce2" -> null
+      - default_security_group_id            = "sg-03bf35762fc5d6ddf" -> null
+      - dhcp_options_id                      = "dopt-9e06fce7" -> null
+      - enable_dns_hostnames                 = false -> null
+      - enable_dns_support                   = true -> null
+      - enable_network_address_usage_metrics = false -> null
+      - id                                   = "vpc-0913492e3cadc766c" -> null
+      - instance_tenancy                     = "default" -> null
+      - ipv6_netmask_length                  = 0 -> null
+      - main_route_table_id                  = "rtb-04eaa216490fc9ce2" -> null
+      - owner_id                             = "373160674113" -> null
+      - tags                                 = {} -> null
+      - tags_all                             = {} -> null
+        # (4 unchanged attributes hidden)
+    }
+
+delete the vpc manually and try to rerun the terraform command again.
+![image-68](https://github.com/user-attachments/assets/1822c909-ec48-414a-8068-28091a3687b4)
+![image-69](https://github.com/user-attachments/assets/06fc10c7-ed2a-41a6-9b6d-5e29f33b8b8e)
