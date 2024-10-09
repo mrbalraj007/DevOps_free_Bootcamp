@@ -1369,9 +1369,6 @@ Search for "```Extended E-mail Notification```"
 ![image-20](https://github.com/user-attachments/assets/e180f343-8884-44b1-a4b5-ab50e5d8bddd)
 
 
-Open Gmail ID and have look for notification email:
-![image-21](https://github.com/user-attachments/assets/7c79a48a-9304-44c7-95ff-4967b93cfd78)
-
 ### <span style="color: cyan;"> Integrate SonarQube in Jenkins.</span>
 Go to Sonarqube and generate the token
 
