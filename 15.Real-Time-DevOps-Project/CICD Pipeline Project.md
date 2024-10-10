@@ -1,4 +1,5 @@
 # <span style="color: Yellow;"> Building a Blue-Green Deployment Pipeline with Jenkins and Kubernetes </span>
+
 In this blog, we will explore how to set up a Blue-Green deployment pipeline using Jenkins and Kubernetes. This approach helps to minimize downtime and reduce risk during application updates. Let's dive into the details!
 
 ## <span style="color: Yellow;"> Prerequisites </span>
