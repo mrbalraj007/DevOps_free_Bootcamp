@@ -237,7 +237,7 @@ hostnamectl
 
 ## <span style="color: yellow;"> Setup the Jenkins </span>
 Go to Jenkins EC2 and run the following command 
-Access Jenkins via http://<your-server-ip>:8080. Retrieve the initial admin password using:
+Access Jenkins via ```http://<your-server-ip>:8080```. Retrieve the initial admin password using:
 ```bash
 sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 ```
@@ -264,8 +264,8 @@ Maven Integration
 Pipeline Maven Integration
 ```
 
-- Run any job and verify that job is executing on agent node.
-   - create a below pipeline and build it and verify the outcomes in agent machine.
+- Run any job and verify that job is executing successfully.
+   - create a below pipeline and build it and verify the outcomes.
 ```bash
 pipeline {
     agent any
@@ -308,6 +308,7 @@ CONTAINER ID   IMAGE             COMMAND                  CREATED          STATU
 515e835cd107   sonatype/nexus3   "/opt/sonatype/nexus…"   13 minutes ago   Up 13 minutes   0.0.0.0:8081->8081/tcp, :::8081->8081/tcp   Nexus-Server
 ubuntu@ip-172-31-16-90:~$
 ```
+We need to login to the container to retrieve the admin password.
 ```sh
 sudo docker exec -it <container ID> /bin/bash
 ```
@@ -330,7 +331,7 @@ bash-4.4$ ls
 admin.password  cache  elasticsearch  generated-bundles  javaprefs  keystores  log   restore-from-backup
 blobs           db     etc            instances          karaf.pid  lock       port  tmp
 bash-4.4$ cat admin.password
-820af89c-cef2-472d-8ba8-3cf374bb1b20
+820af89c-cef2-472d-8ba8-3cf374bb1b20   # Default Password for Admin
 bash-4.4$
 ```
 ![image-11](https://github.com/user-attachments/assets/f6212fdf-be82-4aa5-84f9-483401bf80d5)
@@ -339,14 +340,13 @@ bash-4.4$
 ![image-14](https://github.com/user-attachments/assets/338ceb09-7bba-49be-8767-991b0bf89d4f)
 
 
-Configure the RBAC
-
+### <span style="color: cyan;"> Configure the RBAC </span>
 On to Terraform EC2
 ```sh
 kubectl create ns webapps
 ```
 
-- create a file svc.yml
+- Create a file svc.yml
 ```sh
 apiVersion: v1
 kind: ServiceAccount
@@ -358,7 +358,8 @@ metadata:
 kubectl apply -f svc.yml
 serviceaccount/jenkins created
 ```
-- to create a role
+- To create a role
+    - Create a file role.yml
 ```sh
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -404,6 +405,7 @@ kubectl apply -f role.yml
 role.rbac.authorization.k8s.io/app-role created
 ```
 - Bind the role to service account
+  - Create a file bind.yml
 ```sh
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -423,6 +425,8 @@ subjects:
 kubectl apply -f bind.yml
 rolebinding.rbac.authorization.k8s.io/app-rolebinding created
 ```
+- To service account
+  - Create a file sec.yml
 ```sh
 apiVersion: v1
 kind: Secret
@@ -437,7 +441,7 @@ kubectl apply -f sec.yml -n webapps
 secret/mysecretname created
 ```
 
-To get the token.
+- To get the token.
 
 ```sh
  kubectl get secret -n webapps
@@ -459,17 +463,10 @@ namespace:  7 bytes
 token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IjFBZE9BWDhYRGxFejlQVkdrSWJXRDBYdVdrWVRaSThxdU42eGdpdnEwTjAifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJ3ZWJhcHBzIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6Im15c2VjcmV0bmFtZSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJqZW5raW5zIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiYWZjZGQ2NjUtMmIzMy00MDc5LTk5MDUtNzM2MDI5ZGYyNTliIiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50OndlYmFwcHM6amVua2lucyJ9.gJvKqVY4fnLCeMKX8tNGt1LfM6yYkgrIEf0tmLH5Q8HOQJIfs0JLWMEIGLQkMJx-0qpFRoOgznHn9cYHh1o_tnbbkEQdi1VACGTMmjBXbK-cscPMGK-lTnw7-wV-Y-lmeTw3PMRczBX3IqAdsyzUVPlKaXRpDA1t48FV1SXvvkTArK0exy-524B8WJ7SADYwogHMj41PYfaY5uMIkQlfDYz45Kb93tfvnbxeO7YnZ2biIqMF4FNI24kw_WutDiE6tsURXyYJf5oOq6mrtzTolb0grRuWPgoFPxbD-eV_5I4cO_1QYlyqxlJt8cbQnK1f5SIHzDZyhp_JYRghG_cd4Q
 ```
 
-- add the token into jenkins
-
-    Dashboard
-    Manage Jenkins
-    Credentials
-    System
-    Global credentials (unrestricted)
+- Configure/Add the token into Jenkins, which will be used in the pipeline.<br>
+  - Dashboard> Manage Jenkins> Credentials> System> Global credentials (unrestricted)
 
 ![image-16](https://github.com/user-attachments/assets/0978a3a8-5ebb-4086-aa00-75df0fb3a258)
-
-
 
 <!-- 
 - Create a ClusterRole for PV access
@@ -504,33 +501,15 @@ roleRef:
 ```sh
 ```
 
+## <span style="color: yellow;"> Configure the tools </span> 
+- Maven
+   - Dashboard> Manage Jenkins> Tools
 
-- configure the tools- 
-
-- maven
-Dashboard
-Manage Jenkins
-Tools
 ![image-17](https://github.com/user-attachments/assets/cd0ad587-ed0d-4c44-a206-12b63e166247)
 ![image-18](https://github.com/user-attachments/assets/8b4822d3-047b-4874-a059-d41ed6c9b3a9)
 
 
-- sonar-scanner
-Dashboard
-Manage Jenkins
-Tools
-![image-19](https://github.com/user-attachments/assets/c2b5c1f7-a306-46bc-b326-847fe80bd9a5)
-![image-20](https://github.com/user-attachments/assets/aed4baa6-f96e-4018-b16d-1ebd84aa47eb)
-
-- Sonar-Server
-    Dashboard
-    Manage Jenkins
-    System
-
-![image-25](https://github.com/user-attachments/assets/c1c489b3-6f9b-47c7-a3bf-89e8083ca787)
-![image-26](https://github.com/user-attachments/assets/46cbae72-16c5-41ac-9d38-0a0d2b319e6b)
-
-- Configure Nexus
+### <span style="color: cyan;"> Configure Nexus </span>
 ![image-27](https://github.com/user-attachments/assets/16816600-46a4-4a4a-afdb-52f3cda7a1bb)
 ![image-28](https://github.com/user-attachments/assets/66d2fd3c-9e26-48f9-ac9b-2204243247d3)
 ![image-29](https://github.com/user-attachments/assets/ddfa753d-0449-49e4-8c46-d51f5012021c)
@@ -541,25 +520,26 @@ add credential to Nexus Server
 ![image-30](https://github.com/user-attachments/assets/d775b2cf-c20b-479a-871f-63acc4d8d181)
 
 - for Java based application, we have to add the following two credentials.
-
+```bash
     <server>
       <id>maven-releases</id>
       <username>admin</username>
-      <password>S0nar!ube2024</password>
+      <password>password</password>
     </server>
     
     <server>
       <id>maven-snapshots</id>
       <username>admin</username>
-      <password>S0nar!ube2024</password>
+      <password>password</password>
     </server>
-
+```
 ![image-33](https://github.com/user-attachments/assets/ca5c3c12-e029-4c7a-8b0f-de4a3ffcdd99)
 
 
-How to get details, go to Nexus. 
-http://3.84.186.15:8081/repository/maven-releases/
+How to get details, go to Nexus. <br> 
+http://3.84.186.15:8081/repository/maven-releases/ <br>
 http://3.84.186.15:8081/repository/maven-snapshots/
+
 ![image-31](https://github.com/user-attachments/assets/a602de33-55fe-40cf-aa44-c03adc691d04)
 ![image-32](https://github.com/user-attachments/assets/e75a3cc7-0f02-441d-94e6-be82ceffff3a)
 
@@ -567,46 +547,78 @@ Go to Application Repo and select the pom.xml
 ![image-34](https://github.com/user-attachments/assets/159d6b98-a021-41db-9aca-26154fd084c1)
 
 
-- Configure the webhooks for code quality check
-Open sonarqube UI
+***************************************
+
+### <span style="color: cyan;"> Integrate SonarQube in Jenkins.</span>
+Go to Sonarqube and generate the token
+
+> Administration> Security> users>
+
+![image-24](https://github.com/user-attachments/assets/30d99980-a369-4409-bb73-14b943fbfe14)
+![image-25](https://github.com/user-attachments/assets/3b4d4339-2e5c-4fb4-916b-05259ff52100)
+![image-26](https://github.com/user-attachments/assets/8d8e4a99-6de7-452f-af08-e32a70d129b3)
+
+
+now, open Jenkins UI and create a credential for sonarqube
+> Dashboard> Manage Jenkins> Credentials> System> Global credentials (unrestricted)
+![image-24](https://github.com/user-attachments/assets/b3a0605c-38b0-4353-977d-669a6aa41f76)
+
+#### <span style="color: cyan;"> Configure the ```sonarqube scanner``` in Jenkins.</span>
+> Dashboard> Manage Jenkins> Tools
+
+Search for ```SonarQube Scanner installations``` 
+![image-28](https://github.com/user-attachments/assets/a6eb21a9-c5e9-4e3d-89c5-da58a5b5cfa2)
+![image-20](https://github.com/user-attachments/assets/aed4baa6-f96e-4018-b16d-1ebd84aa47eb)
+
+
+#### <span style="color: cyan;"> Configure the ```sonarqube server``` in Jenkins.</span>
+On Jenkins UI:
+  > Dashboard> Manage Jenkins> System > Search for ```SonarQube installations``` 
+![image-25](https://github.com/user-attachments/assets/c1c489b3-6f9b-47c7-a3bf-89e8083ca787)
+
+        Name: sonar
+        server URL: <http:Sonarqube IP address:9000>
+        Server authenticatoin Token: select the sonarqube token from list.
+![image-26](https://github.com/user-attachments/assets/46cbae72-16c5-41ac-9d38-0a0d2b319e6b)
+
+
+Now, we will configure the ```webhook``` for code quality check in Sonarqube
+Open SonarQube UI:
 
 ![image-35](https://github.com/user-attachments/assets/09eaef57-dd2d-4767-aa52-3b0c91925a6c)
 
-http://34.207.143.49:8080/sonarqube-webhook/
+    <http://jenkinsIPAddress:8080/sonarqube-webhook/>
+
 ![image-36](https://github.com/user-attachments/assets/7a1b460b-95ef-4ae2-80c6-d57d1d7f1bdb)
 
+#### <span style="color: cyan;"> Configure the Github in Jenkins.</span>
+First generate the token first in github and configure it in Jenkins
 
+[Generate a token in Github](https://docs.catalyst.zoho.com/en/tutorials/githubbot/java/generate-personal-access-token/)
 
-
-
-
-
-- Setup the credentials
-      Dashboard
-    Manage Jenkins
-    Credentials
-    System
-    Global credentials (unrestricted)
-
-- Git hub
+Now, open Jenkins UI
+  > Dashboard> Manage Jenkins> Credentials> System> Global credentials (unrestricted)
 ![image-21](https://github.com/user-attachments/assets/57f32901-42b1-415e-b2f7-8ea36930e8c1)
 
-- Sonarqube 
-- Go to SonarQube UI
+### <span style="color: cyan;"> [Generate docker Token](https://www.geeksforgeeks.org/create-and-manage-docker-access-tokens/) and update in Jenkins.</span>
+  > Dashboard> Manage Jenkins> Credentials> System> Global credentials (unrestricted)
 
-![image-22](https://github.com/user-attachments/assets/ce86e0d2-af60-4c75-a6af-6fff31493e0f)
-![image-23](https://github.com/user-attachments/assets/e320ee44-beff-4288-a117-ed07e958b363)
-squ_27ff7e0844173c47f802fa7a581f4b648ddc1748
-
-
-![image-24](https://github.com/user-attachments/assets/b3a0605c-38b0-4353-977d-669a6aa41f76)
-
-
-- Docker 
+- Configure the docker
+> Name- docker
+> [x] install automatically <br>
+> docker version: latest
+### <span style="color: cyan;"> Set docker cred in Jenkins </span>
+-    Dashboard>Manage Jenkins > Credentials> System>
+    Global credentials (unrestricted) &rArr; Click on "New credentials"
+> kind: "username with password"
+> username: your docker login ID
+> password: docker token
+> Id: docker-cred #it would be used in pipeline
+> Description:docker-cred
 ![image-43](https://github.com/user-attachments/assets/2cc29020-85be-4591-8f52-b0f763d9bd45)
 
 
-create a pipeline and build it
+- Create a pipeline and build it
 ```sh
 pipeline {
     agent any
@@ -679,26 +691,30 @@ pipeline {
    }   
 }                       
 ```
+
+Build failed 😢
 ![image-37](https://github.com/user-attachments/assets/a80fb77b-6c35-4b56-a783-79c9d34c1356)
 
 ![image-40](https://github.com/user-attachments/assets/226197f3-d85c-4b1a-8bde-94ef25e74b6f)
 
-## Troubleshooting:
-The error I encountered is related to the SonarScanner failing to connect to the SonarQube server because the server URL is incorrectly specified. Specifically, the error indicates that no URL scheme (http or https) was found for the SonarQube server's address.
+****
+## <span style="color: yellow;"> Troubleshooting: </span>
+I encountered an error where the SonarScanner failed to connect to the SonarQube server due to an incorrectly specified server URL. Specifically, the error indicates that no URL scheme (http or https) was found for the SonarQube server's address.
+I have configured it as below; 
+here, ```http``` was missing:
 
-I have configured it as below here http was missing:
 ![image-38](https://github.com/user-attachments/assets/eaafabe1-09c5-4f80-afa0-bd182cd3bfa5)
 
-here is the updated screenshot:
+This is how it should be configured:
 ![image-39](https://github.com/user-attachments/assets/cba6e230-ec5c-4b5a-96f1-6a94284d7315)
 
-now, build it again. 
+Now, I tried to build it again, but it keeps failing.
 ![image-41](https://github.com/user-attachments/assets/58887d45-820b-4036-8b32-b5d410da9e96)
-![image-42](https://github.com/user-attachments/assets/7e8d8dc5-de00-43c1-9520-a8ddb5993a90)
 
-Note--> pipeline was aborted and noticed that syntex was missing in pipeline. I was using "NANOSECONDS" in pipeline and it should be hours.
 
-here is corrected pipeline.
+**Note**: The pipeline was aborted, and I noticed that I was using "NANOSECONDS" in the pipeline; however, it should be "HOURS.".
+****
+Here is corrected pipeline.
 
 ```sh
 pipeline {
@@ -773,7 +789,7 @@ pipeline {
 } 
 ```
 
-- add parameter in pipeline for blue and green environment
+- add parameter for``` blue and green``` environment and below is the updated pipeline.
 ```sh
 pipeline {
     agent any
@@ -870,86 +886,69 @@ pipeline {
    }   
 }        
 ```
+Again build failed ;-)
 ![image-44](https://github.com/user-attachments/assets/2aabd326-8cbd-4598-98fa-544c70b157aa)
 
 
-Troubleshooting and Solution:
-Add the User to the Docker Group
-Run the following command to add the Jenkins user (replace jenkins if Jenkins is running under a different user) to the docker group:
-
-bash
-Copy code
-sudo usermod -aG docker jenkins
-
-Restart Jenkins and Docker
-After adding the Jenkins user to the docker group, restart Jenkins and Docker for the changes to take effect:
-
-bash
-Copy code
-sudo systemctl restart jenkins
-sudo systemctl restart docker
-d. Verify Membership
-You can verify if the user has been added to the docker group by running:
-
-bash
-Copy code
-groups jenkins
-
-Verify Permissions for /var/run/docker.sock
-Check the permissions on the Docker socket to ensure it is accessible by the docker group:
-
-bash
-Copy code
-ls -l /var/run/docker.sock
-It should show something like:
-
-arduino
-Copy code
-srw-rw---- 1 root docker 0 Oct  9 09:42 /var/run/docker.sock
-If the group is not docker, you may need to correct the ownership by running:
-
-bash
-Copy code
-sudo chown root:docker /var/run/docker.sock
-Ensure that group members have read and write permissions:
-
-bash
-Copy code
-sudo chmod 660 /var/run/docker.sock
-
-Test the Setup
-Once the above steps are complete, test the setup by running a simple Docker command in the Jenkins pipeline to verify that the issue is resolved:
-```sh
-Copy code
-pipeline {
-    agent any
-    stages {
-        stage('Test Docker') {
-            steps {
-                sh 'docker ps'
+- **Troubleshooting and Solution**:
+    - Add the User to the Docker Group (Run the following command to add the Jenkins user (replace jenkins if Jenkins is running under a different user) to the docker group:)<br>
+            
+            sudo usermod -aG docker jenkins
+            
+    - Restart Jenkins and Docker (After adding the Jenkins user to the docker group, restart Jenkins and Docker for the changes to take effect:)
+           
+            sudo systemctl restart jenkins
+            sudo systemctl restart docker
+           
+    - Verify Membership (You can verify if the user has been added to the docker group by running:)
+           
+            groups jenkins
+           
+    - Verify Permissions for /var/run/docker.sock (Check the permissions on the Docker socket to ensure it is accessible by the docker group:)
+           
+            ls -l /var/run/docker.sock
+           
+            It should show something like:
+               srw-rw---- 1 root docker 0 Oct  9 09:42 /var/run/docker.sock
+            
+            If the group is not docker, you may need to correct the ownership by running:
+                sudo chown root:docker /var/run/docker.sock
+            
+            Ensure that group members have read and write permissions:
+                sudo chmod 660 /var/run/docker.sock
+            
+    - **Test the docker login connectivity**: Once the above steps are complete, test the setup by running a simple Docker command in the Jenkins pipeline to verify that the issue is resolved:
+        ```sh
+        Copy code
+        pipeline {
+            agent any
+            stages {
+                stage('Test Docker') {
+                    steps {
+                        sh 'docker ps'
+                    }
+                }
             }
         }
-    }
-}
-```
+        ```
 ![image-45](https://github.com/user-attachments/assets/b75856c3-2c98-4706-ba2b-7e23932afe28)
 
 
-Now, run the build again.
+**Now, run the build again.**
 
 ![image-46](https://github.com/user-attachments/assets/8499853d-02d3-49b9-89f9-e24fa40510b1)
 
-Image view from Docker Hub: 
+- **Image view from Docker Hub**:
 ![image-47](https://github.com/user-attachments/assets/06757c1d-fcb9-4e5d-a150-a3615ac5c936)
 
-View from SonarQube:
+- **View from SonarQube:**
 ![image-48](https://github.com/user-attachments/assets/b8c82caf-78e0-44cc-a5fb-35a4dd3532fa)
 
-View from Nexus:
+- **View from Nexus:**
 ![image-49](https://github.com/user-attachments/assets/8d2936ab-40a6-4e51-ab7d-3619785de914)
 
 
-Add the MySQL Deployment, Service and SVC-APP in pipeline
+- Add the **```MySQL Deployment, Service and SVC-APP```** in pipeline
 
 here is the complete pipeline.
 
@@ -1074,6 +1073,9 @@ pipeline {
 ```
 
 ![image-50](https://github.com/user-attachments/assets/1c078ea1-e192-4d01-aa50-9166fea37512)
+
+From Terraform VM:
+
 ![image-51](https://github.com/user-attachments/assets/e8f7a64c-369f-40a5-971a-17654693ed67)
 ![image-52](https://github.com/user-attachments/assets/373fa8f0-24b7-424c-87a2-1a75b73241b8)
 
@@ -1097,7 +1099,7 @@ ip-10-0-2-201.ec2.internal   Ready    <none>   4h15m   v1.30.4-eks-a737599
 ip-10-0-2-220.ec2.internal   Ready    <none>   4h15m   v1.30.4-eks-a737599
 ```
 
-Deploy to K8s
+- **Deploy to K8s**
 
 ```sh
 pipeline {
@@ -1266,16 +1268,26 @@ pipeline {
    }   
 }        
 ```
+Build Status
 ![image-53](https://github.com/user-attachments/assets/d3fc75a1-0c38-4c07-a6b8-6de46b64d4bd)
 
-Now, try toa ccess it throught the URL (aba6848fca700468f834ff45be100a18-73608189.us-east-1.elb.amazonaws.com) in browser.
+### <span style="color: Cyan;"> Verify application.
+- Now, time to acces the application 
+```bash
+aba6848fca700468f834ff45be100a18-73608189.us-east-1.elb.amazonaws.com
+```
+Try to access application throught the URL (aba6848fca700468f834ff45be100a18-73608189.us-east-1.elb.amazonaws.com) in browser.
 ```sh
 ubuntu@ip-172-31-93-220:~$ kubectl get svc -n webapps
 NAME              TYPE           CLUSTER-IP      EXTERNAL-IP                                                             PORT(S)        AGE
 bankapp-service   LoadBalancer   172.20.249.93   aba6848fca700468f834ff45be100a18-73608189.us-east-1.elb.amazonaws.com   80:32657/TCP   33m
 mysql-service     ClusterIP      172.20.64.19    <none>                                                                  3306/TCP       33m
 ```
+
+
 ![image-54](https://github.com/user-attachments/assets/85672827-0c28-4d1b-aec7-90694dd30cda)
+
+Congratulations! :-) You have deployed the application successfully.
 
 
 You have to run the pipeline for Green environment as well.
@@ -1283,7 +1295,7 @@ You have to run the pipeline for Green environment as well.
 ![image-56](https://github.com/user-attachments/assets/90a55c20-f2a6-4d4a-aef5-e0d78b1b7ba1)
 
 
-Now, run it again with switch traffic
+Now run the pipeline again to switch traffic.
 ![image-57](https://github.com/user-attachments/assets/ef72e499-b531-4a72-8ec6-b86ad16496b9)
 
 ```sh
@@ -1308,6 +1320,7 @@ replicaset.apps/bankapp-green-57bd8b8b58   1         1         1       5m10s
 replicaset.apps/mysql-f5c84b88             1         1         1       38m
 ubuntu@ip-172-31-93-220:~$
 ```
+- Pipeline Status:
 ![image-58](https://github.com/user-attachments/assets/6821c8b5-117e-4d18-8de2-b6c52706367f)
 ![image-59](https://github.com/user-attachments/assets/2e66e62f-6d5d-4aa4-901e-bfa9d84bc2ec)
 
@@ -1340,124 +1353,25 @@ replicaset.apps/mysql-f5c84b88             1         1         1       43m
 
 ```
 ![image-61](https://github.com/user-attachments/assets/aee77798-07f0-4c24-ac0d-842109c350d8)
+
+
+- **Nexus Status**
 ![image-62](https://github.com/user-attachments/assets/3b3ebd6f-21df-4300-a129-5d6a78c44410)
+
+- **SonarQube Status**
 ![image-63](https://github.com/user-attachments/assets/913917ba-cea4-4f1b-82c3-db7166720674)
 ![image-64](https://github.com/user-attachments/assets/14089ab0-3870-464e-a813-b4aca7eaffb9)
-![image-65](https://github.com/user-attachments/assets/b325403d-40c5-46a8-aa5b-f96b8c626f20)
-
-
-
-
-
-
-
-
-
-
-### <span style="color: cyan;"> Configure email:</span>
-Open a Jenkins UI and go to 
-    Dashboard> Manage Jenkins> Credentials> System> Global credentials (unrestricted) <br>
-
-![image-17](https://github.com/user-attachments/assets/6d87f8a3-ac4b-4e08-863a-db7af794396b)
-
-#### <span style="color: cyan;">Configure email notification </span>
-    Dashboard> Manage Jenkins> System
-Search for "```Extended E-mail Notification```"
-
-![image-18](https://github.com/user-attachments/assets/b7090f49-f40c-4994-9260-83f87841d15a)
-![image-19](https://github.com/user-attachments/assets/03d1a791-7bfc-4078-8852-5f1aaf6dc8a3)
-![image-20](https://github.com/user-attachments/assets/e180f343-8884-44b1-a4b5-ab50e5d8bddd)
-
-
-### <span style="color: cyan;"> Integrate SonarQube in Jenkins.</span>
-Go to Sonarqube and generate the token
-
-> Administration> Security> users>
-
-![image-24](https://github.com/user-attachments/assets/30d99980-a369-4409-bb73-14b943fbfe14)
-![image-25](https://github.com/user-attachments/assets/3b4d4339-2e5c-4fb4-916b-05259ff52100)
-![image-26](https://github.com/user-attachments/assets/8d8e4a99-6de7-452f-af08-e32a70d129b3)
-
-now, open Jenkins UI and create a credential for sonarqube
-
-> Dashboard> Manage Jenkins> Credentials> System> Global credentials (unrestricted)
-
-![image-27](https://github.com/user-attachments/assets/9dc502f1-fa13-4e79-b209-1fa669dc53ab)
-
-#### <span style="color: cyan;"> Configure the sonarqube scanner in Jenkins.</span>
-> Dashboard> Manage Jenkins> Tools
-
-Search for ```SonarQube Scanner installations``` 
-
-![image-28](https://github.com/user-attachments/assets/a6eb21a9-c5e9-4e3d-89c5-da58a5b5cfa2)
-![image-29](https://github.com/user-attachments/assets/51ced903-061b-409d-ae05-867f24dc2253)
-
-#### <span style="color: cyan;"> Configure the Github in Jenkins.</span>
-First generate the token first in github and configure it in Jenkins
-
-[Generate a token in Github](https://docs.catalyst.zoho.com/en/tutorials/githubbot/java/generate-personal-access-token/)
-
-Now, open Jenkins UI
-  > Dashboard> Manage Jenkins> Credentials> System> Global credentials (unrestricted)
-
-![image-30](https://github.com/user-attachments/assets/b5df0219-7925-448c-84b2-5b3c92ded7c7)
-
-
-#### <span style="color: cyan;"> Configure the sonarqube server in Jenkins.</span>
-On Jenkins UI:
-  > Dashboard> Manage Jenkins> System > Search for ```SonarQube installations``` 
-![image-31](https://github.com/user-attachments/assets/b3f27eb2-a87c-4e9f-8472-ae7f638cd86a)
-![image-32](https://github.com/user-attachments/assets/1cb62ce5-d282-454e-a7ef-c139e5e89a41)
-
-Now, we will confire the ```webhook``` in Sonarqube
-Open SonarQube UI:
-
-![image-33](https://github.com/user-attachments/assets/723238a3-0263-46a8-939b-c7bf96e24cdb)
-![image-34](https://github.com/user-attachments/assets/b45774d9-a8e8-42b5-bdf3-b922864edc15)
-
-### <span style="color: cyan;"> [Generate docker Token](https://www.geeksforgeeks.org/create-and-manage-docker-access-tokens/) and update in Jenkins.</span>
-  > Dashboard> Manage Jenkins> Credentials> System> Global credentials (unrestricted)
-
-- Configure the docker
-> Name- docker
-> [x] install automatically
-> docker version: latest
-### <span style="color: cyan;"> Set docker cred in Jenkins </span>
--    Dashboard>Manage Jenkins > Credentials> System>
-    Global credentials (unrestricted) &rArr; Click on "New credentials"
-> kind: "username with password"
-> username: your docker login ID
-> password: docker token
-> Id: docker-cred #it would be used in pipeline
-> Description:docker-cred
-![image-51](https://github.com/user-attachments/assets/fab143ab-7f19-48c4-8e4e-d83c3c155318)
-
-
-
-
-
-### <span style="color: Cyan;"> Verify application.
-- Now, time to acces the application 
-```bash
-<worker-public-ip>:31000
-```
-
-
-Congratulations! :-) You have deployed the application successfully.
-
-### <span style="color: Yellow;"> Status in Sonarqube
-
-
-### <span style="color: Yellow;"> Image status in DockerHub
-
-
 
 
 ### <span style="color: Yellow;"> Resources used in AWS:
 
 - EC2 instances
+![image-15](https://github.com/user-attachments/assets/5a9bd484-ee80-4500-a309-203ff89d09c1)
+
+
 
 - EKS Cluster 
+![image-65](https://github.com/user-attachments/assets/b325403d-40c5-46a8-aa5b-f96b8c626f20)
 
 
 ## <span style="color: Yellow;"> Environment Cleanup:
@@ -1466,13 +1380,24 @@ Congratulations! :-) You have deployed the application successfully.
    - then delete the __```virtual machine```__.
 
 #### To delete ```AWS EKS cluster```
-   -   Login into the Jenkins Master EC2 instance and change the directory to /k8s_setup_file, and run the following command to delete the cluste.
+   -   Login into the Terraform EC2 instance and change the directory to /k8s_setup_file, and run the following command to delete the cluste.
 ```bash
 cd /k8s_setup_file
 sudo terraform destroy --auto-approve
 ```
+I was getting below error message while deleting the EKS cluster
+![image-67](https://github.com/user-attachments/assets/7d3f41e5-a4c5-4bdd-91a8-b8f139629340)
+
+### Solution: 
+   - I. I have deleted the load balancer manually from the AWS console.
+   
+     ![image-66](https://github.com/user-attachments/assets/f7b3ea90-2260-46f0-b330-266d4654a02a)
+   - II. Delete the VPC manually and try to rerun the Terraform command again and it works :-)
+
+     ![image-68](https://github.com/user-attachments/assets/1822c909-ec48-414a-8068-28091a3687b4)
+
 #### Now, time to delete the ```Virtual machine```.
-Go to folder *<span style="color: cyan;">"13.Real-Time-DevOps-Project/Terraform_Code/Code_IAC_Terraform_box"</span>* and run the terraform command.
+Go to folder *<span style="color: cyan;">"15.Real-Time-DevOps-Project/Terraform_Code/Code_IAC_Terraform_box"</span>* and run the terraform command.
 ```bash
 cd Terraform_Code/
 
@@ -1483,14 +1408,8 @@ da---l          26/09/24   9:48 AM                Code_IAC_Terraform_box
 
 Terraform destroy --auto-approve
 ```
+![image-69](https://github.com/user-attachments/assets/06fc10c7-ed2a-41a6-9b6d-5e29f33b8b8e)
 
-![image-15](https://github.com/user-attachments/assets/5a9bd484-ee80-4500-a309-203ff89d09c1)
-
-
-![image-67](https://github.com/user-attachments/assets/7d3f41e5-a4c5-4bdd-91a8-b8f139629340)
-
-
-![image-66](https://github.com/user-attachments/assets/f7b3ea90-2260-46f0-b330-266d4654a02a)
 
 ## <span style="color: Yellow;"> Conclusion
 
@@ -1503,34 +1422,3 @@ For a deeper understanding and detailed steps on similar setups, feel free to ch
 __Ref Link__
 
 - [YouTube Link](https://www.youtube.com/watch?v=tstBG7RC9as&list=PLJcpyd04zn7p_nI0hoYRcqSqVS_9_eLaR&index=134 " Blue-Green Deployment CICD Pipeline")
-
-
-*********
-
-Terraform will perform the following actions:
-
-  # aws_vpc.vpc will be destroyed
-  - resource "aws_vpc" "vpc" {
-      - arn                                  = "arn:aws:ec2:us-east-1:373160674113:vpc/vpc-0913492e3cadc766c" -> null
-      - assign_generated_ipv6_cidr_block     = false -> null
-      - cidr_block                           = "10.0.0.0/16" -> null
-      - default_network_acl_id               = "acl-0a1c6acbc417b28a1" -> null
-      - default_route_table_id               = "rtb-04eaa216490fc9ce2" -> null
-      - default_security_group_id            = "sg-03bf35762fc5d6ddf" -> null
-      - dhcp_options_id                      = "dopt-9e06fce7" -> null
-      - enable_dns_hostnames                 = false -> null
-      - enable_dns_support                   = true -> null
-      - enable_network_address_usage_metrics = false -> null
-      - id                                   = "vpc-0913492e3cadc766c" -> null
-      - instance_tenancy                     = "default" -> null
-      - ipv6_netmask_length                  = 0 -> null
-      - main_route_table_id                  = "rtb-04eaa216490fc9ce2" -> null
-      - owner_id                             = "373160674113" -> null
-      - tags                                 = {} -> null
-      - tags_all                             = {} -> null
-        # (4 unchanged attributes hidden)
-    }
-
-delete the vpc manually and try to rerun the terraform command again.
-![image-68](https://github.com/user-attachments/assets/1822c909-ec48-414a-8068-28091a3687b4)
-![image-69](https://github.com/user-attachments/assets/06fc10c7-ed2a-41a6-9b6d-5e29f33b8b8e)
