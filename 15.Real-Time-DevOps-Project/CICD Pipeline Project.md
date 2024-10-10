@@ -109,7 +109,7 @@ terraform apply
 Once you run the terraform command, then we will verify the following things to make sure everything is setup via a terraform.
 
 ### <span style="color: Orange;"> Inspect the ```Cloud-Init``` logs</span>: 
-Once connected to EC2 instance then you can check the status of the ```user_data``` script by inspecting the [log files](https://github.com/mrbalraj007/DevOps_free_Bootcamp/blob/main/13.Real-Time-DevOps-Project/cloud-init-output.log).
+Once connected to EC2 instance then you can check the status of the ```user_data``` script by inspecting the [log files]([cloud-init-output.log](https://github.com/user-attachments/files/17321314/cloud-init-output.log)).
 ```bash
 # Primary log file for cloud-init
 sudo tail -f /var/log/cloud-init-output.log
