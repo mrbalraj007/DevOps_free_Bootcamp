@@ -1,6 +1,8 @@
 # <span style="color: Yellow;"> DevOps Love Story: CI/CD Pipeline for Valentine's Day</span>
 This Valentine’s Day DevOps CI/CD project offers an entertaining DevOps-themed walkthrough with Jenkins, SonarQube, Docker, and Trivy, focusing on a playful web app with a Valentine theme. It demonstrates an end-to-end pipeline setup, from setting up Jenkins and Docker to configuring code quality checks with SonarQube and conducting security scans with Trivy.
 
+![Valentine Day DevOps](https://github.com/user-attachments/assets/fc43d9eb-663c-4f11-a5ee-e456c5b37bd2)
+
 ## <span style="color: Yellow;"> Prerequisites </span>
 
 Before diving into this project, here are some skills and tools you should be familiar with:
@@ -632,6 +634,7 @@ http://35.174.11.211:8081/
 ```bash
 http://35.174.11.211:8081/yes.html
 ```
+![alt text](<Valentine Day DevOps CICD project.gif>)
 
 "If you try to build it again, it will fail because it will indicate that it already exists. Therefore, we are introducing Docker Compose, and the updated pipeline is provided below."
 

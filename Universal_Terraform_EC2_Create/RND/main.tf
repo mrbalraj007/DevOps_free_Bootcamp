@@ -1,27 +1,14 @@
-# main.tf
-
-terraform {
-  required_version = ">= 1.0.0"
-
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 4.0"
-    }
-  }
-}
-
 provider "aws" {
-  region = var.aws_region
+  region = "us-east-1" # Specify your desired region
 }
 
-# Data source to find the latest Ubuntu 22.04 LTS AMI
+# Fetch the latest Ubuntu 24.04 LTS AMI
 data "aws_ami" "ubuntu" {
   most_recent = true
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server*"] # For Ubuntu Instance.
   }
 
   filter {
@@ -29,98 +16,275 @@ data "aws_ami" "ubuntu" {
     values = ["hvm"]
   }
 
-  owners = ["099720109477"] # Canonical
+  owners = ["099720109477"] # Canonical owner ID for Ubuntu AMIs
 }
 
-# # Create an SSH key pair
-# resource "aws_key_pair" "jenkins_key" {
-#   key_name   = var.key_name
-#   public_key = file(var.public_key_path)
+
+# resource "aws_instance" "ansible_svr" {
+#   #ami           = "ami-0c55b159cbfafe1f0"  # Ubuntu 20.04 AMI for us-east-1, change based on your region
+#   ami                    = data.aws_ami.ubuntu.id
+#   instance_type          = "t2.micro"
+#   key_name               = "MYLABKEY" # Replace with your SSH key
+#   vpc_security_group_ids = [aws_security_group.ProjectSG.id]
+#   user_data              = templatefile("./scripts/user_data_ansible.sh", {})
+#   tags = {
+#     Name = "Ansible-svr"
+#   }
 # }
 
-# Create a security group to allow SSH and Jenkins UI access
-resource "aws_security_group" "jenkins_sg" {
-  name        = "jenkins_sg"
-  description = "Allow SSH and Jenkins UI access"
 
-  ingress {
-    description = "SSH"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [var.allowed_ssh_cidr]
+# resource "aws_instance" "docker_svr" {
+#   #ami           = "ami-0c55b159cbfafe1f0"  # Ubuntu 20.04 AMI for us-east-1, change based on your region
+#   ami                    = data.aws_ami.ubuntu.id
+#   instance_type          = "t2.micro"
+#   key_name               = "MYLABKEY" # Replace with your SSH key
+#   vpc_security_group_ids = [aws_security_group.ProjectSG.id]
+#   user_data              = templatefile("./scripts/user_data_docker.sh", {})
+#   tags = {
+#     Name = "docker-svr"
+#   }
+# }
+
+# resource "aws_instance" "jenkins_svr" {
+#   #ami           = "ami-0c55b159cbfafe1f0"  # Ubuntu 20.04 AMI for us-east-1, change based on your region
+#   ami                    = data.aws_ami.ubuntu.id
+#   instance_type          = "t2.large"
+#   key_name               = "MYLABKEY" # Replace with your SSH key
+#   vpc_security_group_ids = [aws_security_group.ProjectSG.id]
+#   user_data              = templatefile("./scripts/user_data_jenkins.sh", {})
+#   tags = {
+#     Name = "jenkins_svr"
+#   }
+# }
+
+# resource "aws_instance" "tomcat_svr" {
+#   #ami           = "ami-0c55b159cbfafe1f0"  # Ubuntu 20.04 AMI for us-east-1, change based on your region
+#   ami                    = data.aws_ami.ubuntu.id
+#   instance_type          = "t2.micro"
+#   key_name               = "MYLABKEY" # Replace with your SSH key
+#   vpc_security_group_ids = [aws_security_group.ProjectSG.id]
+#   user_data              = templatefile("./scripts/user_data_tomcat.sh", {})
+#   tags = {
+#     Name = "tomcat_svr"
+#   }
+# }
+
+
+# Security Group Configuration
+resource "aws_security_group" "ProjectSG" {
+  name        = "Project-SG"
+  description = "Allow inbound traffic"
+
+  dynamic "ingress" {
+    for_each = toset([22, 25, 80, 443, 6443, 465, 27017])
+    content {
+      description = "inbound rule for port ${ingress.value}"
+      from_port   = ingress.value
+      to_port     = ingress.value
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
   }
 
   ingress {
-    description = "Jenkins UI"
-    from_port   = 8080
-    to_port     = 8080
+    description = "Custom TCP Port Range"
+    from_port   = 3000
+    to_port     = 10000
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # For production, restrict this to trusted IPs
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "Custom TCP Port Range 30000 to 32767"
+    from_port   = 20000
+    to_port     = 32767
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
     from_port   = 0
     to_port     = 0
-    protocol    = "-1" # Allow all outbound traffic
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = {
-    Name = "jenkins_sg"
+    Name = "Project-VM-SG"
   }
 }
 
-# Launch an EC2 instance with Jenkins installed
-resource "aws_instance" "jenkins" {
-  ami                         = data.aws_ami.ubuntu.id
-  instance_type               = var.instance_type
-  key_name                    = var.key_name
-  vpc_security_group_ids      = [aws_security_group.jenkins_sg.id]
-  associate_public_ip_address = true
-
-  # Provide the user data script to install Jenkins and create user Balraj
-  user_data = templatefile("${path.module}/install_jenkins.sh.tpl", {
-    balraj_password = var.balraj_password
-  })
+# Separate EC2 Instance for Terraform with IAM Profile and Folder Copy
+resource "aws_instance" "terraform_vm" {
+  ami                    = data.aws_ami.ubuntu.id
+  key_name               = "MYLABKEY"  # Change key name as per your setup
+  instance_type          = "t3.medium" # Instance type for Terraform VM t2.large
+  iam_instance_profile   = aws_iam_instance_profile.k8s_cluster_instance_profile.name
+  vpc_security_group_ids = [aws_security_group.ProjectSG.id]
+  user_data              = templatefile("./scripts/user_data_terraform.sh", {})
 
   tags = {
-    Name = "JenkinsServer"
+    Name = "bootstrap-svr"
   }
 
-  # Output the public IP after creation
-  provisioner "local-exec" {
-    command = "echo Jenkins instance created with public IP: ${self.public_ip}"
+  root_block_device {
+    volume_size = 30
   }
-}
 
-# Verification: Check if Jenkins UI is accessible using remote-exec
-resource "null_resource" "verify_jenkins_ui" {
+  # Copy the k8s_setup_file folder after the instance is created
+  provisioner "file" {
+    source      = "k8s_setup_file"
+    destination = "/home/ubuntu/k8s_setup_file"
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file("MYLABKEY.pem")
+      host        = self.public_ip
+    }
+  }
+
+  # Set appropriate ownership for the copied folder
   provisioner "remote-exec" {
     inline = [
-      <<-EOT
-        #!/bin/bash
-        for i in {1..30}; do
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%%{http_code}" http://localhost:8080)
-          if [ "$HTTP_STATUS" -eq 200 ] || [ "$HTTP_STATUS" -eq 401 ]; then
-            echo "Jenkins UI is accessible."
-            exit 0
-          fi
-          echo "Waiting for Jenkins UI to become accessible..."
-          sleep 10
-        done
-        echo "Jenkins UI is not accessible after waiting."
-        exit 1
-      EOT
+      "sudo chown -R ubuntu:ubuntu /home/ubuntu/k8s_setup_file"
     ]
 
     connection {
       type        = "ssh"
       user        = "ubuntu"
-      private_key = file("MYLABKEY.PEM")
-      host        = aws_instance.jenkins.public_ip
+      private_key = file("MYLABKEY.pem")
+      host        = self.public_ip
     }
   }
+}
 
-  depends_on = [aws_instance.jenkins]
+
+# Custom IAM Policy for EKS with full permissions
+resource "aws_iam_policy" "eks_custom_policy" {
+  name        = "eks_custom_policy"
+  description = "Custom policy for EKS operations with full permissions"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid      = "VisualEditor0",
+        Effect   = "Allow",
+        Action   = "eks:*",
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+
+# Attach Custom EKS Policy to IAM Role
+resource "aws_iam_role_policy_attachment" "eks_custom_policy_attachment" {
+  role       = aws_iam_role.k8s_cluster_role.name
+  policy_arn = aws_iam_policy.eks_custom_policy.arn
+}
+
+
+# Create IAM Role
+resource "aws_iam_role" "k8s_cluster_role" {
+  name = "Role_k8s_cluster"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+# Create IAM permissions
+
+# Create Profile for EC2 
+resource "aws_iam_instance_profile" "k8s_cluster_instance_profile" {
+  name = "Role_k8s_cluster-Profile"
+  role = aws_iam_role.k8s_cluster_role.name
+}
+
+# Attach Full AmazonEKSClusterPolicy Permissions to IAM Role
+resource "aws_iam_role_policy_attachment" "eks_full_access" {
+  role       = aws_iam_role.k8s_cluster_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+}
+
+# Attach Full AmazonEKSServicePolicy Permissions to IAM Role
+resource "aws_iam_role_policy_attachment" "eksservice_full_access" {
+  role       = aws_iam_role.k8s_cluster_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
+}
+
+# Attach Full AmazonEC2ContainerRegistryReadOnly Services Permissions to IAM Role
+resource "aws_iam_role_policy_attachment" "containerreg_full_access" {
+  role       = aws_iam_role.k8s_cluster_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
+
+# Attach Full AmazonEKSWorkerNodePolicy Services Permissions to IAM Role
+resource "aws_iam_role_policy_attachment" "ekswork_full_access" {
+  role       = aws_iam_role.k8s_cluster_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+}
+
+# Attach Full AmazonEKS_CNI_Policy Permissions to IAM Role
+resource "aws_iam_role_policy_attachment" "ekscni_full_access" {
+  role       = aws_iam_role.k8s_cluster_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+}
+
+# Attach Full AmazonEC2FullAccess Permissions to IAM Role
+resource "aws_iam_role_policy_attachment" "ec2_full_access" {
+  role       = aws_iam_role.k8s_cluster_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
+}
+
+# Attach Full IAMFullAccess Permissions to IAM Role
+resource "aws_iam_role_policy_attachment" "iam_full_access" {
+  role       = aws_iam_role.k8s_cluster_role.name
+  policy_arn = "arn:aws:iam::aws:policy/IAMFullAccess"
+}
+
+# Attach Full AmazonVPCFullAccess Permissions to IAM Role
+resource "aws_iam_role_policy_attachment" "vpc_full_access" {
+  role       = aws_iam_role.k8s_cluster_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonVPCFullAccess"
+}
+
+# Attach Full ElasticLoadBalancingFullAccess Permissions to IAM Role
+resource "aws_iam_role_policy_attachment" "elb_full_access" {
+  role       = aws_iam_role.k8s_cluster_role.name
+  policy_arn = "arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess"
+}
+
+
+
+
+# output "Ansible_server_public_ip" {
+#   value = aws_instance.ansible_svr.public_ip
+# }
+
+# output "docker_server_public_ip" {
+#   value = aws_instance.docker_svr.public_ip
+# }
+
+# output "Jenkins_server_public_ip" {
+#   value = aws_instance.jenkins_svr.public_ip
+# }
+
+# output "tomcat_server_public_ip" {
+#   value = aws_instance.tomcat_svr.public_ip
+# }
+
+
+output "terraform_vm_public_ip" {
+  value = aws_instance.terraform_vm.public_ip
 }
