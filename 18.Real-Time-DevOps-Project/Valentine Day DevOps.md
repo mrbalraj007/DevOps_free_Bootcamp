@@ -138,7 +138,7 @@ Docker-build-step
 SonarQube Scanner
 ```
 
-### <span style="color: cyan;"> Configure SonarQube </span>
+### <span style="color: cyan;"> Configure Sonarbube </span>
 
 <public IP address: 9000>
 
@@ -634,7 +634,7 @@ http://35.174.11.211:8081/
 ```bash
 http://35.174.11.211:8081/yes.html
 ```
-![alt text](<Valentine Day DevOps CICD project.gif>)
+![Valentine Day DevOps CICD project](https://github.com/user-attachments/assets/4c005bbf-a308-4318-be9e-3bc05c7f58ff)
 
 "If you try to build it again, it will fail because it will indicate that it already exists. Therefore, we are introducing Docker Compose, and the updated pipeline is provided below."
 
